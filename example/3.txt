@@ -1,0 +1,22 @@
+func sum(a,b int) int
+{
+  return a+b
+}
+
+
+func main() int
+{
+  x := sum(1,2)	
+	
+  if x < 1 {
+    Ger :=  1
+  }
+  else
+  {
+    Get :=1
+  }
+
+  return 0
+}
+
+

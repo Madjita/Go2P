@@ -1,0 +1,48 @@
+type Stru1 struct {
+ a int
+ b float
+}union local type {
+ x int
+}
+
+type Example struct {
+ a int
+ b float
+}
+
+type Stru2 struct {
+ a int
+ b float
+ ex Example
+}
+
+var itemGlobal Stru2
+itemGlobal.a = 1
+itemGlobal.b = 1+3
+
+
+var itemG Stru2
+itemG.a = itemGlobal.a + itemGlobal.b
+
+
+func sum(x int, y int) int
+{
+  Res := 1+2
+  return 0
+}
+
+func main() int
+{
+  sum(1,2)
+
+  var item Stru2
+  item.a = itemGlobal.a + itemGlobal.b
+  item.b = 3-10
+  item.ex.a = 33
+
+  item.ex.b = item.a - item.ex.a
+
+  return 0
+}
+
+
