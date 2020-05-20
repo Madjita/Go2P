@@ -1,2 +1,13 @@
 # Go2P
- Translator PPP GO
+
+Translator PPP GO
+
+---
+
+Запустить exe (или дебагер) c terminal или (из среды) с параметрами:
+-in <file name>
+
+Example:
+-in /Users/serg/Documents/QtProject/1.txt
+  
+Где "file name" - это документ с кодом для анализатора
