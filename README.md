@@ -5,7 +5,7 @@ Translator PPP GO
 ---
 
 Запустить exe (или дебагер) c terminal или (из среды) с параметрами:
--in "filename"
+-in "file name"
 
 Example:
 -in /Users/serg/Documents/QtProject/1.txt
