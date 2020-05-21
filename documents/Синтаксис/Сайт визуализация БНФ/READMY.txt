@@ -1,0 +1,2 @@
+1) Download folder
+2) Open index.html
