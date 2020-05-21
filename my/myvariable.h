@@ -14,7 +14,7 @@ using namespace std;
 #include "my/recordhardtype.h"
 
 //Объект переменной
-extern class MyVariable
+class MyVariable
 {
 public:
     MyVariable();
