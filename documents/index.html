@@ -1,0 +1,627 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+   
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      
+      
+      <meta name="generator" content="Railroad Diagram Generator 1.60">
+      
+      <style type="text/css">
+    ::-moz-selection
+    {
+      color: #FFFCF0;
+      background: #0F0C00;
+    }
+    ::selection
+    {
+      color: #FFFCF0;
+      background: #0F0C00;
+    }      
+    .ebnf a, .grammar a
+    {
+      text-decoration: none;
+    }
+    .ebnf a:hover, .grammar a:hover
+    {
+      color: #050400;
+      text-decoration: underline;
+    }    
+    .signature
+    {
+      color: #806600;
+      font-size: 11px;
+      text-align: right;
+    }
+    body
+    {
+      font: normal 12px Verdana, sans-serif;
+      color: #0F0C00;
+      background: #FFFCF0;
+    }
+    a:link, a:visited
+    {
+      color: #0F0C00;
+    }
+    a:link.signature, a:visited.signature
+    {
+      color: #806600;
+    }
+    a.button, #tabs li a
+    {
+      padding: 0.25em 0.5em;
+      border: 1px solid #806600;
+      background: #F1E8C6;
+      color: #806600;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    a.button:hover, #tabs li a:hover
+    {
+      color: #050400;
+      background: #FFF6D1;
+      border-color: #050400;       
+    }     
+    #tabs
+    {
+      padding: 3px 10px;
+      margin-left: 0;
+      margin-top: 58px;
+      border-bottom: 1px solid #0F0C00;
+    }  
+    #tabs li
+    {
+      list-style: none;
+      margin-left: 5px;
+      display: inline;
+    }
+    #tabs li a
+    {     
+      border-bottom: 1px solid #0F0C00;
+    }
+    #tabs li a.active
+    {
+      color: #0F0C00;
+      background: #FFFCF0;
+      border-color: #0F0C00;
+      border-bottom: 1px solid #FFFCF0;
+      outline: none;
+    }
+    #divs div
+    {
+      display: none;
+      overflow:auto;
+    }
+    #divs div.active
+    {
+      display: block;
+    }
+    #text
+    {
+      border-color: #806600;
+      background: #FFFEFA;
+      color: #050400;
+    }
+    .small
+    {
+      vertical-align: top;
+      text-align: right;
+      font-size: 9px;
+      font-weight: normal;
+      line-height: 120%;
+    }
+    td.small
+    {
+      padding-top: 0px;
+    }
+    .hidden
+    {
+      visibility: hidden;
+    }
+    td:hover .hidden 
+    {
+      visibility: visible;
+    }
+    div.download
+    {
+      display: none;
+      background: #FFFCF0;
+      position: absolute;
+      right: 34px;
+      top: 94px;
+      padding: 10px;
+      border: 1px dotted #0F0C00;
+    }
+    #divs div.ebnf, .ebnf code
+    {
+      display: block;
+      padding: 10px;
+      background: #FFF6D1;
+      width: 992px;
+    }
+    #divs div.grammar
+    {
+      display: block;
+      padding-left: 16px;
+      padding-top: 2px;
+      padding-bottom: 2px;
+      background: #FFF6D1;
+    }
+    pre
+    {
+      margin: 0px;
+    }
+    .ebnf div
+    {
+      padding-left: 13ch;
+      text-indent: -13ch;
+    }
+    .ebnf code, .grammar code, textarea, pre
+    {
+      font:12px SFMono-Regular,Consolas,Liberation Mono,Menlo,Courier,monospace;
+    }
+    tr.option-line td:first-child
+    {
+      text-align: right
+    }
+    tr.option-text td
+    {
+      padding-bottom: 10px
+    }
+    table.palette
+    {
+      border-top: 1px solid #050400;
+      border-right: 1px solid #050400;
+      margin-bottom: 4px
+    }
+    td.palette
+    {
+      border-bottom: 1px solid #050400;
+      border-left: 1px solid #050400;
+    }
+    a.palette
+    {
+      padding: 2px 3px 2px 10px;
+      text-decoration: none;
+    }
+    .palette
+    {
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -o-user-select: none;
+      -ms-user-select: none;
+    }
+  </style>
+   </head>
+   
+   <body>
+      
+      <p style="font-size: 14px; font-weight:bold"><a name="recordNewType">recordNewType:</a></p><img border="0" src="diagram/recordNewType.png" height="463" width="939" usemap="#recordNewType.map"><map name="recordNewType.map"><area shape="rect" coords="543,1,689,33" href="#rowStructStatement" title="rowStructStatement"><area shape="rect" coords="672,195,854,227" href="#rowRecordStatementType" title="rowRecordStatementType"><area shape="rect" coords="576,311,752,343" href="#rowRecordStatementKey" title="rowRecordStatementKey"></map><p>
+         
+         <div class="ebnf"><code>
+               
+               <div><a href="#recordNewType" title="recordNewType">recordNewType</a></div>
+               
+               <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::= 'keyType' 'lcId' 'keyStruct' 'lcEnter'* 'lcLFigure' 'lcEnter'* ( <a href="#rowStructStatement" title="rowStructStatement">rowStructStatement</a> 'lcEnter'* )* 'lcRFigure' 'keyUnion' 'keyLocal'? ( 'keyType' 'lcEnter'* 'lcLFigure'
+                  ( 'lcEnter'* <a href="#rowRecordStatementType" title="rowRecordStatementType">rowRecordStatementType</a> )* | 'lcEnter'* 'lcLFigure' ( 'lcEnter'* <a href="#rowRecordStatementKey" title="rowRecordStatementKey">rowRecordStatementKey</a> )* ) 'lcEnter'* 'lcRFigure'</div></code></div>
+         </p>
+      
+      <p>no references</p><br><p style="font-size: 14px; font-weight:bold"><a name="rowRecordStatementType">rowRecordStatementType:</a></p><img border="0" src="diagram/rowRecordStatementType.png" height="37" width="169" usemap="#rowRecordStatementType.map"><map name="rowRecordStatementType.map"><area shape="rect" coords="95,1,139,33" href="#End" title="End"></map><p>
+         
+         <div class="ebnf"><code>
+               
+               <div><a href="#rowRecordStatementType" title="rowRecordStatementType">rowRecordStatementType</a></div>
+               
+               <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::= 'lcId' <a href="#End" title="End">End</a></div></code></div>
+         </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#addRecordNewRow" title="addRecordNewRow">addRecordNewRow</a></li>
+            
+            <li><a href="#recordNewType" title="recordNewType">recordNewType</a></li>
+            </ul>
+         </p><br><p style="font-size: 14px; font-weight:bold"><a name="rowRecordStatementKey">rowRecordStatementKey:</a></p><img border="0" src="diagram/rowRecordStatementKey.png" height="81" width="313" usemap="#rowRecordStatementKey.map"><map name="rowRecordStatementKey.map"><area shape="rect" coords="171,45,219,77" href="#type" title="type"><area shape="rect" coords="239,45,283,77" href="#End" title="End"></map><p>
+         
+         <div class="ebnf"><code>
+               
+               <div><a href="#rowRecordStatementKey" title="rowRecordStatementKey">rowRecordStatementKey</a></div>
+               
+               <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::= 'lcId' ( 'lcComma' 'lcId' )* <a href="#type" title="type">type</a> <a href="#End" title="End">End</a></div></code></div>
+         </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#addRecordNewRow" title="addRecordNewRow">addRecordNewRow</a></li>
+            
+            <li><a href="#recordNewType" title="recordNewType">recordNewType</a></li>
+            </ul>
+         </p><br><p style="font-size: 14px; font-weight:bold"><a name="addRecordNewRow">addRecordNewRow:</a></p><img border="0" src="diagram/addRecordNewRow.png" height="81" width="587" usemap="#addRecordNewRow.map"><map name="addRecordNewRow.map"><area shape="rect" coords="291,1,473,33" href="#rowRecordStatementType" title="rowRecordStatementType"><area shape="rect" coords="291,45,467,77" href="#rowRecordStatementKey" title="rowRecordStatementKey"><area shape="rect" coords="513,1,557,33" href="#End" title="End"></map><p>
+         
+         <div class="ebnf"><code>
+               
+               <div><a href="#addRecordNewRow" title="addRecordNewRow">addRecordNewRow</a></div>
+               
+               <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::= 'lcId' 'lcPlus' 'lcAssign' ( <a href="#rowRecordStatementType" title="rowRecordStatementType">rowRecordStatementType</a> | <a href="#rowRecordStatementKey" title="rowRecordStatementKey">rowRecordStatementKey</a> ) <a href="#End" title="End">End</a></div></code></div>
+         </p>
+      
+      <p>no references</p><br><p style="font-size: 14px; font-weight:bold"><a name="structNewType">structNewType:</a></p><img border="0" src="diagram/structNewType.png" height="115" width="843" usemap="#structNewType.map"><map name="structNewType.map"><area shape="rect" coords="543,1,689,33" href="#rowStructStatement" title="rowStructStatement"></map><p>
+         
+         <div class="ebnf"><code>
+               
+               <div><a href="#structNewType" title="structNewType">structNewType</a></div>
+               
+               <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::= 'keyType' 'lcId' 'keyStruct' 'lcEnter'* 'lcLFigure' 'lcEnter'* ( <a href="#rowStructStatement" title="rowStructStatement">rowStructStatement</a> 'lcEnter'* )* 'lcRFigure'</div></code></div>
+         </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#spaces" title="spaces">spaces</a></li>
+            </ul>
+         </p><br><p style="font-size: 14px; font-weight:bold"><a name="func">func:</a></p><img border="0" src="diagram/func.png" height="339" width="985" usemap="#func.map"><map name="func.map"><area shape="rect" coords="317,35,457,67" href="#funcArgsStatement" title="funcArgsStatement"><area shape="rect" coords="747,35,835,67" href="#returnType" title="returnType"><area shape="rect" coords="541,193,627,225" href="#statement" title="statement"><area shape="rect" coords="541,149,683,181" href="#StatementShortInit" title="StatementShortInit"><area shape="rect" coords="743,303,831,335" href="#funcReturn" title="funcReturn"></map><p>
+         
+         <div class="ebnf"><code>
+               
+               <div><a href="#func" title="func">func</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::= 'keyFunc' 'lcId' 'lcLcircl' ( <a href="#funcArgsStatement" title="funcArgsStatement">funcArgsStatement</a> 'lcComma'? )* 'lcRcircl' <a href="#returnType" title="returnType">returnType</a> 'lcEnter'* 'lcLFigure' 'lcEnter'* ( ( <a href="#statement" title="statement">statement</a> | <a href="#StatementShortInit" title="StatementShortInit">StatementShortInit</a> ) 'lcEnter'* )* <a href="#funcReturn" title="funcReturn">funcReturn</a>? 'lcRFigure'</div></code></div>
+         </p>
+      
+      <p>no references</p><br><p style="font-size: 14px; font-weight:bold"><a name="End">End:</a></p><img border="0" src="diagram/End.png" height="81" width="199"><p>
+         
+         <div class="ebnf"><code>
+               
+               <div><a href="#End" title="End">End</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::= 'lcEnter'</div>
+               
+               <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 'lcSemicolon'</div></code></div>
+         </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#StatementShortInit" title="StatementShortInit">StatementShortInit</a></li>
+            
+            <li><a href="#addRecordNewRow" title="addRecordNewRow">addRecordNewRow</a></li>
+            
+            <li><a href="#funcReturn" title="funcReturn">funcReturn</a></li>
+            
+            <li><a href="#import" title="import">import</a></li>
+            
+            <li><a href="#rowRecordStatementKey" title="rowRecordStatementKey">rowRecordStatementKey</a></li>
+            
+            <li><a href="#rowRecordStatementType" title="rowRecordStatementType">rowRecordStatementType</a></li>
+            
+            <li><a href="#rowStructStatement" title="rowStructStatement">rowStructStatement</a></li>
+            
+            <li><a href="#statement" title="statement">statement</a></li>
+            
+            <li><a href="#statementArray" title="statementArray">statementArray</a></li>
+            </ul>
+         </p><br><p style="font-size: 14px; font-weight:bold"><a name="statement">statement:</a></p><img border="0" src="diagram/statement.png" height="179" width="779" usemap="#statement.map"><map name="statement.map"><area shape="rect" coords="257,45,305,77" href="#type" title="type"><area shape="rect" coords="433,77,523,109" href="#expression" title="expression"><area shape="rect" coords="453,143,543,175" href="#expression" title="expression"><area shape="rect" coords="705,45,749,77" href="#End" title="End"></map><p>
+         
+         <div class="ebnf"><code>
+               
+               <div><a href="#statement" title="statement">statement</a></div>
+               
+               <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::= 'keyVar' 'lcId' ( 'lcComma' 'lcId' )* <a href="#type" title="type">type</a> 'lcEqual' ( <a href="#expression" title="expression">expression</a> | ( <a href="#expression" title="expression">expression</a> 'lcComma' )* ) <a href="#End" title="End">End</a></div></code></div>
+         </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#IfElse" title="IfElse">IfElse</a></li>
+            
+            <li><a href="#func" title="func">func</a></li>
+            
+            <li><a href="#loop" title="loop">loop</a></li>
+            
+            <li><a href="#spaces" title="spaces">spaces</a></li>
+            
+            <li><a href="#switchCase" title="switchCase">switchCase</a></li>
+            </ul>
+         </p><br><p style="font-size: 14px; font-weight:bold"><a name="statementArray">statementArray:</a></p><img border="0" src="diagram/statementArray.png" height="69" width="967" usemap="#statementArray.map"><map name="statementArray.map"><area shape="rect" coords="537,1,585,33" href="#type" title="type"><area shape="rect" coords="713,33,853,65" href="#statementArrayInit" title="statementArrayInit"><area shape="rect" coords="893,1,937,33" href="#End" title="End"></map><p>
+         
+         <div class="ebnf"><code>
+               
+               <div><a href="#statementArray" title="statementArray">statementArray</a></div>
+               
+               <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::= 'keyVar' 'lcId' 'lcLSquare' 'lcIntNum'? 'lcRSquare' <a href="#type" title="type">type</a> ( 'lcEqual' <a href="#statementArrayInit" title="statementArrayInit">statementArrayInit</a> )? <a href="#End" title="End">End</a></div></code></div>
+         </p>
+      
+      <p>no references</p><br><p style="font-size: 14px; font-weight:bold"><a name="statementArrayInit">statementArrayInit:</a></p><img border="0" src="diagram/statementArrayInit.png" height="147" width="937" usemap="#statementArrayInit.map"><map name="statementArrayInit.map"><area shape="rect" coords="385,79,433,111" href="#type" title="type"></map><p>
+         
+         <div class="ebnf"><code>
+               
+               <div><a href="#statementArrayInit" title="statementArrayInit">statementArrayInit</a></div>
+               
+               <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::= 'lcLSquare' 'lcIntNum'? 'lcRSquare' <a href="#type" title="type">type</a> 'lcLFigure' 'lcEnter'* 'lcIntNum' ( 'lcComma' 'lcEnter'* 'lcIntNum' )* 'lcRFigure'</div></code></div>
+         </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#statementArray" title="statementArray">statementArray</a></li>
+            </ul>
+         </p><br><p style="font-size: 14px; font-weight:bold"><a name="rowStructStatement">rowStructStatement:</a></p><img border="0" src="diagram/rowStructStatement.png" height="81" width="313" usemap="#rowStructStatement.map"><map name="rowStructStatement.map"><area shape="rect" coords="171,45,219,77" href="#type" title="type"><area shape="rect" coords="239,45,283,77" href="#End" title="End"></map><p>
+         
+         <div class="ebnf"><code>
+               
+               <div><a href="#rowStructStatement" title="rowStructStatement">rowStructStatement</a></div>
+               
+               <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::= 'lcId' ( 'lcComma' 'lcId' )* <a href="#type" title="type">type</a> <a href="#End" title="End">End</a></div></code></div>
+         </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#recordNewType" title="recordNewType">recordNewType</a></li>
+            
+            <li><a href="#structNewType" title="structNewType">structNewType</a></li>
+            </ul>
+         </p><br><p style="font-size: 14px; font-weight:bold"><a name="funcArgsStatement">funcArgsStatement:</a></p><img border="0" src="diagram/funcArgsStatement.png" height="81" width="249" usemap="#funcArgsStatement.map"><map name="funcArgsStatement.map"><area shape="rect" coords="171,45,219,77" href="#type" title="type"></map><p>
+         
+         <div class="ebnf"><code>
+               
+               <div><a href="#funcArgsStatement" title="funcArgsStatement">funcArgsStatement</a></div>
+               
+               <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::= 'lcId' ( 'lcComma' 'lcId' )* <a href="#type" title="type">type</a></div></code></div>
+         </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#func" title="func">func</a></li>
+            </ul>
+         </p><br><p style="font-size: 14px; font-weight:bold"><a name="funcReturn">funcReturn:</a></p><img border="0" src="diagram/funcReturn.png" height="113" width="355" usemap="#funcReturn.map"><map name="funcReturn.map"><area shape="rect" coords="281,1,325,33" href="#End" title="End"></map><p>
+         
+         <div class="ebnf"><code>
+               
+               <div><a href="#funcReturn" title="funcReturn">funcReturn</a></div>
+               
+               <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::= 'keyReturn' ( 'lcId' | 'lcIntNum' )? <a href="#End" title="End">End</a></div></code></div>
+         </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#func" title="func">func</a></li>
+            </ul>
+         </p><br><p style="font-size: 14px; font-weight:bold"><a name="spaces">spaces:</a></p><img border="0" src="diagram/spaces.png" height="247" width="283" usemap="#spaces.map"><map name="spaces.map"><area shape="rect" coords="49,177,125,209" href="#NewType" title="NewType"><area shape="rect" coords="49,133,135,165" href="#statement" title="statement"><area shape="rect" coords="49,89,161,121" href="#structNewType" title="structNewType"><area shape="rect" coords="49,45,123,77" href="#newFunc" title="newFunc"><area shape="rect" coords="49,1,109,33" href="#import" title="import"></map><p>
+         
+         <div class="ebnf"><code>
+               
+               <div><a href="#spaces" title="spaces">spaces</a>&nbsp;&nbsp;&nbsp;::= ( <a href="#NewType" title="NewType">NewType</a> | <a href="#statement" title="statement">statement</a> | <a href="#structNewType" title="structNewType">structNewType</a> | <a href="#newFunc" title="newFunc">newFunc</a> | <a href="#import" title="import">import</a> )* 'lcEof'</div></code></div>
+         </p>
+      
+      <p>no references</p><br><p style="font-size: 14px; font-weight:bold"><a name="import">import:</a></p><img border="0" src="diagram/import.png" height="129" width="685" usemap="#import.map"><map name="import.map"><area shape="rect" coords="481,17,525,49" href="#End" title="End"><area shape="rect" coords="249,93,293,125" href="#End" title="End"></map><p>
+         
+         <div class="ebnf"><code>
+               
+               <div><a href="#import" title="import">import</a>&nbsp;&nbsp;&nbsp;::= 'keyimport' ( 'lcLcircl' ( 'lcEnter'? 'lcString' <a href="#End" title="End">End</a> )+ 'lcRCircl' | 'lcString' <a href="#End" title="End">End</a> )</div></code></div>
+         </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#spaces" title="spaces">spaces</a></li>
+            </ul>
+         </p><br><p style="font-size: 14px; font-weight:bold"><a name="expression">expression:</a></p><img border="0" src="diagram/expression.png" height="257" width="201" usemap="#expression.map"><map name="expression.map"><area shape="rect" coords="49,1,121,33" href="#Addition" title="Addition"></map><p>
+         
+         <div class="ebnf"><code>
+               
+               <div><a href="#expression" title="expression">expression</a></div>
+               
+               <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::= <a href="#Addition" title="Addition">Addition</a></div>
+               
+               <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 'lcSmallerEQ'</div>
+               
+               <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 'lcLargerEQ'</div>
+               
+               <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 'lcSmaller'</div>
+               
+               <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 'lcLarger'</div>
+               
+               <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 'lcEqual'</div></code></div>
+         </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#IfElse" title="IfElse">IfElse</a></li>
+            
+            <li><a href="#StatementInit" title="StatementInit">StatementInit</a></li>
+            
+            <li><a href="#StatementShortInit" title="StatementShortInit">StatementShortInit</a></li>
+            
+            <li><a href="#Term" title="Term">Term</a></li>
+            
+            <li><a href="#Variable" title="Variable">Variable</a></li>
+            
+            <li><a href="#funcArgsCall" title="funcArgsCall">funcArgsCall</a></li>
+            
+            <li><a href="#loop" title="loop">loop</a></li>
+            
+            <li><a href="#statement" title="statement">statement</a></li>
+            
+            <li><a href="#switchCase" title="switchCase">switchCase</a></li>
+            </ul>
+         </p><br><p style="font-size: 14px; font-weight:bold"><a name="Addition">Addition:</a></p><img border="0" src="diagram/Addition.png" height="125" width="169" usemap="#Addition.map"><map name="Addition.map"><area shape="rect" coords="49,1,117,33" href="#Product" title="Product"></map><p>
+         
+         <div class="ebnf"><code>
+               
+               <div><a href="#Addition" title="Addition">Addition</a>&nbsp;::= <a href="#Product" title="Product">Product</a></div>
+               
+               <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 'lcPlus'</div>
+               
+               <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 'lcMinus'</div></code></div>
+         </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#expression" title="expression">expression</a></li>
+            </ul>
+         </p><br><p style="font-size: 14px; font-weight:bold"><a name="Product">Product:</a></p><img border="0" src="diagram/Product.png" height="125" width="167" usemap="#Product.map"><map name="Product.map"><area shape="rect" coords="49,1,101,33" href="#Term" title="Term"></map><p>
+         
+         <div class="ebnf"><code>
+               
+               <div><a href="#Product" title="Product">Product</a>&nbsp;&nbsp;::= <a href="#Term" title="Term">Term</a></div>
+               
+               <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 'lcStar'</div>
+               
+               <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 'lcSlash'</div></code></div>
+         </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#Addition" title="Addition">Addition</a></li>
+            </ul>
+         </p><br><p style="font-size: 14px; font-weight:bold"><a name="Term">Term:</a></p><img border="0" src="diagram/Term.png" height="125" width="497" usemap="#Term.map"><map name="Term.map"><area shape="rect" coords="179,1,249,33" href="#Number" title="Number"><area shape="rect" coords="179,45,251,77" href="#Variable" title="Variable"><area shape="rect" coords="267,89,357,121" href="#expression" title="expression"></map><p>
+         
+         <div class="ebnf"><code>
+               
+               <div><a href="#Term" title="Term">Term</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::= 'lcMinus'? ( <a href="#Number" title="Number">Number</a> | <a href="#Variable" title="Variable">Variable</a> | 'lcLCircl' <a href="#expression" title="expression">expression</a> 'lcRCircl' )</div></code></div>
+         </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#Product" title="Product">Product</a></li>
+            </ul>
+         </p><br><p style="font-size: 14px; font-weight:bold"><a name="Number">Number:</a></p><img border="0" src="diagram/Number.png" height="81" width="191"><p>
+         
+         <div class="ebnf"><code>
+               
+               <div><a href="#Number" title="Number">Number</a>&nbsp;&nbsp;&nbsp;::= 'lcIntNum'</div>
+               
+               <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 'lcRealNum'</div></code></div>
+         </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#Term" title="Term">Term</a></li>
+            </ul>
+         </p><br><p style="font-size: 14px; font-weight:bold"><a name="Variable">Variable:</a></p><img border="0" src="diagram/Variable.png" height="259" width="587" usemap="#Variable.map"><map name="Variable.map"><area shape="rect" coords="243,77,333,109" href="#expression" title="expression"><area shape="rect" coords="169,159,267,191" href="#funcArgsCall" title="funcArgsCall"></map><p>
+         
+         <div class="ebnf"><code>
+               
+               <div><a href="#Variable" title="Variable">Variable</a>&nbsp;::= 'lcId' ( 'lcLSquare' <a href="#expression" title="expression">expression</a> 'lcRSquare' )? ( 'lcPoint' 'lcId' ( 'lcLSquare' <a href="#expression" title="expression">expression</a> 'lcRSquare' )? )* ( 'lcLcircl' ( <a href="#funcArgsCall" title="funcArgsCall">funcArgsCall</a> 'lcComma'? )* 'lcRcircl' )?</div></code></div>
+         </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#Term" title="Term">Term</a></li>
+            </ul>
+         </p><br><p style="font-size: 14px; font-weight:bold"><a name="StatementShortInit">StatementShortInit:</a></p><img border="0" src="diagram/StatementShortInit.png" height="37" width="375" usemap="#StatementShortInit.map"><map name="StatementShortInit.map"><area shape="rect" coords="191,1,281,33" href="#expression" title="expression"><area shape="rect" coords="301,1,345,33" href="#End" title="End"></map><p>
+         
+         <div class="ebnf"><code>
+               
+               <div><a href="#StatementShortInit" title="StatementShortInit">StatementShortInit</a></div>
+               
+               <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::= 'lcId' 'lcAssign' <a href="#expression" title="expression">expression</a> <a href="#End" title="End">End</a></div></code></div>
+         </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#IfElse" title="IfElse">IfElse</a></li>
+            
+            <li><a href="#func" title="func">func</a></li>
+            
+            <li><a href="#loop" title="loop">loop</a></li>
+            
+            <li><a href="#switchCase" title="switchCase">switchCase</a></li>
+            </ul>
+         </p><br><p style="font-size: 14px; font-weight:bold"><a name="funcArgsCall">funcArgsCall:</a></p><img border="0" src="diagram/funcArgsCall.png" height="103" width="331" usemap="#funcArgsCall.map"><map name="funcArgsCall.map"><area shape="rect" coords="49,1,139,33" href="#expression" title="expression"><area shape="rect" coords="69,67,159,99" href="#expression" title="expression"></map><p>
+         
+         <div class="ebnf"><code>
+               
+               <div><a href="#funcArgsCall" title="funcArgsCall">funcArgsCall</a></div>
+               
+               <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::= <a href="#expression" title="expression">expression</a></div>
+               
+               <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| ( <a href="#expression" title="expression">expression</a> 'lcComma' )+</div></code></div>
+         </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#Variable" title="Variable">Variable</a></li>
+            </ul>
+         </p><br><p style="font-size: 14px; font-weight:bold"><a name="StatementInit">StatementInit:</a></p><img border="0" src="diagram/StatementInit.png" height="113" width="707" usemap="#StatementInit.map"><map name="StatementInit.map"><area shape="rect" coords="241,77,331,109" href="#expression" title="expression"><area shape="rect" coords="587,45,677,77" href="#expression" title="expression"></map><p>
+         
+         <div class="ebnf"><code>
+               
+               <div><a href="#StatementInit" title="StatementInit">StatementInit</a></div>
+               
+               <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::= 'lcId' ( 'lcLSquare' <a href="#expression" title="expression">expression</a> 'lcRSquare' )? ( 'lcPoint' 'lcId' ( 'lcLSquare' <a href="#expression" title="expression">expression</a> 'lcRSquare' )? )* 'lcEqual' <a href="#expression" title="expression">expression</a></div></code></div>
+         </p>
+      
+      <p>no references</p><br><p style="font-size: 14px; font-weight:bold"><a name="IfElse">IfElse:</a></p><img border="0" src="diagram/IfElse.png" height="363" width="753" usemap="#IfElse.map"><map name="IfElse.map"><area shape="rect" coords="105,123,195,155" href="#expression" title="expression"><area shape="rect" coords="463,45,549,77" href="#statement" title="statement"><area shape="rect" coords="463,1,605,33" href="#StatementShortInit" title="StatementShortInit"><area shape="rect" coords="437,233,523,265" href="#statement" title="statement"><area shape="rect" coords="437,189,579,221" href="#StatementShortInit" title="StatementShortInit"></map><p>
+         
+         <div class="ebnf"><code>
+               
+               <div><a href="#IfElse" title="IfElse">IfElse</a>&nbsp;&nbsp;&nbsp;::= 'keyIf' <a href="#expression" title="expression">expression</a> 'lcEnter'* 'lcLFigure' 'lcEnter'* ( ( <a href="#statement" title="statement">statement</a> | <a href="#StatementShortInit" title="StatementShortInit">StatementShortInit</a> ) 'lcEnter'* )* 'lcRFigure' ( 'keyElse' 'lcEnter'* 'lcLFigure' 'lcEnter'* ( ( <a href="#statement" title="statement">statement</a> | <a href="#StatementShortInit" title="StatementShortInit">StatementShortInit</a> ) 'lcEnter'* )* 'lcRFigure' )?</div></code></div>
+         </p>
+      
+      <p>no references</p><br><p style="font-size: 14px; font-weight:bold"><a name="loop">loop:</a></p><img border="0" src="diagram/loop.png" height="301" width="923" usemap="#loop.map"><map name="loop.map"><area shape="rect" coords="135,1,177,33" href="#lcId" title="lcId"><area shape="rect" coords="299,1,453,33" href="#StatmentInitShortFor" title="StatmentInitShortFor"><area shape="rect" coords="155,77,297,109" href="#StatementShortInit" title="StatementShortInit"><area shape="rect" coords="437,77,527,109" href="#expression" title="expression"><area shape="rect" coords="687,45,777,77" href="#expression" title="expression"><area shape="rect" coords="627,187,713,219" href="#statement" title="statement"><area shape="rect" coords="627,143,769,175" href="#StatementShortInit" title="StatementShortInit"></map><p>
+         
+         <div class="ebnf"><code>
+               
+               <div><a href="#loop" title="loop">loop</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::= 'keyFor' ( <a href="#lcId" title="lcId">lcId</a> 'lcComma' <a href="#StatmentInitShortFor" title="StatmentInitShortFor">StatmentInitShortFor</a> | ( <a href="#StatementShortInit" title="StatementShortInit">StatementShortInit</a> 'lcSemicolon' <a href="#expression" title="expression">expression</a> 'lcSemicolon' )? <a href="#expression" title="expression">expression</a> ) 'lcLFigure' 'lcEnter'* ( ( <a href="#statement" title="statement">statement</a> | <a href="#StatementShortInit" title="StatementShortInit">StatementShortInit</a> ) 'lcEnter'* )* 'lcRFigure'</div></code></div>
+         </p>
+      
+      <p>no references</p><br><p style="font-size: 14px; font-weight:bold"><a name="switchCase">switchCase:</a></p><img border="0" src="diagram/switchCase.png" height="439" width="1203" usemap="#switchCase.map"><map name="switchCase.map"><area shape="rect" coords="285,271,375,303" href="#expression" title="expression"><area shape="rect" coords="305,337,395,369" href="#expression" title="expression"><area shape="rect" coords="893,161,979,193" href="#statement" title="statement"><area shape="rect" coords="893,117,1035,149" href="#StatementShortInit" title="StatementShortInit"></map><p>
+         
+         <div class="ebnf"><code>
+               
+               <div><a href="#switchCase" title="switchCase">switchCase</a></div>
+               
+               <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;::= 'keySwitch' 'lcEnter'* 'lcLFigure' ( 'lcEnter'* 'keyCase' ( <a href="#expression" title="expression">expression</a> | ( <a href="#expression" title="expression">expression</a> 'lcComma' )* ) 'lcColon' 'lcEnter'* 'lcLFigure' 'lcEnter'* ( ( <a href="#statement" title="statement">statement</a> | <a href="#StatementShortInit" title="StatementShortInit">StatementShortInit</a> ) 'lcEnter'* )* 'lcRFigure' )+ 'lcRFigure'</div></code></div>
+         </p>
+      
+      <p>no references</p><br><hr>
+      
+      <p>
+         
+         <table class="signature" border="0">
+            
+            <tr>
+               
+               <td style="width: 100%">&nbsp;</td>
+               
+               <td valign="top">
+                  
+                  <nobr class="signature">... generated by <a name="Railroad-Diagram-Generator" class="signature" title="https://www.bottlecaps.de/rr/ui#nonterminal" href="https://www.bottlecaps.de/rr/ui#nonterminal" target="_blank">Railroad Diagram Generator</a></nobr>
+                  </td>
+               
+               <td><a name="Railroad-Diagram-Generator" title="https://www.bottlecaps.de/rr/ui#nonterminal" href="https://www.bottlecaps.de/rr/ui#nonterminal" target="_blank"><img border="0" src="diagram/Railroad-Diagram-Generator.png" height="16" width="16"></a></td>
+               </tr>
+            </table>
+         </p>
+      </body>
+   </html>

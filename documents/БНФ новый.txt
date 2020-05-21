@@ -1,0 +1,51 @@
+recordNewType ::= "keyType" "lcId" "keyStruct" "lcEnter"* "lcLFigure" ("lcEnter"* rowStructStatement)*  "lcEnter"* "lcRFigure" "keyUnion" "keyLocal"? (("keyType" "lcEnter"* "lcLFigure" ("lcEnter"* rowRecordStatementType)*  "lcEnter"* "lcRFigure" )|("lcEnter"* "lcLFigure" ("lcEnter"* rowRecordStatementKey)*  "lcEnter"* "lcRFigure" ))
+
+rowRecordStatementType ::= "lcId" End
+rowRecordStatementKey ::= "lcId" (("lcComma" "lcId")+)? type End
+
+addRecordNewRow ::= "lcId" "lcPlus" "lcAssign" (rowRecordStatementType|rowRecordStatementKey) End
+
+
+structNewType ::= "keyType" "lcId" "keyStruct" "lcEnter"* "lcLFigure" ("lcEnter"* rowStructStatement)*  "lcEnter"* "lcRFigure"
+
+func ::= "keyFunc" "lcId" "lcLcircl" (funcArgsStatement "lcComma"?)* "lcRcircl" returnType "lcEnter"* "lcLFigure" ("lcEnter"* (statement|StatementShortInit))*  "lcEnter"* funcReturn? "lcRFigure"
+
+End ::= "lcEnter"|"lcSemicolon"
+
+statement ::= "keyVar" "lcId" (("lcComma" "lcId")+)? type  ("lcEqual" (expression|(expression "lcComma")+)?)  End
+
+statementArray ::= "keyVar" "lcId" "lcLSquare" ("lcIntNum")? "lcRSquare" type  ("lcEqual" statementArrayInit)? End
+statementArrayInit ::= "lcLSquare" ("lcIntNum")? "lcRSquare" type "lcLFigure" "lcEnter"* "lcIntNum" ( "lcComma" "lcEnter"* "lcIntNum")+? "lcRFigure"
+
+rowStructStatement ::= "lcId" (("lcComma" "lcId")+)? type End
+
+funcArgsStatement ::= "lcId" (("lcComma" "lcId")+)? type
+
+funcReturn ::= "keyReturn" ("lcId"|"lcIntNum")? End
+
+spaces ::=  (NewType|statement|structNewType|newFunc|import)*  "lcEof" 
+
+import ::= "keyimport" (("lcLcircl" ("lcEnter"? "lcString" End)+ "lcRCircl")|("lcString" End))
+
+expression ::= Addition|"lcSmallerEQ"|"lcLargerEQ"|"lcSmaller"|"lcLarger"|"lcEqual"
+Addition ::= Product|"lcPlus"|"lcMinus"
+Product ::= Term|"lcStar"|"lcSlash"
+Term ::= "lcMinus"? (Number|Variable|("lcLCircl" expression "lcRCircl"))
+Number ::= "lcIntNum"|"lcRealNum"
+
+
+Variable ::= 'lcId' ( 'lcLSquare' expression 'lcRSquare' )? ( 'lcPoint' 'lcId' ( 'lcLSquare' expression 'lcRSquare' )? )* ( 'lcLcircl' ( funcArgsCall 'lcComma'? )* 'lcRcircl' )?
+
+StatementShortInit ::= "lcId" "lcAssign" expression  End
+
+
+funcArgsCall ::= expression | ( expression 'lcComma' )+
+
+StatementInit ::= 'lcId' ( 'lcLSquare' expression 'lcRSquare')? ( 'lcPoint' 'lcId' ( 'lcLSquare' expression 'lcRSquare')? )* 'lcEqual' expression
+
+
+IfElse   ::= 'keyIf' expression 'lcEnter'* 'lcLFigure' 'lcEnter'* ( ( statement | StatementShortInit ) 'lcEnter'* )* 'lcRFigure' ( 'keyElse' 'lcEnter'* 'lcLFigure' 'lcEnter'* ( ( statement | StatementShortInit ) 'lcEnter'* )* 'lcRFigure' )?
+
+loop ::=  'keyFor' ((lcId "lcComma" StatmentInitShortFor)| expression| (StatementShortInit "lcSemicolon" expression "lcSemicolon" expression)) "lcLFigure" ("lcEnter"* (statement|StatementShortInit))*  "lcEnter"* "lcRFigure"
+
+switchCase ::= "keySwitch"  'lcEnter'* "lcLFigure" ("lcEnter"* ("keyCase" (expression|(expression "lcComma")*)? "lcColon" 'lcEnter'* 'lcLFigure' 'lcEnter'* ( ( statement | StatementShortInit ) 'lcEnter'* )* 'lcRFigure'))+ "lcRFigure"
