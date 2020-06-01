@@ -1,5 +1,7 @@
 #include <iostream>
 
+
+
 #include "alien/scanner.h"
 #include "alien/CompileErrors.h"
 #include "alien/parser.h"
@@ -37,10 +39,24 @@ bool ReadAllBytes(string filename,string& data)
 
 #include <my/myvariable.h>
 
+
+
+//#include "my/intermediate.h"
+
+
+
 bool Start_program(Parser* pars);
 
 int main(int argc, char *argv[])
 {
+
+//    Intermediate inter;
+//    application app;
+//    app.len =1;
+//    app.typ = INTTYP;
+//    app.addr = 0;
+//    inter.OPERAND_constructor(opdType(0),&app);
+
     string data ="";
     string fileName ="";
     string fileNameOut ="";
@@ -185,4 +201,6 @@ int main(int argc, char *argv[])
 bool Start_program(Parser* pars)
 {
     auto main = pars->table.find_name_func("main");
+
+    return main;
 }

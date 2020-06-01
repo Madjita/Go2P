@@ -1,0 +1,10 @@
+func sum(a,b int)
+{
+   c :=  a*-b+a*-b
+   f :=  a*-b-a*-b
+   d :=  a+b
+   h :=  a-b
+
+   //s :=  1+2*(3-4)
+   //far := (x + y) * (y + z) + (x + y + z)
+}

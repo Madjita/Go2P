@@ -901,6 +901,24 @@ bool Parser::StatementShortInit()
                     cout << "Error: Find repeat label in Func body Statment."<<endl;
                     exit(-1);
                 }
+
+                element item;
+                item.appl.typ =  AUTO;
+                item.appl.len = 0;
+                item.appl.addr = 0;
+                item.name = nameId;
+                item.appl.name = nameId;
+                item.appl.val = "undef";
+                //пробую промежуточное представление
+                //auto oper1 = inter.OPERAND_constructor(nameVarOpd,&item.appl);
+                //inter.INSTRUCTION_constructor(assignOpc,oper1,new OPERAND(),nullptr);
+
+                auto operend = inter.create_myoperand(nameVarOpd,newFuncItem->get_variable_at(nameId));
+                inter.create_statement(assignOpc,operend); //Создать инструкцию присвоения
+
+
+                inter.add_operand(nameVarOpd,&item.appl);
+                inter.add_opcType(assignOpc);
             }
 
 
@@ -917,6 +935,7 @@ bool Parser::StatementShortInit()
 
     if(Expression())
     {
+        inter.add_last_oper();
         if(newFuncItem != nullptr)
         {
             newFuncItem->addNameThisType("auto");
@@ -929,6 +948,8 @@ bool Parser::StatementShortInit()
 
     if(End())
     {
+        inter.out_list();
+
         auto item = *vvMap_KeyData.rbegin();
         string variable_label = "";
 
@@ -1687,6 +1708,12 @@ _0:
                             if(Object_variable != nullptr)
                             {
                                 //мы нашли переменную, значит она объявленна и существует (все хорошо)
+
+                                //пробую промежуточное представление
+                                inter.add_operand(inter.create_myoperand(nameVarOpd,Object_variable));
+
+
+
                             }
                             else
                             {
@@ -1708,6 +1735,9 @@ _0:
                                     if(Object_variable != nullptr)
                                     {
                                         //Переменная является глобальной
+
+                                        //пробую промежуточное представление
+                                        inter.add_operand(inter.create_myoperand(nameVarOpd,Object_variable));
                                     }
                                     else
                                     {
@@ -1746,6 +1776,9 @@ _0:
 
             }
         }
+
+
+
 
         nextLex();
     }
@@ -1986,6 +2019,17 @@ bool Parser::Number()
 {
     if(lex == lcIntNum)
     {
+
+
+        //пробую промежуточное представление
+        CONST* item = new CONST;
+        item->typ =  INTTYP;
+        item->val.unum = scanAliend->GetIntValue();
+        inter.add_operand(constOpd,item);
+
+        inter.add_operand(inter.create_myoperand(constOpd,item));
+
+
         nextLex();
         goto _end;
     }
@@ -2002,17 +2046,19 @@ _end:
     return true;
 }
 
+
 bool Parser::Term()
 {
-    InformPosition position;
+    InformPosition position = scanAliend->getPosition();
 
-    if(lex == lcMinus)
-    {
-        nextLex();
-        goto _1;
-    }
 
-_1:
+//    if(lex == lcMinus)
+//    {
+//        find_minusUnOpc = true;
+//        nextLex();
+//    }
+
+//_1:
     if(Number())
     {
         goto _end;
@@ -2039,10 +2085,26 @@ _1:
     //    scanAliend->setPosition(position);
     //    nextLex();
 
+   // scanAliend->setPosition(position);
+
 
 _2:
     if(lex == lcLCircle)
     {
+
+//        //пробую промежуточное представление
+//        application* item = new application;
+//        item->typ =  INTTYP;
+//        item->len = 0;
+//        item->addr = 0;
+//        item->name = scanAliend->GetTxtValue();
+//        item->val = scanAliend->GetTxtValue();
+//        inter.add_operand(constOpd,item);
+
+        inter.set_auto_rang(LCircleOpc);
+
+        inter.add_opc(LCircleOpc);
+
         nextLex();
     }
     else
@@ -2058,6 +2120,10 @@ _2:
 _3:
     if(lex == lcRCircle)
     {
+
+//        inter.add_opcType(RCircleOpc);
+        inter.set_auto_rang(RCircleOpc);
+
         nextLex();
         goto _end;
     }
@@ -2170,18 +2236,27 @@ bool Parser::Product()
 
     if(lex == lcStar)
     {
+        //пробую промежуточное представление
+        inter.add_opc(starOpc);
+
         nextLex();
         goto _end;
     }
 
     if(lex == lcSlash)
     {
+        //пробую промежуточное представление
+        inter.add_opc(slashOpc);
+
         nextLex();
         goto _end;
     }
 
     if(lex == lcMod)
     {
+        //пробую промежуточное представление
+        inter.add_opc(modOpc);
+
         nextLex();
         goto _end;
     }
@@ -2199,6 +2274,7 @@ _end:
 
 bool Parser::Addition()
 {
+
     if(Product())
     {
         goto _end;
@@ -2206,15 +2282,61 @@ bool Parser::Addition()
 
     if(lex == lcPlus)
     {
+
+        if(vvMap_KeyData.rbegin()->size() > 1)
+        {
+            auto item = (vvMap_KeyData.rbegin()->rbegin()+1)->rbegin()->first;
+            if(item == lcId || item == lcIntNum || item == lcRealNum)
+            {
+                //пробую промежуточное представление
+                inter.add_opc(plusOpc);
+
+            }
+            else
+            {
+                inter.add_opc(plusUnOpc);
+            }
+        }
+        else
+        {
+            //пробую промежуточное представление
+            inter.add_opc(plusOpc);
+        }
+
         nextLex();
         goto _end;
     }
 
     if(lex == lcMinus)
     {
+
+        if(vvMap_KeyData.rbegin()->size() > 1)
+        {
+            auto item = (vvMap_KeyData.rbegin()->rbegin()+1)->rbegin()->first;
+            if(item == lcId || item == lcIntNum || item == lcRealNum)
+            {
+                //пробую промежуточное представление
+                inter.add_opc(minusOpc);
+
+            }
+            else
+            {
+               inter.add_opc(minusUnOpc);
+            }
+        }
+        else
+        {
+            //пробую промежуточное представление
+            inter.add_opc(minusOpc);
+        }
+
+
+
         nextLex();
         goto _end;
     }
+
+
 
     if(End())
     {

@@ -20,10 +20,19 @@ using namespace std;
 
 #include "my/table.h"
 
+#include "my/intermediate.h"
+
+
 class Parser
 {
 public:
     Parser(string fileData, CompileErrors &errors);
+
+    opcType type;
+    OPERAND* oper1;
+    OPERAND* oper2;
+
+    Intermediate inter;
 
     Scanner* scanAliend;
     LexClass lex;

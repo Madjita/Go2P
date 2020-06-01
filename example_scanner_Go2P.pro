@@ -25,6 +25,7 @@ SOURCES += \
         my/hardtype.cpp \
         main.cpp \
         my/ifelse.cpp \
+        my/intermediate.cpp \
         my/myvariable.cpp \
         my/recordhardtype.cpp \
         my/table.cpp \
@@ -46,6 +47,7 @@ HEADERS += \
     my/functype.h \
     my/hardtype.h \
     my/ifelse.h \
+    my/intermediate.h \
     my/myvariable.h \
     my/recordhardtype.h \
     my/table.h \

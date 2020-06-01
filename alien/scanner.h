@@ -70,9 +70,6 @@ enum LexClass
     keyString,
     keyByte,
 
-
-
-
     lcLCircle,			// круглые скобки '('
     lcRCircle,			// круглые скобки ')'
     lcLSquare,			// квадратные скобки '['
