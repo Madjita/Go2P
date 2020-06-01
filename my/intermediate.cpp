@@ -487,6 +487,11 @@ string Intermediate::opc(opcType typ)
 }
 
 
+void Intermediate::file_clear(string fileName)
+{
+    ofstream fileOut2(fileName, ios::binary | ios::trunc); //| ios::trunc
+    fileOut2.close();
+}
 
 void Intermediate::out_stek(string fileName, stack<MYINST*>* steck)
 {
@@ -894,6 +899,23 @@ bool Intermediate::add_operand(MYOPER *opdPtr)
     default:
     {
         add_right_operand(opdPtr);
+
+        if(myinstruction->rez == nullptr)
+        {
+
+            auto item = steck_select_->steck_no_priority.top();
+            steck_select_->steck_no_priority.pop();
+
+            myinstruction->rez =  steck_select_->steck_no_priority.top()->arg2;
+            steck_select_->steck_no_priority.push(item);
+
+
+        }
+
+        auto inPtr = create_instruction();
+        myinstruction->next = inPtr;
+        myinstruction = myinstruction->next;
+
         break;
     }
     }
@@ -959,6 +981,15 @@ bool Intermediate::add_opc(opcType typ)
                 myinstruction->next = inPtr;
                 myinstruction = myinstruction->next;
             }
+
+            if(typ == minusUnOpc || typ == plusUnOpc )
+            {
+                steck_select_->steck_no_priority.top()->arg2 = create_myoperand(tmpVarOpd,nullptr);
+                auto inPtr = create_instruction();
+                myinstruction->next = inPtr;
+                myinstruction = myinstruction->next;
+            }
+
         }
 
 
@@ -980,11 +1011,15 @@ bool Intermediate::add_opc(opcType typ)
 
 bool Intermediate::add_last_oper()
 {
-    if(myinstruction->opc == noValueOpc)
-    {
-        steck_begin_->steck_no_priority.top()->arg2 = myinstruction->arg1;
-        delete  myinstruction;
-    }
+   // if(steck_begin_->steck_no_priority.size() < 2)
+   // {
+        if(myinstruction->opc == noValueOpc && myinstruction->arg1 != nullptr)
+        {
+            steck_begin_->steck_no_priority.top()->arg2 = myinstruction->arg1;
+            delete  myinstruction;
+        }
+  //  }
+
 
     return true;
 }
@@ -1054,7 +1089,6 @@ bool Intermediate::add_inSteck()
                    }
 
 
-
                    while(!steck_select_->steck_tmp.empty())
                    {
                        steck_select_->steck_no_priority.push(steck_select_->steck_tmp.top());
@@ -1068,8 +1102,10 @@ bool Intermediate::add_inSteck()
            break;
         }
 
+        case plusUnOpc:
         case minusUnOpc:
         {
+
             if(steck_select_->steck_no_priority.top()->opc == assignOpc)
             {
                 add_rezult(steck_select_->steck_no_priority.top()->arg1);
@@ -1078,6 +1114,8 @@ bool Intermediate::add_inSteck()
             {
                 add_rezult(steck_select_->steck_no_priority.top()->arg2);
             }
+
+
             break;
         }
         default:
@@ -1085,12 +1123,12 @@ bool Intermediate::add_inSteck()
             if(steck_select_->steck_no_priority.top()->opc == assignOpc)
             {
                 add_rezult(steck_select_->steck_no_priority.top()->arg1);
-                add_right_operand(create_myoperand(tmpVarOpd,nullptr));
+                //add_right_operand(create_myoperand(tmpVarOpd,nullptr));
             }
             else
             {
                 add_rezult(steck_select_->steck_no_priority.top()->arg2);
-                add_right_operand(create_myoperand(tmpVarOpd,nullptr));
+                //add_right_operand(create_myoperand(tmpVarOpd,nullptr));
             }
             break;
         }
@@ -1121,19 +1159,29 @@ bool Intermediate::add_inSteck()
     }
 
 
-    switch (myinstruction->opc)
-    {
-    case minusUnOpc:
-    {
-        break;
-    }
-    default:
+    if((myinstruction->arg1 != nullptr && myinstruction->arg2 != nullptr) || myinstruction->opc == assignOpc)
     {
         auto inPtr = create_instruction();
         myinstruction->next = inPtr;
         myinstruction = myinstruction->next;
+    }
+
+
+    switch (myinstruction->opc)
+    {
+
+    case starOpc:
+    case minusUnOpc:
+    {
         break;
     }
+//    default:
+//    {
+//        auto inPtr = create_instruction();
+//        myinstruction->next = inPtr;
+//        myinstruction = myinstruction->next;
+//        break;
+//    }
     }
 
     return true;

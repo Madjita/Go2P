@@ -4,6 +4,7 @@ func sum(a,b int)
    f :=  a*-b-a*-b
    d :=  a+b
    h :=  a-b
+   k :=  24*5-120+5
 
    //s :=  1+2*(3-4)
    //far := (x + y) * (y + z) + (x + y + z)

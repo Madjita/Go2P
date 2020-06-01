@@ -285,6 +285,7 @@ public:
     string opc(opcType typ);
     bool out_list();
     void out_stek(string fileName, stack<MYINST *> *steck);
+    void file_clear(string fileName);
     void create_tmpNumber();
 
 

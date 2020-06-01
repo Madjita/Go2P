@@ -2839,6 +2839,10 @@ _end:
 
 bool Parser::Do()
 {
+    //Очистить файлы list
+    inter.file_clear("out_list2.txt");
+    inter.file_clear("out_list3.txt");
+
     lex = lcNoValue;
     nextLex(); //перейти на первую лексему
 
