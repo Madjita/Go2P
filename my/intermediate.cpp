@@ -481,6 +481,7 @@ string Intermediate::opc(opcType typ)
     case minusUnOpc:
     case  minusOpc:  str = "-";break;
     case assignOpc:  str = ":=";break;
+    case modOpc:     str = "%";break;
     }
 
     return str;
@@ -975,11 +976,11 @@ bool Intermediate::add_opc(opcType typ)
     {
         if(!steck_select_->steck.empty())
         {
-            if(steck_select_->steck_no_priority.top()->opc == minusUnOpc)
+            if(steck_select_->steck_no_priority.top()->opc == minusUnOpc && myinstruction == nullptr)
             {
-                //auto inPtr = create_instruction();
-                //myinstruction->next = inPtr;
-                //myinstruction = myinstruction->next;
+                auto inPtr = create_instruction();
+                myinstruction->next = inPtr;
+                myinstruction = myinstruction->next;
             }
 
             if(typ == minusUnOpc || typ == plusUnOpc )

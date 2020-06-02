@@ -416,7 +416,19 @@ _begin:
 
 
         string  result = "undef";
-        result = to_string(atoi(leftOperendCopy) % atoi(rightOperandCopy));
+
+        //Вставка чтоб не было ошибки удалить данный класс по завершению трех-ажресного кода
+        if(*rightOperandCopy == '-')
+        {
+            result = "0";
+        }
+        else
+        {
+            result = to_string(atoi(leftOperendCopy) % atoi(rightOperandCopy));
+        }
+
+
+        //result = to_string(atoi(leftOperendCopy) % atoi(rightOperandCopy));
         virtualExpression2.erase(virtualExpression2.begin()+position-1,virtualExpression2.begin()+position+2);
 
         map<LexClass,string> agr;
