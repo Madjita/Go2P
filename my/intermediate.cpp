@@ -977,9 +977,9 @@ bool Intermediate::add_opc(opcType typ)
         {
             if(steck_select_->steck_no_priority.top()->opc == minusUnOpc)
             {
-                auto inPtr = create_instruction();
-                myinstruction->next = inPtr;
-                myinstruction = myinstruction->next;
+                //auto inPtr = create_instruction();
+                //myinstruction->next = inPtr;
+                //myinstruction = myinstruction->next;
             }
 
             if(typ == minusUnOpc || typ == plusUnOpc )
@@ -1018,6 +1018,19 @@ bool Intermediate::add_last_oper()
             steck_begin_->steck_no_priority.top()->arg2 = myinstruction->arg1;
             delete  myinstruction;
         }
+        else
+        {
+            auto item = steck_begin_->steck_no_priority.top();
+            steck_begin_->steck_no_priority.pop();
+            if(item->arg2 != nullptr && item->arg1 == nullptr)
+            {
+               item->arg1 = steck_begin_->steck_no_priority.top()->arg2;
+               item->rez = create_myoperand(tmpVarOpd,nullptr);
+               steck_begin_->steck_no_priority.top()->arg2 = item->rez;
+
+            }
+            steck_begin_->steck_no_priority.push(item);
+        }
   //  }
 
 
@@ -1051,6 +1064,12 @@ bool Intermediate::add_inSteck()
         case plusOpc:
         {
            // проверить есть ли предыдущие операторы?
+
+
+           if(steck_select_->steck_no_priority.top()->arg1 == nullptr && steck_select_->steck_no_priority.top()->arg2 != nullptr)
+           {
+                add_last_oper();
+           }
 
            while(steck_select_->steck_no_priority.top()->opc != assignOpc || steck_select_->steck_no_priority.top()->opc != plusOpc || steck_select_->steck_no_priority.top()->opc != minusOpc)
            {
@@ -1097,6 +1116,34 @@ bool Intermediate::add_inSteck()
 
                    break;
                }
+               default:
+               {
+
+                   if(myinstruction->arg1 == nullptr && myinstruction->arg2 == nullptr && myinstruction->rez == nullptr)
+                   {
+
+                       add_left_operand(steck_select_->steck_no_priority.top()->arg2);
+                       steck_select_->steck_no_priority.top()->arg2 = create_myoperand(tmpVarOpd,nullptr);
+                       add_rezult(steck_select_->steck_no_priority.top()->arg2);
+                   }
+                   else
+                   {
+                       add_rezult(steck_select_->steck_no_priority.top()->arg2);
+                       add_right_operand(create_myoperand(tmpVarOpd,nullptr));
+                   }
+
+                   while(!steck_select_->steck_tmp.empty())
+                   {
+                       steck_select_->steck_no_priority.push(steck_select_->steck_tmp.top());
+                       steck_select_->steck_tmp.pop();
+                   }
+
+                   break;
+
+
+
+                   break;
+               }
            }
 
            break;
@@ -1118,6 +1165,25 @@ bool Intermediate::add_inSteck()
 
             break;
         }
+
+//        case modOpc:
+//        case slashOpc:
+//        case starOpc:
+//        {
+
+//            if(steck_select_->steck_no_priority.top()->opc == assignOpc)
+//            {
+//                add_rezult(steck_select_->steck_no_priority.top()->arg1);
+//                //add_right_operand(create_myoperand(tmpVarOpd,nullptr));
+//            }
+//            else
+//            {
+//                add_rezult(steck_select_->steck_no_priority.top()->arg2);
+//                //add_right_operand(create_myoperand(tmpVarOpd,nullptr));
+//            }
+//            break;
+//        }
+
         default:
         {
             if(steck_select_->steck_no_priority.top()->opc == assignOpc)
@@ -1127,8 +1193,24 @@ bool Intermediate::add_inSteck()
             }
             else
             {
-                add_rezult(steck_select_->steck_no_priority.top()->arg2);
-                //add_right_operand(create_myoperand(tmpVarOpd,nullptr));
+                //унарный плюс и унарный минус
+                if(steck_select_->steck_no_priority.top()->priority_rang == 3)
+                {
+                    auto item = steck_select_->steck_no_priority.top();
+                    steck_select_->steck_no_priority.pop();
+                    add_left_operand(steck_select_->steck_no_priority.top()->arg2);
+                    add_rezult(create_myoperand(tmpVarOpd,nullptr));
+                    steck_select_->steck_no_priority.top()->arg2 = myinstruction->rez;
+                    steck_select_->steck_no_priority.push(item);
+                }
+                else
+                {
+                   add_rezult(steck_select_->steck_no_priority.top()->arg2);
+                   //add_right_operand(create_myoperand(tmpVarOpd,nullptr));
+                }
+
+
+
             }
             break;
         }
