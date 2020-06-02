@@ -8,7 +8,7 @@ Table::Table()
 
 void Table::add_gloabals(LexClass lc, string name,LexClass lc_type, string type, string expression)
 {
-    MyVariable* variable = new MyVariable;
+    MyVariable* variable = new MyVariable(varGlobal,this);
     variable->set_lex(lc);
     variable->set_name(name);
     variable->set_lex_type(lc_type);
@@ -49,7 +49,7 @@ HardType *Table::create_object_hardType(string name_hardType)
 
 void Table::add_gloabals(LexClass lc, string name, LexClass lc_type, string type, HardType *item)
 {
-    MyVariable* variable = new MyVariable;
+    MyVariable* variable = new MyVariable(varGlobal,this);
     variable->set_lex(lc);
     variable->set_name(name);
     variable->set_lex_type(lc_type);

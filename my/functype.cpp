@@ -226,7 +226,7 @@ bool FuncType::set_variable_record(RecordHardType *newObject)
 
 void FuncType::add_variable()
 {
-    variables.push_back(new MyVariable);
+    variables.push_back(new MyVariable(varLocal,this));
 }
 
 void FuncType::remove_variable(MyVariable* item)

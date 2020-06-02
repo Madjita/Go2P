@@ -18,7 +18,7 @@ string HardType::getNameHardType()
 
 void HardType::add_variable()
 {
-    variables.push_back(new MyVariable);
+    variables.push_back(new MyVariable(varHardType,this));
 }
 
 MyVariable *HardType::get_variable_at(int position)
@@ -28,6 +28,11 @@ MyVariable *HardType::get_variable_at(int position)
 
 MyVariable *HardType::get_variable_at(string name)
 {
+    if(this == nullptr)
+    {
+        return nullptr;
+    }
+
     for(auto item: variables)
     {
         if(item->get_name() == name)

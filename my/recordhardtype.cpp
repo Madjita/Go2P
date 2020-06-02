@@ -141,7 +141,7 @@ void RecordHardType::setLocal(string data)
 
 void RecordHardType::add_variable()
 {
-    variables_.push_back(new MyVariable);
+    variables_.push_back(new MyVariable(varRecordType,this));
 }
 
 MyVariable *RecordHardType::get_variable_at(int position)
@@ -182,7 +182,7 @@ bool RecordHardType::add_variables_expression(string expression)
 
 void RecordHardType::add_variable_union()
 {
-    variables_union_.push_back(new MyVariable);
+    variables_union_.push_back(new MyVariable(varRecordType,this));
 }
 
 MyVariable *RecordHardType::get_variable_union_at(int position)

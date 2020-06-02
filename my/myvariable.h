@@ -13,11 +13,16 @@ using namespace std;
 #include "my/hardtype.h"
 #include "my/recordhardtype.h"
 
+class Table;
+
+
+
 //Объект переменной
 class MyVariable
 {
 public:
-    MyVariable();
+    MyVariable(varType var,void* parent = nullptr);
+    MyVariable(MyVariable* parent = nullptr);
     ~MyVariable();
 
     void set_lex(LexClass lc);
@@ -38,10 +43,25 @@ public:
 
     MyVariable* clone();
 
+    bool set_parent_var(MyVariable* parent);
+    bool parent_empty();
+    MyVariable *parent_get();
+
     //функция для записи кода
     void add_vvMap_KeyData(vector<vector<map<LexClass,string>>>& set_vvMap_KeyData,int start);
 
 private:
+//    //родитель
+//    union{
+//        Table* varGlobal;
+//        MyVariable* var;
+//        HardType* hardType;
+//        RecordHardType* recordType;
+//    }parent_;
+
+    MyVariable* parent_;
+
+
     //Лексема переменной
     LexClass lc_;
     //Лексема типа

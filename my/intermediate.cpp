@@ -514,6 +514,14 @@ void Intermediate::out_stek(string fileName, stack<MYINST*>* steck)
             }
             case nameVarOpd:
             {
+                auto tmpItem = steck->top()->arg1->val.var;
+
+                while(!tmpItem->parent_empty())
+                {
+                    str2 += tmpItem->parent_get()->get_name()+".";
+                    tmpItem = steck->top()->arg1->val.var->parent_get();
+                }
+
                 str2 += steck->top()->arg1->val.var->get_name()+"\t";
                 break;
             }
@@ -546,11 +554,20 @@ void Intermediate::out_stek(string fileName, stack<MYINST*>* steck)
             }
             case nameVarOpd:
             {
+                auto tmpItem = steck->top()->arg2->val.var;
+
+                while(!tmpItem->parent_empty())
+                {
+                    str2 += tmpItem->parent_get()->get_name()+".";
+                    tmpItem = steck->top()->arg2->val.var->parent_get();
+                }
+
                 str2 += steck->top()->arg2->val.var->get_name()+"\t";
                 break;
             }
             case tmpVarOpd:
             {
+
                 str2 += steck->top()->arg2->val.varTmp->name+"\t";
                 break;
             }

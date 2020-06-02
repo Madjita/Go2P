@@ -1709,11 +1709,6 @@ _0:
                             {
                                 //мы нашли переменную, значит она объявленна и существует (все хорошо)
 
-                                //пробую промежуточное представление
-                                inter.add_operand(inter.create_myoperand(nameVarOpd,Object_variable));
-
-
-
                             }
                             else
                             {
@@ -1737,7 +1732,7 @@ _0:
                                         //Переменная является глобальной
 
                                         //пробую промежуточное представление
-                                        inter.add_operand(inter.create_myoperand(nameVarOpd,Object_variable));
+                                        //inter.add_operand(inter.create_myoperand(nameVarOpd,Object_variable));
                                     }
                                     else
                                     {
@@ -1753,7 +1748,20 @@ _0:
                     else
                     {
                         auto prev_object = save_object_hard_type[save_object_hard_type.size()-1];
+                        auto parent = Object_variable;
                         Object_variable = prev_object->get_variable(name);
+
+                        if(Object_variable != nullptr)
+                        {
+                            Object_variable->set_parent_var(parent);
+                        }
+                        else
+                        {
+                            //Ошибка не инициализированная переменная
+                            cout << "Error: Variable or func call don't Init"<<endl;
+                            cout << "Error: Global variable don't Init"<<endl;
+                            exit(-1);
+                        }
                     }
 
 
@@ -1820,8 +1828,20 @@ _2:
     if(lex == lcPoint)
     {
         nextLex();
+
+        //новое
+        save_object_hard_type.push_back(Object_variable);
+
         goto _0;
     }
+
+    //Дописать чтоб было имя структуры (на данный момент есть лишь указатель на конкретную переменную в нутри стурктуры)
+    if(Object_variable != nullptr)
+    {
+        //пробую промежуточное представление
+        inter.add_operand(inter.create_myoperand(nameVarOpd,Object_variable));
+    }
+
 
     goto _end;
 

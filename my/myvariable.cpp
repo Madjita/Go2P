@@ -1,6 +1,39 @@
 #include "myvariable.h"
 
-MyVariable::MyVariable() {
+#include "my/table.h"
+
+MyVariable::MyVariable(varType var, void* parent)
+{
+    parent_ = nullptr;
+    variable_struct_ = nullptr;
+    variable_record_ = nullptr;
+    expression_ = "undef";
+}
+
+MyVariable::MyVariable(MyVariable* parent)
+{
+//    parent_.var = nullptr;
+//    parent_.hardType = nullptr;
+//    parent_.recordType = nullptr;
+//    parent_.varGlobal = nullptr;
+
+//    switch (var)
+//    {
+//        case varGlobal:
+//                parent_.var = static_cast<MyVariable*>(parent);
+//        break;
+//        case varLocal:
+//                parent_.var = nullptr;
+//        break;
+//        case varHardType:
+//            parent_.hardType = static_cast<HardType*>(parent);
+//        break;
+//        case varRecordType:
+//            parent_.recordType = static_cast<RecordHardType*>(parent);
+//        break;
+//    }
+
+    parent_ = parent;
 
     variable_struct_ = nullptr;
     variable_record_ = nullptr;
@@ -98,6 +131,26 @@ string MyVariable::get_expression() {
 MyVariable *MyVariable::clone()
 {
     return new MyVariable(*this);
+}
+
+bool MyVariable::set_parent_var(MyVariable *parent)
+{
+    parent_ = parent;
+}
+
+bool MyVariable::parent_empty()
+{
+    if(parent_ == nullptr)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+MyVariable *MyVariable::parent_get()
+{
+    return parent_;
 }
 
 void MyVariable::add_vvMap_KeyData(vector<vector<map<LexClass, string> > >& set_vvMap_KeyData, int start)

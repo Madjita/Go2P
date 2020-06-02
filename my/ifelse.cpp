@@ -38,7 +38,7 @@ void IfElse::remove_new_if_else()
 
 void IfElse::add_variable()
 {
-    variables.push_back(new MyVariable);
+    variables.push_back(new MyVariable(varLocal,this));
 }
 
 void IfElse::add_variable(MyVariable *point)
