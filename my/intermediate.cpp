@@ -493,12 +493,9 @@ void Intermediate::file_clear(string fileName)
     ofstream fileOut2(fileName, ios::binary | ios::trunc); //| ios::trunc
     fileOut2.close();
 }
-
-void Intermediate::out_stek(string fileName, stack<MYINST*>* steck)
+/*
+string Intermediate::out_stek(string& str2,stack<MYINST*>* steck)
 {
-    ofstream fileOut2(fileName, ios::binary | ios::app); //| ios::trunc
-    string str2 = "\n\n";
-
     MYINST* top;
     while(!steck->empty())
     {
@@ -623,223 +620,257 @@ void Intermediate::out_stek(string fileName, stack<MYINST*>* steck)
         steck_begin_->steck_tmp.pop();
     }
 
-    fileOut2 << str2;
-    fileOut2.close();
+
 
 }
+*/
 
-int tmpVariable = 0;
-void Intermediate::create_tmpNumber()
+string Intermediate::out_stek_2(string &str, MashineSteck *item, int tab,countSteck st)
 {
+    MYINST* top;
+    stack<MYINST*>* steck;
 
-    while(!steck_begin_->steck.empty())
+    switch (st)
     {
-      if(steck_begin_->steck.top()->rez->typ == tmpVarOpd)
-      {
-         if(steck_begin_->steck.top()->rez->val.varTmp->name == "")
-         {
-             tmpVariable++;
-             steck_begin_->steck.top()->rez->val.varTmp->name = "@t"+to_string(tmpVariable);
-         }
-      }
-
-      if(steck_begin_->steck.top()->arg1->typ == tmpVarOpd)
-      {
-          if(steck_begin_->steck.top()->arg1->val.varTmp->name == "")
-          {
-             tmpVariable++;
-             steck_begin_->steck.top()->arg1->val.varTmp->name = "@t"+to_string(tmpVariable);
-          }
-      }
-
-      steck_begin_->steck_tmp.push(steck_begin_->steck.top());
-      steck_begin_->steck.pop();
+    case st1:
+        steck = &item->steck;
+        break;
+    case st2:
+        steck = &item->steck_no_priority;
+        break;
     }
 
-    while(!steck_begin_->steck_tmp.empty())
+    while(!steck->empty())
     {
-        steck_begin_->steck.push(steck_begin_->steck_tmp.top());
-        steck_begin_->steck_tmp.pop();
+        top = steck->top();
+
+        //        for(int i=0 ; i < tab;i++)
+        //        {
+        //            str +="\t";
+        //        }
+
+        if(top->opc == LCircleOpc)
+        {
+            out_stek_2(str,item->next.top(),tab++,st);
+            item->steck_tmp.push(steck->top());
+            steck->pop();
+
+            item->next_tmp.push(item->next.top());
+            item->next.pop();
+
+            continue;
+        }
+
+        if(top->arg1 != nullptr)
+        {
+            switch (top->arg1->typ)
+            {
+            case constOpd:
+            {
+                str += to_string(steck->top()->arg1->val.cons->val.unum)+"\t";
+                break;
+            }
+            case nameVarOpd:
+            {
+                auto tmpItem = steck->top()->arg1->val.var;
+
+                while(!tmpItem->parent_empty())
+                {
+                    str += tmpItem->parent_get()->get_name()+".";
+                    tmpItem = steck->top()->arg1->val.var->parent_get();
+                }
+
+                str += steck->top()->arg1->val.var->get_name()+"\t";
+                break;
+            }
+            case tmpVarOpd:
+            {
+                str += steck->top()->arg1->val.varTmp->name+"\t";
+                break;
+            }
+            default:
+                str += "null\t";
+                break;
+            }
+
+        }
+        else
+        {
+            str += "null\t";
+        }
+
+        str +=opc(top->opc)+"\t";
+
+        if(top->arg2 != nullptr)
+        {
+            switch (top->arg2->typ)
+            {
+            case constOpd:
+            {
+                str += to_string(steck->top()->arg2->val.cons->val.unum)+"\t";
+                break;
+            }
+            case nameVarOpd:
+            {
+                auto tmpItem = steck->top()->arg2->val.var;
+
+                while(!tmpItem->parent_empty())
+                {
+                    str += tmpItem->parent_get()->get_name()+".";
+                    tmpItem = steck->top()->arg2->val.var->parent_get();
+                }
+
+                str += steck->top()->arg2->val.var->get_name()+"\t";
+                break;
+            }
+            case tmpVarOpd:
+            {
+
+                str += steck->top()->arg2->val.varTmp->name+"\t";
+                break;
+            }
+            default:
+                str += "null\t";
+                break;
+            }
+        }
+        else
+        {
+            str += "null\t";
+        }
+
+        str +="\t=\t";
+
+        if(top->rez != nullptr)
+        {
+            switch (top->rez->typ)
+            {
+            case constOpd:
+            {
+                str += to_string(steck->top()->rez->val.cons->val.unum)+"\t";
+                break;
+            }
+            case nameVarOpd:
+            {
+                str += steck->top()->rez->val.var->get_name()+"\t";
+                break;
+            }
+            case tmpVarOpd:
+            {
+                str += steck->top()->rez->val.varTmp->name+"\t";
+                break;
+            }
+            default:
+                str += "null\t";
+                break;
+            }
+        }
+        else
+        {
+            str += "null\t";
+        }
+
+        str += "priority_rang: "+to_string(steck->top()->priority_rang)+"\t number: "+to_string(steck->top()->number)+"\t\n";
+        item->steck_tmp.push(steck->top());
+        steck->pop();
+    }
+
+    while(!item->steck_tmp.empty())
+    {
+        steck->push(item->steck_tmp.top());
+        item->steck_tmp.pop();
+    }
+
+    while(!item->next_tmp.empty())
+    {
+        item->next.push(item->next_tmp.top());
+        item->next_tmp.pop();
+    }
+
+    return str;
+}
+
+void Intermediate::out_stek_file(string fileName,countSteck st)
+{
+    ofstream fileOut2(fileName, ios::binary | ios::app); //| ios::trunc
+    string str2 = "\n\n";
+
+
+    out_stek_2(str2,steck_begin_,0,st);
+
+    fileOut2 << str2;
+    fileOut2.close();
+}
+
+
+int tmpVariable = 0;
+void Intermediate::create_tmpNumber(MashineSteck* steck_select_)
+{
+
+    while(!steck_select_->steck.empty())
+    {
+
+        if(steck_select_->steck.top()->opc == LCircleOpc)
+        {
+            create_tmpNumber(steck_select_->next.top());
+            steck_select_->steck_tmp.push(steck_select_->steck.top());
+            steck_select_->steck.pop();
+            continue;
+        }
+
+        if(steck_select_->steck.top()->rez->typ == tmpVarOpd)
+        {
+            if(steck_select_->steck.top()->rez->val.varTmp->name == "")
+            {
+                tmpVariable++;
+                steck_select_->steck.top()->rez->val.varTmp->name = "@t"+to_string(tmpVariable);
+            }
+        }
+
+        if(steck_select_->steck.top()->arg1 != nullptr)
+        {
+            if(steck_select_->steck.top()->arg1->typ == tmpVarOpd)
+            {
+                if(steck_select_->steck.top()->arg1->val.varTmp->name == "")
+                {
+                    tmpVariable++;
+                    steck_select_->steck.top()->arg1->val.varTmp->name = "@t"+to_string(tmpVariable);
+                }
+            }
+        }
+
+
+        steck_select_->steck_tmp.push(steck_select_->steck.top());
+        steck_select_->steck.pop();
+    }
+
+    while(!steck_select_->steck_tmp.empty())
+    {
+        steck_select_->steck.push(steck_select_->steck_tmp.top());
+        steck_select_->steck_tmp.pop();
     }
 
 }
 
 int tabs = 0;
+
 bool Intermediate::out_list()
 {
 
-    create_tmpNumber();
-    out_stek("out_list2.txt",&steck_begin_->steck_no_priority);
-    out_stek("out_list3.txt",&steck_begin_->steck);
+    create_tmpNumber(steck_begin_);
+    out_stek_file("out_list2.txt",st1);
+    out_stek_file("out_list3.txt",st2);
 
     steck_begin_ = new MashineSteck;
     steck_select_ = steck_begin_;
+    steck_select_->parent = nullptr;
+
     myinstruction = create_instruction();
-
-
-//    ofstream fileOut2("out_list2.txt", ios::binary | ios::app); //| ios::trunc
-//    string str2 = "\n\n";
-
-//    MYINST* top;
-//    while(!steck_begin_->steck.empty())
-//    {
-//        top = steck_begin_->steck.top();
-//        if(top->arg1 != nullptr)
-//        {
-//            switch (top->arg1->typ)
-//            {
-//            case constOpd:
-//            {
-//                str2 += to_string(steck_begin_->steck.top()->arg1->val.cons->val.unum)+"\t";
-//                break;
-//            }
-//            case nameVarOpd:
-//            {
-//                str2 += steck_begin_->steck.top()->arg1->val.var->get_name()+"\t";
-//                break;
-//            }
-//            default:
-//                str2 += "null\t";
-//                break;
-//            }
-
-//        }
-//        else
-//        {
-//            str2 += "null\t";
-//        }
-
-//        str2 +=opc(top->opc);
-
-//        if(top->arg2 != nullptr)
-//        {
-//            switch (top->arg2->typ)
-//            {
-//            case constOpd:
-//            {
-//                str2 += to_string(steck_begin_->steck.top()->arg2->val.cons->val.unum)+"\t";
-//                break;
-//            }
-//            case nameVarOpd:
-//            {
-//                str2 += steck_begin_->steck.top()->arg2->val.var->get_name()+"\t";
-//                break;
-//            }
-//            default:
-//                str2 += "null\t";
-//                break;
-//            }
-//        }
-//        else
-//        {
-//            str2 += "\tnull\t";
-//        }
-
-//        str2 +="\t=\t";
-
-//        if(top->rez != nullptr)
-//        {
-//            switch (top->rez->typ)
-//            {
-//            case constOpd:
-//            {
-//                str2 += to_string(steck_begin_->steck.top()->rez->val.cons->val.unum)+"\t";
-//                break;
-//            }
-//            case nameVarOpd:
-//            {
-//                str2 += steck_begin_->steck.top()->rez->val.var->get_name()+"\t";
-//                break;
-//            }
-//            default:
-//                str2 += "null\t";
-//                break;
-//            }
-//        }
-//        else
-//        {
-//            str2 += "null\t";
-//        }
-
-//        str2 += "priority_rang: "+to_string(steck_begin_->steck.top()->priority_rang)+"\t number: "+to_string(steck_begin_->steck.top()->number)+"\t\n";
-//        steck_begin_->steck_tmp.push(steck_begin_->steck.top());
-//        steck_begin_->steck.pop();
-//    }
-
-//    while(!steck_begin_->steck_tmp.empty())
-//    {
-//        steck_begin_->steck.push(steck_begin_->steck_tmp.top());
-//        steck_begin_->steck_tmp.pop();
-//    }
-
-//    fileOut2 << str2;
-//    fileOut2.close();
-//    steck_begin_ = new MashineSteck;
-//    steck_select_ = steck_begin_;
-
-
-//    ofstream fileOut("out_list.txt", ios::binary | ios::trunc);
-
-//    INSTRUCTION* item = list->firstInstr;
-
-//    string str = "";
-
-//    do
-//    {
-
-//        if(item->arg1 != nullptr)
-//        {
-//            str +=  item->arg1->val.var->name;
-//            str +=  " " +opc(item->opc)+" ";
-//        }
-
-//        if(item->arg2 != nullptr)
-//        {
-//            str +=  item->arg2->val.var->name;
-//        }
-
-//        if(item->rez != nullptr)
-//        {
-//            str +=  "( "+item->rez->val.var->name +" )";
-//        }
-
-//        str +="\n";
-//        tabs++;
-//        for(int i=0; i < tabs;i++)
-//        {
-//            str += "\t";
-//        }
-
-
-//        if(item->arg1 != nullptr)
-//        {
-//            cout << item->arg1->val.var->name;
-//        }
-
-//        cout << " " +opc(item->opc)+" ";
-//        if(item->arg2 != nullptr)
-//        {
-//            cout << item->arg2->val.var->name;
-//        }
-
-//        if(item->rez != nullptr)
-//        {
-//            cout << "( "+item->rez->val.var->name +" )";
-//        }
-
-//        cout << endl;
-
-//        item = item->next;
-
-
-//    }while(item != nullptr);
-
-//    fileOut << str;
-//    fileOut.close();
 
     return true;
 
 }
+
 
 MYOPER* Intermediate::create_myoperand(opdType typ, void *val)
 {
@@ -984,11 +1015,50 @@ bool Intermediate::add_opc(opcType typ)
     {
     case LCircleOpc:
     {
-        steck_select_->next = new MashineSteck; //создаем новый стек (для скобок)
+
+        if(myinstruction->arg1 != nullptr && myinstruction->rez != nullptr)
+        {
+            myinstruction->arg2 = create_myoperand(tmpVarOpd,nullptr);
+
+            auto inPtr = create_instruction();
+            myinstruction->next = inPtr;
+            myinstruction = myinstruction->next;
+        }
+
+
+        command++;
+        myinstruction->number = command;
+        myinstruction->priority_rang = get_auto_rang(typ); // выявляем приоритет
+        myinstruction->opc = typ;
+
+        add_inSteck();
+
+
+
+        steck_select_->next.push(new MashineSteck); //создаем новый стек (для скобок)
         steck_selectPrev_ = steck_select_; // запоминаем родителя
-        steck_select_ = steck_select_->next; // переходим к дочернему объекту
+        steck_select_ = steck_select_->next.top(); // переходим к дочернему объекту
+        steck_select_->parent = steck_selectPrev_;
+
+
+        auto inPtr = create_instruction();
+        myinstruction->next = inPtr;
+        myinstruction = myinstruction->next;
+
         break;
     }
+    case RCircleOpc:
+    {
+        add_last_oper();
+        steck_select_ = steck_select_->parent; // возвращаемся на стек назад
+
+        auto inPtr = create_instruction();
+        myinstruction->next = inPtr;
+        myinstruction = myinstruction->next;
+
+        break;
+    }
+
     default:
     {
         if(!steck_select_->steck.empty())
@@ -1029,27 +1099,27 @@ bool Intermediate::add_opc(opcType typ)
 
 bool Intermediate::add_last_oper()
 {
-   // if(steck_begin_->steck_no_priority.size() < 2)
-   // {
-        if(myinstruction->opc == noValueOpc && myinstruction->arg1 != nullptr)
+    // if(steck_begin_->steck_no_priority.size() < 2)
+    // {
+    if(myinstruction->opc == noValueOpc && myinstruction->arg1 != nullptr)
+    {
+        steck_select_->steck_no_priority.top()->arg2 = myinstruction->arg1;
+        delete  myinstruction;
+    }
+    else
+    {
+        auto item = steck_select_->steck_no_priority.top();
+        steck_select_->steck_no_priority.pop();
+        if(item->arg2 != nullptr && item->arg1 == nullptr)
         {
-            steck_begin_->steck_no_priority.top()->arg2 = myinstruction->arg1;
-            delete  myinstruction;
-        }
-        else
-        {
-            auto item = steck_begin_->steck_no_priority.top();
-            steck_begin_->steck_no_priority.pop();
-            if(item->arg2 != nullptr && item->arg1 == nullptr)
-            {
-               item->arg1 = steck_begin_->steck_no_priority.top()->arg2;
-               item->rez = create_myoperand(tmpVarOpd,nullptr);
-               steck_begin_->steck_no_priority.top()->arg2 = item->rez;
+            item->arg1 = steck_select_->steck_no_priority.top()->arg2;
+            item->rez = create_myoperand(tmpVarOpd,nullptr);
+            steck_select_->steck_no_priority.top()->arg2 = item->rez;
 
-            }
-            steck_begin_->steck_no_priority.push(item);
         }
-  //  }
+        steck_select_->steck_no_priority.push(item);
+    }
+    //  }
 
 
     return true;
@@ -1081,90 +1151,90 @@ bool Intermediate::add_inSteck()
         case minusOpc:
         case plusOpc:
         {
-           // проверить есть ли предыдущие операторы?
+            // проверить есть ли предыдущие операторы?
 
 
-           if(steck_select_->steck_no_priority.top()->arg1 == nullptr && steck_select_->steck_no_priority.top()->arg2 != nullptr)
-           {
+            if(steck_select_->steck_no_priority.top()->arg1 == nullptr && steck_select_->steck_no_priority.top()->arg2 != nullptr)
+            {
                 add_last_oper();
-           }
+            }
 
-           while(steck_select_->steck_no_priority.top()->opc != assignOpc || steck_select_->steck_no_priority.top()->opc != plusOpc || steck_select_->steck_no_priority.top()->opc != minusOpc)
-           {
-
-
-               if(steck_select_->steck_no_priority.top()->opc == assignOpc || steck_select_->steck_no_priority.top()->opc == plusOpc || steck_select_->steck_no_priority.top()->opc == minusOpc)
-               {
-                   break;
-               }
-
-               steck_select_->steck_tmp.push(steck_select_->steck_no_priority.top());
-               steck_select_->steck_no_priority.pop();
-           }
+            while(steck_select_->steck_no_priority.top()->opc != assignOpc || steck_select_->steck_no_priority.top()->opc != plusOpc || steck_select_->steck_no_priority.top()->opc != minusOpc)
+            {
 
 
-           switch (steck_select_->steck_no_priority.top()->opc)
-           {
-               case assignOpc:
-               {
-                   // возвращаем в основной стек следующую операцию и берем от нее результат
-                   if(!steck_select_->steck_tmp.empty())
-                   {
-                       steck_select_->steck_no_priority.push(steck_select_->steck_tmp.top());
-                       steck_select_->steck_tmp.pop();
+                if(steck_select_->steck_no_priority.top()->opc == assignOpc || steck_select_->steck_no_priority.top()->opc == plusOpc || steck_select_->steck_no_priority.top()->opc == minusOpc)
+                {
+                    break;
+                }
 
-                       add_rezult(steck_select_->steck_no_priority.top()->rez);
-                       steck_select_->steck_no_priority.top()->rez = create_myoperand(tmpVarOpd,nullptr);
-                       add_left_operand(steck_select_->steck_no_priority.top()->rez);
-                       add_right_operand(create_myoperand(tmpVarOpd,nullptr));
-
-                   }
-                   else
-                   {
-                        add_rezult(steck_select_->steck_no_priority.top()->arg1);
-                        add_right_operand(create_myoperand(tmpVarOpd,nullptr));
-                   }
+                steck_select_->steck_tmp.push(steck_select_->steck_no_priority.top());
+                steck_select_->steck_no_priority.pop();
+            }
 
 
-                   while(!steck_select_->steck_tmp.empty())
-                   {
-                       steck_select_->steck_no_priority.push(steck_select_->steck_tmp.top());
-                       steck_select_->steck_tmp.pop();
-                   }
+            switch (steck_select_->steck_no_priority.top()->opc)
+            {
+            case assignOpc:
+            {
+                // возвращаем в основной стек следующую операцию и берем от нее результат
+                if(!steck_select_->steck_tmp.empty())
+                {
+                    steck_select_->steck_no_priority.push(steck_select_->steck_tmp.top());
+                    steck_select_->steck_tmp.pop();
 
-                   break;
-               }
-               default:
-               {
+                    add_rezult(steck_select_->steck_no_priority.top()->rez);
+                    steck_select_->steck_no_priority.top()->rez = create_myoperand(tmpVarOpd,nullptr);
+                    add_left_operand(steck_select_->steck_no_priority.top()->rez);
+                    add_right_operand(create_myoperand(tmpVarOpd,nullptr));
 
-                   if(myinstruction->arg1 == nullptr && myinstruction->arg2 == nullptr && myinstruction->rez == nullptr)
-                   {
-
-                       add_left_operand(steck_select_->steck_no_priority.top()->arg2);
-                       steck_select_->steck_no_priority.top()->arg2 = create_myoperand(tmpVarOpd,nullptr);
-                       add_rezult(steck_select_->steck_no_priority.top()->arg2);
-                   }
-                   else
-                   {
-                       add_rezult(steck_select_->steck_no_priority.top()->arg2);
-                       add_right_operand(create_myoperand(tmpVarOpd,nullptr));
-                   }
-
-                   while(!steck_select_->steck_tmp.empty())
-                   {
-                       steck_select_->steck_no_priority.push(steck_select_->steck_tmp.top());
-                       steck_select_->steck_tmp.pop();
-                   }
-
-                   break;
+                }
+                else
+                {
+                    add_rezult(steck_select_->steck_no_priority.top()->arg1);
+                    add_right_operand(create_myoperand(tmpVarOpd,nullptr));
+                }
 
 
+                while(!steck_select_->steck_tmp.empty())
+                {
+                    steck_select_->steck_no_priority.push(steck_select_->steck_tmp.top());
+                    steck_select_->steck_tmp.pop();
+                }
 
-                   break;
-               }
-           }
+                break;
+            }
+            default:
+            {
 
-           break;
+                if(myinstruction->arg1 == nullptr && myinstruction->arg2 == nullptr && myinstruction->rez == nullptr)
+                {
+                    add_left_operand(steck_select_->steck_no_priority.top()->arg2);
+                    steck_select_->steck_no_priority.top()->arg2 = create_myoperand(tmpVarOpd,nullptr);
+                    add_rezult(steck_select_->steck_no_priority.top()->arg2);
+
+                }
+                else
+                {
+                    add_rezult(steck_select_->steck_no_priority.top()->arg2);
+                    add_right_operand(create_myoperand(tmpVarOpd,nullptr));
+                }
+
+                while(!steck_select_->steck_tmp.empty())
+                {
+                    steck_select_->steck_no_priority.push(steck_select_->steck_tmp.top());
+                    steck_select_->steck_tmp.pop();
+                }
+
+                break;
+
+
+
+                break;
+            }
+            }
+
+            break;
         }
 
         case plusUnOpc:
@@ -1184,29 +1254,13 @@ bool Intermediate::add_inSteck()
             break;
         }
 
-//        case modOpc:
-//        case slashOpc:
-//        case starOpc:
-//        {
-
-//            if(steck_select_->steck_no_priority.top()->opc == assignOpc)
-//            {
-//                add_rezult(steck_select_->steck_no_priority.top()->arg1);
-//                //add_right_operand(create_myoperand(tmpVarOpd,nullptr));
-//            }
-//            else
-//            {
-//                add_rezult(steck_select_->steck_no_priority.top()->arg2);
-//                //add_right_operand(create_myoperand(tmpVarOpd,nullptr));
-//            }
-//            break;
-//        }
-
         default:
         {
             if(steck_select_->steck_no_priority.top()->opc == assignOpc)
             {
                 add_rezult(steck_select_->steck_no_priority.top()->arg1);
+
+                add_left_operand(create_myoperand(tmpVarOpd,nullptr));
                 //add_right_operand(create_myoperand(tmpVarOpd,nullptr));
             }
             else
@@ -1223,8 +1277,50 @@ bool Intermediate::add_inSteck()
                 }
                 else
                 {
-                   add_rezult(steck_select_->steck_no_priority.top()->arg2);
-                   //add_right_operand(create_myoperand(tmpVarOpd,nullptr));
+
+                    if(steck_select_->steck_no_priority.top()->opc == LCircleOpc)
+                    {
+                        if(myinstruction->arg1 == nullptr)
+                        {
+                            //add_left_operand(steck_select_->steck_no_priority.top()->rez);
+                            //add_rezult(create_myoperand(tmpVarOpd,nullptr));
+
+                            auto item = steck_select_->steck_no_priority.top();
+                            add_left_operand(item->rez);
+                            add_rezult(create_myoperand(tmpVarOpd,nullptr));
+
+                            steck_select_->steck_no_priority.pop();
+                            if(steck_select_->steck_no_priority.top()->opc == assignOpc)
+                            {
+                                steck_select_->steck_no_priority.top()->arg1 = myinstruction->rez;
+                            }
+                            else
+                            {
+                                steck_select_->steck_no_priority.top()->arg2 = myinstruction->rez;
+                            }
+                            steck_select_->steck_no_priority.push(item);
+                        }
+                        else
+                        {
+
+                        }
+                    }
+                    else
+                    {
+
+//                        if(myinstruction->opc == LCircleOpc)
+//                        {
+//                            if(myinstruction->arg1 == nullptr)
+//                            {
+//                                myinstruction->arg1 = steck_select_->steck_no_priority.top()->arg2;
+//                            }
+//                        }
+
+
+                        add_rezult(steck_select_->steck_no_priority.top()->arg2);
+                        //add_right_operand(create_myoperand(tmpVarOpd,nullptr));
+                    }
+
                 }
 
 
@@ -1245,8 +1341,36 @@ bool Intermediate::add_inSteck()
             steck_select_->steck.pop();
             rang_steck = steck_select_->steck.top()->priority_rang;
         }
-    }
 
+    }
+    else
+    {
+        if(steck_select_->parent != nullptr)
+        {
+            if(myinstruction->arg1 ==nullptr)
+            {
+                add_rezult(steck_select_->parent->steck_no_priority.top()->rez);
+                add_right_operand(create_myoperand(tmpVarOpd,nullptr));
+            }
+            else
+            {
+
+                if(steck_select_->steck_no_priority.empty())
+                {
+                    add_rezult(steck_select_->parent->steck_no_priority.top()->rez);
+                    add_right_operand(create_myoperand(tmpVarOpd,nullptr));
+                }
+                else
+                {
+                    add_rezult(create_myoperand(tmpVarOpd,nullptr));
+                    add_right_operand(create_myoperand(tmpVarOpd,nullptr));
+                }
+
+
+
+            }
+        }
+    }
 
 
     steck_select_->steck.push(myinstruction);
@@ -1275,13 +1399,13 @@ bool Intermediate::add_inSteck()
     {
         break;
     }
-//    default:
-//    {
-//        auto inPtr = create_instruction();
-//        myinstruction->next = inPtr;
-//        myinstruction = myinstruction->next;
-//        break;
-//    }
+        //    default:
+        //    {
+        //        auto inPtr = create_instruction();
+        //        myinstruction->next = inPtr;
+        //        myinstruction = myinstruction->next;
+        //        break;
+        //    }
     }
 
     return true;

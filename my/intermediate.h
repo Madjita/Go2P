@@ -218,13 +218,25 @@ struct MYOPER {
     MYOPER *next; // для организации списка операндов
 };
 
+
+
 //Стековая машина
 struct MashineSteck
 {
     stack<MYINST*> steck_no_priority;
     stack<MYINST*> steck;
     stack<MYINST*> steck_tmp; //промежуточный стек
-    MashineSteck* next;
+    stack<MashineSteck*> next;
+    stack<MashineSteck*> next_tmp;
+    MashineSteck* parent;
+};
+
+
+
+//Для вывода в файл
+enum countSteck{
+    st1, // Стек с приоритетом
+    st2 //  Стек без приоритета
 };
 
 
@@ -283,10 +295,14 @@ public:
     void set_auto_rang(opcType typ);
 
     string opc(opcType typ);
+
     bool out_list();
-    void out_stek(string fileName, stack<MYINST *> *steck);
+    //string out_stek(string& str,stack<MYINST *> *steck);
+
+    string out_stek_2(string& str, MashineSteck* item,int tab,countSteck st);
+    void out_stek_file(string fileName,countSteck st);
     void file_clear(string fileName);
-    void create_tmpNumber();
+    void create_tmpNumber(MashineSteck*);
 
 
 

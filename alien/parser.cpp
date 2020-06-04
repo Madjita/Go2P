@@ -2111,20 +2111,7 @@ bool Parser::Term()
 _2:
     if(lex == lcLCircle)
     {
-
-//        //пробую промежуточное представление
-//        application* item = new application;
-//        item->typ =  INTTYP;
-//        item->len = 0;
-//        item->addr = 0;
-//        item->name = scanAliend->GetTxtValue();
-//        item->val = scanAliend->GetTxtValue();
-//        inter.add_operand(constOpd,item);
-
-        inter.set_auto_rang(LCircleOpc);
-
         inter.add_opc(LCircleOpc);
-
         nextLex();
     }
     else
@@ -2140,9 +2127,7 @@ _2:
 _3:
     if(lex == lcRCircle)
     {
-
-//        inter.add_opcType(RCircleOpc);
-        inter.set_auto_rang(RCircleOpc);
+        inter.add_opc(RCircleOpc);
 
         nextLex();
         goto _end;
