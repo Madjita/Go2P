@@ -916,9 +916,6 @@ bool Parser::StatementShortInit()
                 auto operend = inter.create_myoperand(nameVarOpd,newFuncItem->get_variable_at(nameId));
                 inter.create_statement(assignOpc,operend); //Создать инструкцию присвоения
 
-
-                inter.add_operand(nameVarOpd,&item.appl);
-                inter.add_opcType(assignOpc);
             }
 
 
@@ -2045,7 +2042,7 @@ bool Parser::Number()
         CONST* item = new CONST;
         item->typ =  INTTYP;
         item->val.unum = scanAliend->GetIntValue();
-        inter.add_operand(constOpd,item);
+
 
         inter.add_operand(inter.create_myoperand(constOpd,item));
 
@@ -2291,7 +2288,7 @@ bool Parser::Addition()
         if(vvMap_KeyData.rbegin()->size() > 1)
         {
             auto item = (vvMap_KeyData.rbegin()->rbegin()+1)->rbegin()->first;
-            if(item == lcId || item == lcIntNum || item == lcRealNum)
+            if(item == lcId || item == lcIntNum || item == lcRealNum || item == lcRCircle)
             {
                 //пробую промежуточное представление
                 inter.add_opc(plusOpc);
@@ -2318,7 +2315,7 @@ bool Parser::Addition()
         if(vvMap_KeyData.rbegin()->size() > 1)
         {
             auto item = (vvMap_KeyData.rbegin()->rbegin()+1)->rbegin()->first;
-            if(item == lcId || item == lcIntNum || item == lcRealNum)
+            if(item == lcId || item == lcIntNum || item == lcRealNum || item == lcRCircle)
             {
                 //пробую промежуточное представление
                 inter.add_opc(minusOpc);

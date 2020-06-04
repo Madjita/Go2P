@@ -29,8 +29,6 @@ public:
     Parser(string fileData, CompileErrors &errors);
 
     opcType type;
-    OPERAND* oper1;
-    OPERAND* oper2;
 
     Intermediate inter;
 

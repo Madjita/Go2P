@@ -1,22 +1,11 @@
 #include "intermediate.h"
 
-OPD_LIST opdList;
+static int opdNum = 0; // Номер операнда (в порядке создания)
+static int tmpVarOpdNum = 0; // Номер временной переменной (в порядке создания)
 
 Intermediate::Intermediate()
 {
 
-    instruction = new INSTRUCTION;
-    instruction->opc = noValueOpc;
-    instruction->rez = nullptr;
-    instruction->arg1 = nullptr;
-    instruction->arg2 = nullptr;
-    instruction->next = nullptr;
-
-
-    list = new INSTR_LIST;
-    list->lastOpd = instruction->rez;
-    list->lastInstr = instruction;
-    list->firstInstr = instruction;
 
     priority_rang = 0;
     myinstruction = create_instruction();
@@ -29,407 +18,14 @@ Intermediate::Intermediate()
 }
 
 
-static int opdNum = 0; // Номер операнда (в порядке создания)
-static int tmpVarOpdNum = 0; // Номер временной переменной (в порядке создания)
-
-// Создание и заполнение структуры константы
-struct CONST *Intermediate::CONST_constructor(scalType typ, void *val)
-{
-    struct CONST *constPtr;
-    if((constPtr = (struct CONST*)malloc(sizeof(struct CONST)))==NULL)
-    {
-        //er(23);
-        exit(1);
-    }
-    constPtr->typ = typ;
-    if(typ == INTTYP) constPtr->val.unum = *((int *)val);
-    else if(typ == FLOATTYP) constPtr->val.fnum = *((float *)val);
-    return constPtr;
-}
-
-// Создание и заполнение структуры операнда
-OPERAND *Intermediate::OPERAND_constructor(opdType typ, void *val)
-{
-    struct OPERAND *opdPtr;
-
-    int OPERAND_size = sizeof(struct OPERAND);
-    if((opdPtr = (struct OPERAND*)malloc(OPERAND_size))==NULL)
-    {
-        //er(23);
-        exit(1);
-    }
-    opdPtr->ident = ++opdNum;
-    opdPtr->typ = typ;
-    opdPtr->next = NULL;
-    switch(typ)
-    {
-    case constOpd:
-        opdPtr->val.cons = (struct CONST *)val;
-        break;
-    case nameVarOpd:
-        opdPtr->val.var = (struct application *)val;
-        break;
-    case tmpVarOpd:
-        opdPtr->val.var = (struct application *)val; // организация и содержимое определятся позднее
-        break;
-    default:
-        opdPtr->val.var = NULL; //
-    }
-    OPD_LIST_append(&opdList, opdPtr);
-    return opdPtr;
-}
-
-// Вывод списка операндов в файл
-void Intermediate::OPD_LIST_out(struct OPD_LIST* list, FILE* outfil)
-{
-    struct OPERAND* p_tmp;
-    fprintf(outfil, "\n    Список операндов:\n");
-    if(list->last == NULL) {
-        fprintf(outfil, "Операнды отсутствуют!\n");
-        return;
-    }
-    p_tmp = list->last;
-    do {
-        char* typ;
-        char* vec_scal;
-        switch(p_tmp->next->typ) {
-        case nameVarOpd:
-            if(p_tmp->next->val.var->typ == INTTYP) typ = (char*)"int";
-            else typ = (char*)"float";
-            if(p_tmp->next->val.var->len == 0) vec_scal = (char*)"скаляр";
-            else vec_scal = (char*)"вектор";
-            fprintf(outfil, "%d: Объявленная переменная, %s, %s, адрес = %d\n",
-                    p_tmp->next->ident, typ, vec_scal, p_tmp->next->val.var->addr
-                    );
-            break;
-        case tmpVarOpd:
-            fprintf(outfil, "%d: Промежуточная переменная (не определяется)\n",
-                    p_tmp->next->ident
-                    );
-            /*
-    if(p_tmp->next->val.var->typ == INTTYP) typ = (char*)"int";
-    else typ = (char*)"float";
-    if(p_tmp->next->val.var->len == 0) vec_scal = (char*)"скаляр";
-    else vec_scal = (char*)"вектор";
-    fprintf(outfil, "%d: Промежуточная переменная, %s, %s\n",
-      p_tmp->next->ident, typ, vec_scal
-    );
-      */
-            break;
-        case constOpd:
-            if(p_tmp->next->val.cons->typ == INTTYP) {
-                typ = (char*)"int";
-                fprintf(outfil, "%d: Константа, %s, %d\n",
-                        p_tmp->next->ident, typ, p_tmp->next->val.cons->val.unum
-                        );
-            } else {
-                typ = (char*)"float";
-                fprintf(outfil, "%d: Константа, %s, %e\n",
-                        p_tmp->next->ident, typ, p_tmp->next->val.cons->val.fnum
-                        );
-            }
-            break;
-        case labelOpd:
-            fprintf(outfil, "%d: Метка\n",
-                    p_tmp->next->ident
-                    );
-            break;
-        default:
-            fprintf(outfil, "Структура операнда непонятна\n");
-        }
-        p_tmp = p_tmp->next;
-    } while(p_tmp != list->last);
-}
-
-// Добавление операнда к списку операндов
-void Intermediate::OPD_LIST_append(OPD_LIST* list,OPERAND*  opdPtr)
-{
-    if(list->last == NULL)
-        opdPtr->next = opdPtr;
-    else {
-        opdPtr->next = list->last->next;
-        list->last->next = opdPtr;
-    }
-    list->last = opdPtr;
-}
-
-// Создание и начальная установка операнда метки
-OPERAND* Intermediate::CreateLabel()
-{
-    struct INSTRUCTION* tmpInstrPtr; // указатель на команду - метку
-    // создается операнд - метка
-    struct OPERAND* tmpOpdPtr =
-            OPERAND_constructor(labelOpd, NULL);
-    // команда - метка с обратной связью на операнд
-    tmpInstrPtr = INSTRUCTION_constructor(labelOpc, tmpOpdPtr, NULL, NULL);
-    tmpOpdPtr->val.label = tmpInstrPtr;
-    return tmpOpdPtr;
-}
 
 
-// Создание и заполнение структуры команды
-struct INSTRUCTION* Intermediate::INSTRUCTION_constructor(opcType opc, struct OPERAND* arg1, OPERAND* arg2, OPERAND* rez)
-{
-    struct INSTRUCTION* iPtr;
-    if((iPtr = (struct INSTRUCTION*)malloc(sizeof(struct INSTRUCTION)))==NULL)
-    {
-        //er(23);
-        exit(1);
-    }
-    iPtr->opc = opc;
-    iPtr->arg1 = arg1;
-    iPtr->arg2 = arg2;
-    iPtr->rez = rez;
-    iPtr->next = NULL;
-    //iPtr->line = line; // строка
-    //iPtr->column = column; // колонка по симпольно
-    return iPtr;
-}
 
-// Создание и заполнение структуры списка команд промежуточного представления
-struct INSTR_LIST *Intermediate::INSTR_LIST_constructor(struct INSTRUCTION *fInstrPtr, struct INSTRUCTION *eInstrPtr, struct OPERAND *opdPtr)
 
-{
-    struct INSTR_LIST *iListPtr;
-    if((iListPtr = (struct INSTR_LIST*)malloc(sizeof(struct INSTR_LIST)))==NULL)
-    {
-        //er(23);
-        exit(1);
-    }
-    iListPtr->firstInstr = fInstrPtr;
-    iListPtr->lastInstr = eInstrPtr;
-    iListPtr->lastOpd = opdPtr;
-    return iListPtr;
-}
 
-// Конкатенация двух списков команд в первый
-// Замена или установка операнда списка не производится.
-// Она должна осуществляться явно в программе анализатора
-void Intermediate::INSTR_LIST_cat(struct INSTR_LIST **iListRecPtrPtr, struct INSTR_LIST *iListSrcPtr)
-{
-    // Проверка  на пустоту списков команд
-    if(*iListRecPtrPtr == NULL) // Список приемника пуст
-        if(iListSrcPtr == NULL) // Список источника пуст
-            return; // - Получили пустой результат
-        else { // а источник есть
-            *iListRecPtrPtr = iListSrcPtr;
-            return;
-        }
-    else // Список приемника есть
-        if(iListSrcPtr == NULL) // Список источника пуст
-            return; // - Получили результат, равный приемнику
-    // Конкатенация реально происходит при непустом источнике
-    if(iListSrcPtr->firstInstr != NULL) { // Источник не является пустым списком
-        if((*iListRecPtrPtr)->firstInstr != NULL) // Приемник - не пустой список
-            (*iListRecPtrPtr)->lastInstr->next = iListSrcPtr->firstInstr;
-        else
-            (*iListRecPtrPtr)->firstInstr = iListSrcPtr->firstInstr;
-        (*iListRecPtrPtr)->lastInstr  = iListSrcPtr->lastInstr;
-    }
-}
-
-// Добавление к списку команд отдельной команды
-void Intermediate::INSTR_LIST_append(INSTR_LIST **iListRecPtrPtr, INSTRUCTION *instrPtr)
-{
-    // Проверка на отсутствие списка команд и его формирование в этом случае
-    if(*iListRecPtrPtr == NULL) {// список команд отсутствует
-        *iListRecPtrPtr = INSTR_LIST_constructor(NULL, NULL, NULL);
-        (*iListRecPtrPtr)->firstInstr = instrPtr;
-        (*iListRecPtrPtr)->lastInstr = instrPtr;
-        return;
-    }
-    if((*iListRecPtrPtr)->firstInstr != NULL)
-        (*iListRecPtrPtr)->lastInstr->next = instrPtr;
-    else
-        (*iListRecPtrPtr)->firstInstr = instrPtr;
-    (*iListRecPtrPtr)->lastInstr = instrPtr;
-}
-
-// Вывод списка команд
-void Intermediate::INSTR_LIST_out(struct INSTR_LIST *iListRec, FILE* outfil)
-{
-    int arg1Ident, arg2Ident, rezIdent;
-    struct INSTRUCTION* tmpPtr;
-    fprintf(outfil, "\n           Список команд:\n");
-    if(iListRec == NULL) {
-        fprintf(outfil, "Список команд отсутствует!\n");
-        return;
-    }
-    if(iListRec->firstInstr == NULL) {
-        fprintf(outfil, "Список команд пуст!\n");
-        return;
-    }
-    for(tmpPtr = iListRec->firstInstr; tmpPtr != NULL; tmpPtr = tmpPtr->next) {
-        char *opcName;
-        switch(tmpPtr->opc) {
-        //      case addOpc: 	 opcName = (char*)"ADD";	break;
-        //      case assOpc: 	 opcName = (char*)"ASSIGN";	break;
-        //      case divOpc: 	 opcName = (char*)"DIV";	break;
-        //      case eqOpc: 	 opcName = (char*)"EQ";	break;
-        //      case emptyOpc: 	 opcName = (char*)"EMPTY";	break;
-        //      case exitOpc: 	 opcName = (char*)"EXIT";	break;
-        //      case geOpc: 	 opcName = (char*)"GE";	break;
-        //      case gotoOpc: 	 opcName = (char*)"GOTO";	break;
-        //      case gtOpc: 	 opcName = (char*)"GT";	break;
-        //      case ifOpc: 	 opcName = (char*)"IF";	break;
-        //      case inOpc: 	 opcName = (char*)"IN";	break;
-        //      case indexOpc: 	 opcName = (char*)"INDEX";	break;
-        //      case labelOpc: 	 opcName = (char*)"LABEL";	break;
-        //      case leOpc: 	 opcName = (char*)"LE";	break;
-        //      case ltOpc: 	 opcName = (char*)"LT";	break;
-        //      case minOpc: 	 opcName = (char*)"MIN";	break;
-        //      case modOpc: 	 opcName = (char*)"MOD";	break;
-        //      case multOpc: 	 opcName = (char*)"MULT";	break;
-        //      case neOpc: 	 opcName = (char*)"NE";	break;
-        //      case outOpc: 	 opcName = (char*)"OUT";	break;
-        //      case subOpc: 	 opcName = (char*)"SUB";	break;
-        //      case skipOutOpc: 	 opcName = (char*)"SKIPOUT";	break;
-        //      case spaceOutOpc:  opcName = (char*)"SPACEOUT";	break;
-        //      case tabOutOpc:    opcName = (char*)"TABOUT";	break;
-        default: opcName = (char*)"NODEF";
-        }
-        arg1Ident = (tmpPtr->arg1 == NULL) ? 0 : tmpPtr->arg1->ident;
-        arg2Ident = (tmpPtr->arg2 == NULL) ? 0 : tmpPtr->arg2->ident;
-        rezIdent = (tmpPtr->rez == NULL) ? 0 : tmpPtr->rez->ident;
-
-        fprintf(outfil, "%s\t%d,\t%d,\t%d\t// Строка = %d, столбец = %d\n",
-                opcName, arg1Ident, arg2Ident, rezIdent, tmpPtr->line, tmpPtr->column
-                );
-    }
-}
 
 
 //мои функции
-
-bool Intermediate::add_operand(opdType typ, void *val)
-{
-    OPERAND *opdPtr;
-    opdPtr = OPERAND_constructor(typ,val);
-
-    if(instruction->arg1 == nullptr)
-    {
-        instruction->arg1 = opdPtr;
-
-        if(priority_rang != 0)
-        {
-            instruction->priority_rang = priority_rang; //устанавливаем данному вырожению приоритет
-            //set_next_priori(priority_rang);
-        }
-    }
-    else
-    {
-        if(instruction->opc != noValueOpc)
-        {
-            if(instruction->arg2 == nullptr)
-            {
-                instruction->arg2 = opdPtr;
-                //instruction->rez  = opdPtr;
-
-                // Создаем новую инструкцию
-                INSTRUCTION* iPtr;
-                if((iPtr = (struct INSTRUCTION*)malloc(sizeof(struct INSTRUCTION)))==NULL)
-                {
-                    //er(23);
-                    exit(1);
-                }
-                iPtr->opc = noValueOpc;
-                iPtr->arg1 = nullptr;
-                iPtr->arg2 = nullptr;
-                iPtr->rez = instruction->arg2;
-                iPtr->next = nullptr;
-                //iPtr->line = line; // строка
-                //iPtr->column = column; // колонка по симпольно
-
-
-
-                INSTR_LIST_append(&list,iPtr);
-                instruction->next = iPtr;
-
-                instruction->priority_rang = priority_rang; //устанавливаем данному вырожению приоритет
-
-                instruction = instruction->next;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-bool Intermediate::add_opcType(opcType typ)
-{
-    switch (instruction->opc)
-    {
-    case noValueOpc:
-    {
-        instruction->opc = typ;
-
-        tmpVarOpdNum++;
-
-        //пробую промежуточное представление
-        application* item = new application;
-        item->typ =  INTTYP;
-        item->len = 0;
-        item->addr = 0;
-        item->name = "tmp_"+to_string(tmpVarOpdNum);
-        item->val = "tmp_"+to_string(tmpVarOpdNum);
-        item->name = "tmp_"+to_string(tmpVarOpdNum);
-
-        set_auto_rang(typ); //устанавливаем приоритет операции
-
-        add_operand(tmpVarOpd,item);
-        break;
-    }
-    case minusUnOpc:
-    {
-        break;
-    }
-    }
-
-    return true;
-}
-
-bool Intermediate::set_next_priori(int rang)
-{
-    auto copy_first = list->firstInstr;
-    auto copy_last = list->lastInstr;
-
-    switch (rang)
-    {
-    case 1:
-    {
-        break;
-    }
-
-    case 4:
-    {
-        if(list)
-
-            list->firstInstr = list->lastInstr;
-        list->lastInstr = copy_first;
-
-        list->firstInstr->next = copy_first->next; //скопировали указатель на следующий элимент от 1
-
-
-        break;
-    }
-
-
-    case 5:
-    {
-        break;
-    }
-    }
-
-    return true;
-}
 
 // устанавливает приоритет
 void Intermediate::set_auto_rang(opcType typ)
@@ -1168,8 +764,8 @@ bool Intermediate::add_inSteck()
                     //Если наткнулись на скобку то  посомтреть что с лева от скобки и справа (записать в аргумент и продолжить поиск)
                     if(steck_select_->steck_no_priority.top()->opc == LCircleOpc && myinstruction->arg1 == nullptr)
                     {
-                        if(!steck_select_->steck_tmp.empty())
-                        {
+                       // if(!steck_select_->steck_tmp.empty())
+                       // {
 
                             auto item = steck_select_->steck_no_priority.top();
 
@@ -1189,7 +785,16 @@ bool Intermediate::add_inSteck()
                                 steck_select_->steck_tmp.pop();
 
                                 //Берем результат скобки и записываем в 1 аргумент
-                                add_left_operand(steck_select_->steck_tmp.top()->rez);
+                                if(steck_select_->steck_tmp.empty())
+                                {
+                                   add_left_operand(steck_select_->steck_no_priority.top()->rez);
+                                }
+                                else
+                                {
+                                   add_left_operand(steck_select_->steck_tmp.top()->rez);
+                                }
+
+
                                 myinstruction->arg2 = create_myoperand(tmpVarOpd,nullptr);
                             }
                             else
@@ -1198,7 +803,7 @@ bool Intermediate::add_inSteck()
                                 steck_select_->steck_no_priority.pop();
                                 continue;
                             }
-                        }
+
                     }
 
 
@@ -1247,33 +852,37 @@ bool Intermediate::add_inSteck()
 
                 if(myinstruction->arg1 == nullptr && myinstruction->arg2 == nullptr && myinstruction->rez == nullptr)
                 {
-                    //Если наткнулись на скобку то записать в аргумент и продолжить поиск
-                    if(steck_select_->steck_no_priority.top()->opc == LCircleOpc)
-                    {
-                        if(!steck_select_->steck_tmp.empty())
-                        {
-                            add_left_operand(steck_select_->steck_tmp.top()->rez);
-                            myinstruction->arg2 = create_myoperand(tmpVarOpd,nullptr);
+//                    //Если наткнулись на скобку то записать в аргумент и продолжить поиск
+//                    if(steck_select_->steck_no_priority.top()->opc == LCircleOpc)
+//                    {
+//                        if(!steck_select_->steck_tmp.empty())
+//                        {
+//                            add_left_operand(steck_select_->steck_tmp.top()->rez);
+//                            myinstruction->arg2 = create_myoperand(tmpVarOpd,nullptr);
 
-                            steck_select_->steck_tmp.push(steck_select_->steck_no_priority.top());
-                            steck_select_->steck_no_priority.pop();
+//                            steck_select_->steck_tmp.push(steck_select_->steck_no_priority.top());
+//                            steck_select_->steck_no_priority.pop();
 
-                            //Если за скобкой следует равно то арг1 установить как результат
-                            if(steck_select_->steck_no_priority.top()->opc == assignOpc)
-                            {
-                                steck_select_->steck_no_priority.top()->arg1 = create_myoperand(tmpVarOpd,nullptr);
-                                add_rezult(steck_select_->steck_no_priority.top()->arg1);
-                            }
+//                            //Если за скобкой следует равно то арг1 установить как результат
+//                            if(steck_select_->steck_no_priority.top()->opc == assignOpc)
+//                            {
+//                                steck_select_->steck_no_priority.top()->arg1 = create_myoperand(tmpVarOpd,nullptr);
+//                                add_rezult(steck_select_->steck_no_priority.top()->arg1);
+//                            }
 
-                            //add_rezult(create_myoperand(tmpVarOpd,nullptr));
-                        }
-                    }
-                    else
-                    {
-                        add_left_operand(steck_select_->steck_no_priority.top()->arg2);
-                        steck_select_->steck_no_priority.top()->arg2 = create_myoperand(tmpVarOpd,nullptr);
-                        add_rezult(steck_select_->steck_no_priority.top()->arg2);
-                    }
+//                            //add_rezult(create_myoperand(tmpVarOpd,nullptr));
+//                        }
+//                    }
+//                    else
+//                    {
+//                        add_left_operand(steck_select_->steck_no_priority.top()->arg2);
+//                        steck_select_->steck_no_priority.top()->arg2 = create_myoperand(tmpVarOpd,nullptr);
+//                        add_rezult(steck_select_->steck_no_priority.top()->arg2);
+//                    }
+
+                    add_left_operand(steck_select_->steck_no_priority.top()->arg2);
+                    steck_select_->steck_no_priority.top()->arg2 = create_myoperand(tmpVarOpd,nullptr);
+                    add_rezult(steck_select_->steck_no_priority.top()->arg2);
                 }
                 else
                 {

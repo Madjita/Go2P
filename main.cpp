@@ -40,22 +40,10 @@ bool ReadAllBytes(string filename,string& data)
 #include <my/myvariable.h>
 
 
-
-//#include "my/intermediate.h"
-
-
-
 bool Start_program(Parser* pars);
 
 int main(int argc, char *argv[])
 {
-
-//    Intermediate inter;
-//    application app;
-//    app.len =1;
-//    app.typ = INTTYP;
-//    app.addr = 0;
-//    inter.OPERAND_constructor(opdType(0),&app);
 
 
     string data ="";

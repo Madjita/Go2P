@@ -36,7 +36,6 @@ struct application {
 };
 
 
-
 struct element {
     string name;
     struct application appl;
@@ -69,35 +68,6 @@ typedef enum {
     labelOpd    // операнд - метка
 } opdType;
 
-// Организация операнда
-struct OPERAND {
-    opdType typ; // тип операнда
-    union {
-        // ссылка на именованную или промежуточную переменную
-        application *var;
-        // ссылка на константу
-        CONST *cons;
-        // ссылка на метку
-        struct INSTRUCTION *label;
-    } val; // значение операнда
-    // Дополнительные параметры, обеспечивающие тестирование
-    int ident; // уникальный идентификатор операнда
-    OPERAND *next; // для организации списка операндов
-};
-
-//// �������� � ���������� ��������� ���࠭��
-//struct OPERAND* OPERAND_constructor(opdType, void*);
-
-// Организация списка операндов
-struct OPD_LIST {
-    struct OPERAND *last;
-};
-
-//// Добавление операнда к списку операндов
-//void OPD_LIST_append(struct OPD_LIST*, struct OPERAND*);
-
-//// Вывод списка операндов в файл
-//void OPD_LIST_out(struct OPD_LIST *, char *, char *);
 
 // Структуры данных и функции, обеспечивающие хранение и обработку
 // команд промежуточного представления
@@ -136,42 +106,7 @@ typedef enum {
     funcOpc,            //call func
 } opcType;
 
-//typedef enum {
-//  addOpc,	assOpc,		divOpc,		eqOpc,
-//  emptyOpc,     exitOpc,	geOpc,		gotoOpc,
-//  gtOpc,
-//  ifOpc,	inOpc,		indexOpc,	labelOpc,
-//  leOpc,	ltOpc,		minOpc,         modOpc,
-//  multOpc,	neOpc,          outOpc,		skipOutOpc,
-//  spaceOutOpc,  subOpc,         tabOutOpc
-//} opcType;
 
-// Организация промежуточной команды
-struct INSTRUCTION {
-    opcType opc; //код операции
-    struct INSTRUCTION *next; // отношение расположения/управления
-
-    // Операндная часть инструкции
-    struct OPERAND *arg1;
-    struct OPERAND *arg2; // промежуточное представление ( может arg2 = rez - тогда это означает о промежуточном результате)
-    struct OPERAND *rez;
-    // Место встречи в тексте программы
-    int line;
-    int column;
-    //Добавил
-    INSTRUCTION* parent;
-    int priority_rang; //ранг приоритета операции
-};
-
-
-
-
-// Организация списка промежуточных команд
-struct INSTR_LIST {
-    INSTRUCTION *firstInstr;
-    INSTRUCTION *lastInstr;
-    OPERAND* lastOpd;
-};
 
 
 #include <stack>
@@ -247,50 +182,7 @@ public:
     Intermediate();
 
 
-    // Создание и заполнение структуры константы
-    struct CONST *CONST_constructor(scalType, void*);
-
-
-    // Создание и заполнение структуры операнда
-    OPERAND* OPERAND_constructor(opdType, void*);
-
-    // Добавление операнда к списку операндов
-    void OPD_LIST_append(OPD_LIST*,OPERAND*);
-
-
-    // Вывод списка операндов в файл
-    void OPD_LIST_out(OPD_LIST*, FILE*);
-
-    // Вывод списка команд
-    void INSTR_LIST_out(INSTR_LIST *, FILE*);
-
-    // Добавление к списку команд отдельной команды
-    void INSTR_LIST_append( INSTR_LIST**,  INSTRUCTION*);
-
-    // Конкатенация двух списков команд в первый
-    // Замена или установка операнда списка не производится.
-    // Она должна осуществляться явно в программе анализатора
-    void INSTR_LIST_cat( INSTR_LIST**,  INSTR_LIST*);
-
-    // Создание и заполнение структуры списка команд промежуточного представления
-    INSTR_LIST *INSTR_LIST_constructor( INSTRUCTION*,
-                                        INSTRUCTION*,  OPERAND*);
-
-    // Создание и заполнение структуры команды
-    INSTRUCTION* INSTRUCTION_constructor
-    (opcType,  OPERAND*,  OPERAND*,  OPERAND*);
-
-    // Создание операнда - метки
-    OPERAND* CreateLabel();
-
-
     //Мои функции
-    bool add_operand(opdType typ,void*); // добавить операнд
-    bool add_opcType(opcType typ);
-    bool set_next_priori(int rang);
-
-
-    bool remove_last_tmpVarOpd();
 
     void set_auto_rang(opcType typ);
 
@@ -331,8 +223,6 @@ public:
     MYOPER* rezult;
 
 private:
-    INSTRUCTION* instruction;
-    INSTR_LIST* list;
     int priority_rang; //ранг приоритета операции
 
     MashineSteck* steck_begin_;
