@@ -192,9 +192,11 @@ public:
     //string out_stek(string& str,stack<MYINST *> *steck);
 
     string out_stek_2(string& str, MashineSteck* item,int tab,countSteck st);
+    void create_tmpNumber(MashineSteck*);
+
     void out_stek_file(string fileName,countSteck st);
     void file_clear(string fileName);
-    void create_tmpNumber(MashineSteck*);
+
 
 
 

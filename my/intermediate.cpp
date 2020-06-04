@@ -409,6 +409,11 @@ void Intermediate::create_tmpNumber(MashineSteck* steck_select_)
         if(steck_select_->steck.top()->opc == LCircleOpc)
         {
             create_tmpNumber(steck_select_->next.top());
+
+            steck_select_->next_tmp.push(steck_select_->next.top());
+            steck_select_->next.pop();
+
+
             steck_select_->steck_tmp.push(steck_select_->steck.top());
             steck_select_->steck.pop();
             continue;
@@ -444,6 +449,12 @@ void Intermediate::create_tmpNumber(MashineSteck* steck_select_)
     {
         steck_select_->steck.push(steck_select_->steck_tmp.top());
         steck_select_->steck_tmp.pop();
+    }
+
+    while(!steck_select_->next_tmp.empty())
+    {
+        steck_select_->next.push(steck_select_->next_tmp.top());
+        steck_select_->next_tmp.pop();
     }
 
 }
@@ -648,6 +659,17 @@ bool Intermediate::add_opc(opcType typ)
         add_last_oper();
         steck_select_ = steck_select_->parent; // возвращаемся на стек назад
 
+
+//        steck_select_->steck_tmp.push(steck_select_->steck_no_priority.top());
+
+//        myinstruction = steck_select_->steck_no_priority.top();
+
+//        if(myinstruction->opc != assignOpc)
+//        {
+
+//        }
+
+
         auto inPtr = create_instruction();
         myinstruction->next = inPtr;
         myinstruction = myinstruction->next;
@@ -699,6 +721,7 @@ bool Intermediate::add_last_oper()
     // {
     if(myinstruction->opc == noValueOpc && myinstruction->arg1 != nullptr)
     {
+        delete steck_select_->steck_no_priority.top()->arg2;
         steck_select_->steck_no_priority.top()->arg2 = myinstruction->arg1;
         delete  myinstruction;
     }
@@ -708,6 +731,12 @@ bool Intermediate::add_last_oper()
         steck_select_->steck_no_priority.pop();
         if(item->arg2 != nullptr && item->arg1 == nullptr)
         {
+
+            if(steck_select_->steck_no_priority.top()->opc == LCircleOpc)
+            {
+                //Надо подумать
+            }
+
             item->arg1 = steck_select_->steck_no_priority.top()->arg2;
             item->rez = create_myoperand(tmpVarOpd,nullptr);
             steck_select_->steck_no_priority.top()->arg2 = item->rez;
@@ -761,48 +790,119 @@ bool Intermediate::add_inSteck()
                 if(steck_select_->steck_no_priority.top()->opc == LCircleOpc || steck_select_->steck_no_priority.top()->opc == assignOpc || steck_select_->steck_no_priority.top()->opc == plusOpc || steck_select_->steck_no_priority.top()->opc == minusOpc)
                 {
 
+
+
                     //Если наткнулись на скобку то  посомтреть что с лева от скобки и справа (записать в аргумент и продолжить поиск)
                     if(steck_select_->steck_no_priority.top()->opc == LCircleOpc && myinstruction->arg1 == nullptr)
                     {
-                       // if(!steck_select_->steck_tmp.empty())
-                       // {
 
-                            auto item = steck_select_->steck_no_priority.top();
+                        auto item = steck_select_->steck_no_priority.top();
 
-                            steck_select_->steck_tmp.push(steck_select_->steck_no_priority.top());
-                            steck_select_->steck_no_priority.pop();
+                        steck_select_->steck_tmp.push(steck_select_->steck_no_priority.top());
+                        steck_select_->steck_no_priority.pop();
 
-                            auto left = steck_select_->steck_no_priority.top();
+                        auto left = steck_select_->steck_no_priority.top();
 
-                             //Если за скобкой следует равно то арг1 установить как результат
-                            if(left->opc == assignOpc)
+                        //возвращаем скобку обратно
+                        steck_select_->steck_no_priority.push(steck_select_->steck_tmp.top());
+                        steck_select_->steck_tmp.pop();
+
+                        if(left->opc == assignOpc)
+                        {
+                            if(steck_select_->steck_tmp.empty())
                             {
-                                left->arg1 = create_myoperand(tmpVarOpd,nullptr);
-                                add_rezult(left->arg1);
-
-                                //возвращаем скобку обратно
-                                steck_select_->steck_no_priority.push(steck_select_->steck_tmp.top());
-                                steck_select_->steck_tmp.pop();
-
-                                //Берем результат скобки и записываем в 1 аргумент
-                                if(steck_select_->steck_tmp.empty())
-                                {
-                                   add_left_operand(steck_select_->steck_no_priority.top()->rez);
-                                }
-                                else
-                                {
-                                   add_left_operand(steck_select_->steck_tmp.top()->rez);
-                                }
-
-
-                                myinstruction->arg2 = create_myoperand(tmpVarOpd,nullptr);
+                                add_left_operand(steck_select_->steck_no_priority.top()->rez);
                             }
                             else
                             {
-                                steck_select_->steck_tmp.push(steck_select_->steck_no_priority.top());
-                                steck_select_->steck_no_priority.pop();
-                                continue;
+                                add_left_operand(left->arg1);
                             }
+
+                            add_right_operand(create_myoperand(tmpVarOpd,nullptr));
+                            left->arg1 = create_myoperand(tmpVarOpd,nullptr);
+                            add_rezult(left->arg1);
+
+                        }
+                        else
+                        {
+                            if(left->priority_rang == 6)
+                            {
+                                add_left_operand(left->arg2);
+                                left->arg2 = create_myoperand(tmpVarOpd,nullptr);
+                                add_rezult(left->arg2);
+                            }
+                            else
+                            {
+
+                                add_rezult(left->rez);
+                                left->rez = create_myoperand(tmpVarOpd,nullptr);
+                                add_left_operand(left->rez);
+                                add_right_operand(create_myoperand(tmpVarOpd,nullptr));
+
+                            }
+                        }
+
+
+
+
+                        // if(!steck_select_->steck_tmp.empty())
+                        // {
+
+                        //auto item = steck_select_->steck_no_priority.top();
+
+                        //steck_select_->steck_tmp.push(steck_select_->steck_no_priority.top());
+                        //steck_select_->steck_no_priority.pop();
+
+                        //auto left = steck_select_->steck_no_priority.top();
+
+                        //Если за скобкой следует равно то арг1 установить как результат
+                        //if(left->opc == assignOpc)
+                        //{
+
+                        //
+                        //Думаю
+                        //Берем результат скобки и записываем в 1 аргумент
+                        /*if(steck_select_->steck_tmp.empty())
+                            {
+                                add_left_operand(steck_select_->steck_no_priority.top()->rez);
+
+                            }
+                            else
+                            {
+                                //add_left_operand(steck_select_->steck_tmp.top()->rez);
+                                add_left_operand(left->arg1);
+                                left->arg1 = create_myoperand(tmpVarOpd,nullptr);
+                                add_rezult(left->arg1);
+                            }*/
+                        //
+
+                        //                            left->arg1 = create_myoperand(tmpVarOpd,nullptr);
+                        //                            add_rezult(left->arg1);
+
+                        //                            //возвращаем скобку обратно
+                        //                            steck_select_->steck_no_priority.push(steck_select_->steck_tmp.top());
+                        //                            steck_select_->steck_tmp.pop();
+
+                        //                            //Берем результат скобки и записываем в 1 аргумент
+                        //                            if(steck_select_->steck_tmp.empty())
+                        //                            {
+                        //                                add_left_operand(steck_select_->steck_no_priority.top()->rez);
+                        //                            }
+                        //                            else
+                        //                            {
+                        //                                add_left_operand(steck_select_->steck_tmp.top()->rez);
+                        //                            }
+
+
+                        /*myinstruction->arg2 = create_myoperand(tmpVarOpd,nullptr);
+                        }
+                        else
+                        {
+
+                            steck_select_->steck_tmp.push(steck_select_->steck_no_priority.top());
+                            steck_select_->steck_no_priority.pop();
+                            continue;
+                        }*/
 
                     }
 
@@ -852,34 +952,6 @@ bool Intermediate::add_inSteck()
 
                 if(myinstruction->arg1 == nullptr && myinstruction->arg2 == nullptr && myinstruction->rez == nullptr)
                 {
-//                    //Если наткнулись на скобку то записать в аргумент и продолжить поиск
-//                    if(steck_select_->steck_no_priority.top()->opc == LCircleOpc)
-//                    {
-//                        if(!steck_select_->steck_tmp.empty())
-//                        {
-//                            add_left_operand(steck_select_->steck_tmp.top()->rez);
-//                            myinstruction->arg2 = create_myoperand(tmpVarOpd,nullptr);
-
-//                            steck_select_->steck_tmp.push(steck_select_->steck_no_priority.top());
-//                            steck_select_->steck_no_priority.pop();
-
-//                            //Если за скобкой следует равно то арг1 установить как результат
-//                            if(steck_select_->steck_no_priority.top()->opc == assignOpc)
-//                            {
-//                                steck_select_->steck_no_priority.top()->arg1 = create_myoperand(tmpVarOpd,nullptr);
-//                                add_rezult(steck_select_->steck_no_priority.top()->arg1);
-//                            }
-
-//                            //add_rezult(create_myoperand(tmpVarOpd,nullptr));
-//                        }
-//                    }
-//                    else
-//                    {
-//                        add_left_operand(steck_select_->steck_no_priority.top()->arg2);
-//                        steck_select_->steck_no_priority.top()->arg2 = create_myoperand(tmpVarOpd,nullptr);
-//                        add_rezult(steck_select_->steck_no_priority.top()->arg2);
-//                    }
-
                     add_left_operand(steck_select_->steck_no_priority.top()->arg2);
                     steck_select_->steck_no_priority.top()->arg2 = create_myoperand(tmpVarOpd,nullptr);
                     add_rezult(steck_select_->steck_no_priority.top()->arg2);
@@ -978,13 +1050,15 @@ bool Intermediate::add_inSteck()
                     else
                     {
 
-                        //                        if(myinstruction->opc == LCircleOpc)
-                        //                        {
-                        //                            if(myinstruction->arg1 == nullptr)
-                        //                            {
-                        //                                myinstruction->arg1 = steck_select_->steck_no_priority.top()->arg2;
-                        //                            }
-                        //                        }
+                        if(myinstruction->opc == LCircleOpc)
+                        {
+                            if(myinstruction->arg1 == nullptr)
+                            {
+                                myinstruction->arg1 = steck_select_->steck_no_priority.top()->arg2;
+                            }
+                        }
+
+
 
 
                         add_rezult(steck_select_->steck_no_priority.top()->arg2);
