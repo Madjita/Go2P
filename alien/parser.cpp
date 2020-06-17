@@ -886,6 +886,10 @@ bool Parser::StatementShortInit()
             if(point_if_else != nullptr)
             {
                 point_if_else->add_variables_to_vector(nameId);
+
+                //Новый код Польской записи (проверяю)
+                polish.push_operand(nameVarOpd,newFuncItem->get_variable_at(nameId));
+                polish.push_operation(assignOpc);
             }
             else
             {
@@ -902,19 +906,10 @@ bool Parser::StatementShortInit()
                     exit(-1);
                 }
 
-                element item;
-                item.appl.typ =  AUTO;
-                item.appl.len = 0;
-                item.appl.addr = 0;
-                item.name = nameId;
-                item.appl.name = nameId;
-                item.appl.val = "undef";
-                //пробую промежуточное представление
-                //auto oper1 = inter.OPERAND_constructor(nameVarOpd,&item.appl);
-                //inter.INSTRUCTION_constructor(assignOpc,oper1,new OPERAND(),nullptr);
 
-                auto operend = inter.create_myoperand(nameVarOpd,newFuncItem->get_variable_at(nameId));
-                inter.create_statement(assignOpc,operend); //Создать инструкцию присвоения
+                //Новый код Польской записи (проверяю)
+                polish.push_operand(nameVarOpd,newFuncItem->get_variable_at(nameId));
+                polish.push_operation(assignOpc);
 
             }
 
@@ -932,7 +927,7 @@ bool Parser::StatementShortInit()
 
     if(Expression())
     {
-        inter.add_last_oper();
+        //inter.add_last_oper();
         if(newFuncItem != nullptr)
         {
             newFuncItem->addNameThisType("auto");
@@ -945,7 +940,11 @@ bool Parser::StatementShortInit()
 
     if(End())
     {
-        inter.out_list();
+        //inter.out_list();
+
+        //Новый код Польской записи (проверяю)
+        polish.End();
+        ///
 
         auto item = *vvMap_KeyData.rbegin();
         string variable_label = "";
@@ -1836,7 +1835,10 @@ _2:
     if(Object_variable != nullptr)
     {
         //пробую промежуточное представление
-        inter.add_operand(inter.create_myoperand(nameVarOpd,Object_variable));
+        //inter.add_operand(inter.create_myoperand(nameVarOpd,Object_variable));
+
+        //Новый код Польской записи (проверяю)
+        polish.push_operand(nameVarOpd,Object_variable);
     }
 
 
@@ -2044,7 +2046,10 @@ bool Parser::Number()
         item->val.unum = scanAliend->GetIntValue();
 
 
-        inter.add_operand(inter.create_myoperand(constOpd,item));
+        //inter.add_operand(inter.create_myoperand(constOpd,item));
+
+        //Новый код Польской записи (проверяю)
+        polish.push_operand(constOpd,item);
 
 
         nextLex();
@@ -2108,7 +2113,11 @@ bool Parser::Term()
 _2:
     if(lex == lcLCircle)
     {
-        inter.add_opc(LCircleOpc);
+        //inter.add_opc(LCircleOpc);
+
+        //Новый код Польской записи (проверяю)
+        polish.push_operation(LCircleOpc);
+
         nextLex();
     }
     else
@@ -2124,7 +2133,10 @@ _2:
 _3:
     if(lex == lcRCircle)
     {
-        inter.add_opc(RCircleOpc);
+        //inter.add_opc(RCircleOpc);
+
+        //Новый код Польской записи (проверяю)
+        polish.push_operation(RCircleOpc);
 
         nextLex();
         goto _end;
@@ -2156,28 +2168,43 @@ _0:
 
     if(lex == lcLarger)
     {
+        //Новый код Польской записи (проверяю)
+        polish.push_operation(largerOpc);
+
         nextLex();
         goto _1;
     }
 
     if(lex == lcSmaller)
     {
+        //Новый код Польской записи (проверяю)
+        polish.push_operation(smallerOpc);
+
         nextLex();
         goto _1;
     }
     if(lex == lcSmallerEQ)
     {
+        //Новый код Польской записи (проверяю)
+        polish.push_operation(smallerEQOpc);
+
         nextLex();
         goto _1;
     }
     if(lex == lcLargerEQ)
     {
+        //Новый код Польской записи (проверяю)
+        polish.push_operation(largerEQOpc);
+
         nextLex();
         goto _1;
     }
 
     if(lex == lcEQ)
     {
+        //Новый код Польской записи (проверяю)
+        polish.push_operation(eqOpc);
+
         nextLex();
         goto _1;
     }
@@ -2239,7 +2266,10 @@ bool Parser::Product()
     if(lex == lcStar)
     {
         //пробую промежуточное представление
-        inter.add_opc(starOpc);
+        //inter.add_opc(starOpc);
+
+        //Новый код Польской записи (проверяю)
+        polish.push_operation(starOpc);
 
         nextLex();
         goto _end;
@@ -2248,7 +2278,10 @@ bool Parser::Product()
     if(lex == lcSlash)
     {
         //пробую промежуточное представление
-        inter.add_opc(slashOpc);
+        //inter.add_opc(slashOpc);
+
+        //Новый код Польской записи (проверяю)
+        polish.push_operation(slashOpc);
 
         nextLex();
         goto _end;
@@ -2257,7 +2290,10 @@ bool Parser::Product()
     if(lex == lcMod)
     {
         //пробую промежуточное представление
-        inter.add_opc(modOpc);
+        //inter.add_opc(modOpc);
+
+        //Новый код Польской записи (проверяю)
+        polish.push_operation(modOpc);
 
         nextLex();
         goto _end;
@@ -2291,18 +2327,27 @@ bool Parser::Addition()
             if(item == lcId || item == lcIntNum || item == lcRealNum || item == lcRCircle)
             {
                 //пробую промежуточное представление
-                inter.add_opc(plusOpc);
+                //inter.add_opc(plusOpc);
+
+                //Новый код Польской записи (проверяю)
+                polish.push_operation(plusOpc);
 
             }
             else
             {
-                inter.add_opc(plusUnOpc);
+                //inter.add_opc(plusUnOpc);
+
+                //Новый код Польской записи (проверяю)
+                polish.push_operation(plusUnOpc);
             }
         }
         else
         {
             //пробую промежуточное представление
-            inter.add_opc(plusOpc);
+            //inter.add_opc(plusOpc);
+
+            //Новый код Польской записи (проверяю)
+            polish.push_operation(plusOpc);
         }
 
         nextLex();
@@ -2318,18 +2363,27 @@ bool Parser::Addition()
             if(item == lcId || item == lcIntNum || item == lcRealNum || item == lcRCircle)
             {
                 //пробую промежуточное представление
-                inter.add_opc(minusOpc);
+                //inter.add_opc(minusOpc);
+
+                //Новый код Польской записи (проверяю)
+                polish.push_operation(minusOpc);
 
             }
             else
             {
-               inter.add_opc(minusUnOpc);
+               //inter.add_opc(minusUnOpc);
+
+               //Новый код Польской записи (проверяю)
+               polish.push_operation(minusUnOpc);
             }
         }
         else
         {
             //пробую промежуточное представление
-            inter.add_opc(minusOpc);
+            //inter.add_opc(minusOpc);
+
+            //Новый код Польской записи (проверяю)
+            polish.push_operation(minusOpc);
         }
 
 
@@ -2372,6 +2426,12 @@ bool Parser::IfElse()
 _1:
     if(Expression())
     {
+        //Новый код Польской записи (проверяю)
+        polish.End();
+        //Как только закончится условное вырожение добавить иснтрукцию Отрицательного условия ifZ
+        polish.push_operation(ifZOpc);
+
+
         //Написать код который обрабатывает условие между if и {
         //записывает результат в объект
         //local_if_else->set_result_if(expression_between_ifelse(*vvMap_KeyData.rbegin()));
@@ -2388,6 +2448,8 @@ _2:
 
     if(lcLFigure_lcRFigure())
     {
+        //Новый код Польской записи (проверяю)
+        polish.End();
 
     }
     else
@@ -2841,9 +2903,6 @@ _end:
 
 bool Parser::Do()
 {
-    //Очистить файлы list
-    inter.file_clear("out_list2.txt");
-    inter.file_clear("out_list3.txt");
 
     lex = lcNoValue;
     nextLex(); //перейти на первую лексему
@@ -2851,6 +2910,9 @@ bool Parser::Do()
     // Процесс пошел!
     if(Spaces())
     {
+        //Запись в файл трехадресеных команд
+        polish.out_stek_file("polish.txt");
+
         cout <<"\\\\------------------------------\n";
         cout << "Good\n";
         return true; // Все прошло нормально
@@ -2887,7 +2949,6 @@ _0:
     }
     else
     {
-
         if(lex == lcEnter)
         {
             nextLex();
@@ -3572,9 +3633,23 @@ _3:
     scanAliend->setPosition(position);
     lex = saveLex;
 
+
+
+
 _4:
+
+    if(lex == lcEnter)
+    {
+        goto _3;
+    }
+
     if(lex == lcRFigure)
     {
+
+        //Новый код Польской записи (проверяю)
+        //Устанавливаем метку
+        polish.set_goto_label();
+
 
         //Удалить временные переменные
         if(newFuncItem != nullptr)

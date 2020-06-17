@@ -25,10 +25,12 @@ SOURCES += \
         my/hardtype.cpp \
         main.cpp \
         my/ifelse.cpp \
-        my/intermediate.cpp \
         my/myvariable.cpp \
         my/recordhardtype.cpp \
         my/table.cpp \
+        my/three_address_code/polish_notation/graph.cpp \
+        my/three_address_code/polish_notation/polish_notation.cpp \
+        my/three_address_code/three_address_code.cpp \
         my/variableexeption.cpp
 
 # Default rules for deployment.
@@ -47,8 +49,11 @@ HEADERS += \
     my/functype.h \
     my/hardtype.h \
     my/ifelse.h \
-    my/intermediate.h \
     my/myvariable.h \
     my/recordhardtype.h \
     my/table.h \
+    my/three_address_code/Type_data.h \
+    my/three_address_code/polish_notation/graph.h \
+    my/three_address_code/polish_notation/polish_notation.h \
+    my/three_address_code/three_address_code.h \
     my/variableexeption.h

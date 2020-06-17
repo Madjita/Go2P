@@ -20,8 +20,8 @@ using namespace std;
 
 #include "my/table.h"
 
-#include "my/intermediate.h"
 
+#include "my/three_address_code/polish_notation/polish_notation.h"
 
 class Parser
 {
@@ -30,7 +30,9 @@ public:
 
     opcType type;
 
-    Intermediate inter;
+    Polish_notation polish;
+
+
 
     Scanner* scanAliend;
     LexClass lex;
@@ -45,6 +47,7 @@ public:
     bool Statement();
     bool StatementArray();
     bool StatementArrayInit();
+    //инициализация атоматическая
     bool StatementShortInit();
     bool StatementInit();
     bool funcReturn();
@@ -62,7 +65,7 @@ public:
     bool Product();
     bool Addition();
 
-
+    //Условия if else
     bool IfElse();
     bool loop();
     bool switchCase();
