@@ -2245,7 +2245,7 @@ _1:
         goto _end;
     }
 
-    if(lex  == lcLFigure && vvMap_KeyData.rbegin()->begin()->begin()->first == keyIf)
+    if(lex  == lcLFigure ) //&& vvMap_KeyData.rbegin()->begin()->begin()->first == keyIf
     {
         goto _end;
     }
@@ -2520,7 +2520,11 @@ _6:
     }
 
 _end:
-    local_if_else->add_vvMap_KeyData(vvMap_KeyData,start_position_vvMap_KeyData);
+
+    if(local_if_else != nullptr)
+    {
+        local_if_else->add_vvMap_KeyData(vvMap_KeyData,start_position_vvMap_KeyData);
+    }
     return true;
 
 }
@@ -2528,11 +2532,12 @@ _end:
 bool Parser::loop()
 {
     InformPosition position;
-    LexClass saveLex;
+    LexClass saveLex = lex;
 
     position = scanAliend->getPosition();
     if(lex == keyFor)
     {
+        polish.save_label_begin_for();
         nextLex();
     }
     else
@@ -2542,8 +2547,18 @@ bool Parser::loop()
 
 
     /////////////
+    if(StatementShortInit())
+    {
 
-    if(lex == lcId)
+    }
+    else
+    {
+        scanAliend->setPosition(position);
+        lex = saveLex;
+    }
+
+
+    if(lex == lcSemicolon)
     {
         nextLex();
     }
@@ -2557,11 +2572,27 @@ bool Parser::loop()
 _5:
     if(Expression())
     {
+        //Новый код Польской записи (проверяю)
+        polish.End();
+        //Как только закончится условное вырожение добавить иснтрукцию Отрицательного условия ifZ
+        polish.push_operation(ifZOpc);
 
+    }
+
+_12:
+    if(lex == lcEnter)
+    {
+        // position = scanAliend->getPosition();
+        nextLex();
+        position = scanAliend->getPosition();
+        saveLex = lex;
+
+        goto _12;
     }
 
     if(lex == lcLFigure)
     {
+
         nextLex();
         goto _4;
     }
@@ -2571,6 +2602,7 @@ _5:
         nextLex();
         goto _6;
     }
+
 
 
     //////////
@@ -2594,23 +2626,26 @@ _1:
 
     if(Expression())
     {
-        goto _2;
-    }
-
-_2:
-    if(lex == lcSemicolon)
-    {
-        nextLex();
-    }
-    else
-    {
-        return false;
-    }
-
-    if(Expression())
-    {
         goto _3;
     }
+
+
+//_2:
+//    if(lex == lcSemicolon)
+//    {
+//        nextLex();
+//    }
+//    else
+//    {
+//        return false;
+//    }
+
+//    if(Expression())
+//    {
+
+//        goto _3;
+//    }
+
 
 _3:
     if(lex == lcEnter)
@@ -2698,6 +2733,13 @@ _4:
 
     if(lex == lcRFigure)
     {
+
+//        //Новый код Польской записи (проверяю)
+//        polish.End();
+
+        //Устанавливаем метку
+        polish.set_goto_label(it_is_for);
+
         nextLex();
         goto _end;
     }
@@ -2705,7 +2747,6 @@ _4:
     {
         return false;
     }
-
 
 _end:
     return true;
@@ -3608,16 +3649,22 @@ _3:
     lex = saveLex;
 
 
-    //Подумать над тем что когда я захожу в 2 условие по if во время выхода из последнего нужно указать возвращать на 1
-    local_if_else->add_new_if_else();
-    point_if_else = local_if_else->get_if_else(local_if_else->get_if_else_size());
-    if(IfElse())
+    if(local_if_else != nullptr)
     {
-        goto _4;
-    }
-    local_if_else->remove_new_if_else();
-    scanAliend->setPosition(position);
-    lex = saveLex;
+        //Подумать над тем что когда я захожу в 2 условие по if во время выхода из последнего нужно указать возвращать на 1
+        local_if_else->add_new_if_else();
+        point_if_else = local_if_else->get_if_else(local_if_else->get_if_else_size());
+
+
+        if(IfElse())
+        {
+            goto _4;
+        }
+        local_if_else->remove_new_if_else();
+        scanAliend->setPosition(position);
+        lex = saveLex;
+
+     }
 
     if(loop())
     {
@@ -3648,13 +3695,16 @@ _4:
 
         //Новый код Польской записи (проверяю)
         //Устанавливаем метку
-        polish.set_goto_label();
+        polish.set_goto_label(it_is_if);
 
 
         //Удалить временные переменные
         if(newFuncItem != nullptr)
         {
-            local_if_else->variable_clear();
+            if(local_if_else != nullptr)
+            {
+                local_if_else->variable_clear();
+            }
         }
 
 

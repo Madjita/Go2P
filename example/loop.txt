@@ -1,0 +1,21 @@
+func sum( i,max int)
+{
+     for i < max 
+     {
+ 	if 5>2
+     	{ 
+        	x4 := 5
+     	}
+     	else
+     	{
+       		x2 := 6
+     	}
+
+	 x3 := i + 1
+         for 2 < 3 
+     	 { 
+	    x1 := 1+1
+         }
+  	 
+     }
+}

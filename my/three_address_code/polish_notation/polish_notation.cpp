@@ -206,7 +206,7 @@ void Polish_notation::End()
         {
             //Достаем правый операнд
             pop_operand_right = pop_operand();
-            //Достаем левй операнд
+            //Достаем левый операнд
             pop_operand_left = pop_operand();
             //Создаем временную переменную операнд и добавляемв в стек операндов
             OPERAND* tmp = push_operand(tmpVarOpd,nullptr);
@@ -472,7 +472,7 @@ string Polish_notation::opc(opcType typ)
     return str;
 }
 
-void Polish_notation::set_goto_label()
+void Polish_notation::set_goto_label(for_or_if typ)
 {
     if(stack_goto_labels.empty())
     {
@@ -489,11 +489,32 @@ void Polish_notation::set_goto_label()
         }
         case ifZOpc:
         {
-            stack_goto_labels.top()->arg2->val.label = vector_polish.size()+1; //+1  потому что я потом вставляю еще один оператор goto
-            stack_goto_labels.pop();
+            switch (typ)
+            {
+                case it_is_if:
+                {
+                    stack_goto_labels.top()->arg2->val.label = vector_polish.size()+1; //+1  потому что я потом вставляю еще один оператор goto
+                    stack_goto_labels.pop();
+                    //Установить оператор goto (по выходу из положительного условия)
+                    push_operation(gotoOpc);
+                    break;
+                }
+                case it_is_for:
+                {
+                    stack_goto_labels.top()->arg2->val.label = vector_polish.size()+1;
+                    stack_goto_labels.pop();
 
-            //Установить оператор goto (по выходу из положительного условия)
-            push_operation(gotoOpc);
+                    //Установить оператор goto (по достижению закрывающейся скобки)
+                    push_operation(gotoOpc);
+                    stack_goto_labels.top()->arg1->val.label = label_begin_for.top();
+                    label_begin_for.pop();
+                    stack_goto_labels.pop();
+                    break;
+                }
+            }
+
+
+
             break;
         }
         default:
@@ -503,4 +524,9 @@ void Polish_notation::set_goto_label()
         }
     }
 
+}
+
+void Polish_notation::save_label_begin_for()
+{
+     label_begin_for.push(vector_polish.size()); // сохранненная позиция  метки на начало цикла for
 }

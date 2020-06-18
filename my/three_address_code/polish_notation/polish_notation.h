@@ -11,6 +11,11 @@ using namespace std;
 #include <my/three_address_code/three_address_code.h>
 
 
+typedef enum
+{
+  it_is_if,
+  it_is_for,
+} for_or_if;
 
 //RPN - обратная польская запись
 //Формирует дерево, где листья - это оперенды, а корни - это операции
@@ -38,8 +43,10 @@ public:
     string opc(opcType typ);
 
     //Установить метку
-    void set_goto_label();
+    void set_goto_label(for_or_if typ);
 
+    // сохранение позиция  метки на начало цикла for
+    void save_label_begin_for();
 
 
 private:
@@ -48,6 +55,8 @@ private:
 
     vector<INSTRUCTION*> vector_polish;  // стек польской записи
     stack<INSTRUCTION*> stack_goto_labels; // стек хранит инструкции где ожидается определение метки
+
+    stack<int> label_begin_for; // сохранненная позиция  метки на начало цикла for
 
 };
 

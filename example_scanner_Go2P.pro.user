@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.12.1, 2020-06-17T11:09:22. -->
+<!-- Written by QtCreator 4.12.1, 2020-06-18T19:12:35. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -309,7 +309,7 @@
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">example_scanner_Go2P2</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/Users/serg/Documents/QtProject/example_scanner_Go2P/Go2P/example_scanner_Go2P.pro</value>
     <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/Users/serg/Documents/QtProject/example_scanner_Go2P/Go2P/example_scanner_Go2P.pro</value>
-    <value type="QString" key="RunConfiguration.Arguments">-in /Users/serg/Documents/QtProject/example_scanner_Go2P/Go2P/example/4.txt</value>
+    <value type="QString" key="RunConfiguration.Arguments">-in /Users/serg/Documents/QtProject/example_scanner_Go2P/Go2P/example/loop.txt</value>
     <value type="bool" key="RunConfiguration.Arguments.multi">false</value>
     <value type="QString" key="RunConfiguration.OverrideDebuggerStartup"></value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
