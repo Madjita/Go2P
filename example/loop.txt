@@ -1,21 +1,20 @@
-func sum( i,max int)
+func sum( max int)
 {
-     for i < max 
+     for i := 0; i < 10; i++ 
      {
- 	if 5>2
-     	{ 
-        	x4 := 5
-     	}
-     	else
-     	{
-       		x2 := 6
-     	}
-
-	 x3 := i + 1
-         for 2 < 3 
-     	 { 
-	    x1 := 1+1
-         }
-  	 
+       sum := i
      }
+
+  sum2 := 1
+  for ; sum2 < 1000; {
+    x := 12
+  }
+  
+  for sum2 < 15 {
+    Y :=12
+  }
+  
+  for {
+   X12 := 123
+ }
 }

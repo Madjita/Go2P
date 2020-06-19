@@ -42,6 +42,20 @@ struct CONST {
     } val; // значение константы
 };
 
+typedef enum
+{
+    label_if_false, // изначальное условие if
+    label_if_true,
+    label_for,
+    label_break,
+    label_continue
+} label_typ;
+
+struct LABEL{
+    label_typ typ; // тип метки
+    int position; // позиция в трех-адресной ленте
+};
+
 // Разновидности операнда
 typedef enum {
     noOpd,      // не выбранна
@@ -62,6 +76,8 @@ typedef enum {
     minusOpc,           //минус '-'
     minusUnOpc,         //унарный минус '-'
     plusUnOpc,         //унарный плюс '+'
+    dicrimentOpc,       // декремент '−−'
+    incrimentOpc,       //инкремент '++'
     modOpc,             //остаток от деления '%'
     slashOpc,           // деление '/'
     assignOpc,			// авто присваивание ':='

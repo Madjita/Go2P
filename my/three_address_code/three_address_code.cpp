@@ -30,7 +30,8 @@ OPERAND *Three_address_code::Create_new_operand(opdType typ, void *val)
     switch(typ)
     {
     case labelOpd:
-        opdPtr->val.label = 0;
+        opdPtr->val.label = new LABEL;
+        opdPtr->val.label->position = 0;
         break;
     case constOpd:
         opdPtr->val.cons = (struct CONST *)val;
@@ -78,6 +79,8 @@ int Three_address_code::get_auto_rang(opcType typ)
         }
 
         //унарный минус
+        case dicrimentOpc:
+        case incrimentOpc:
         case minusUnOpc:
         {
             priority_rang = 3;

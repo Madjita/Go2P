@@ -95,6 +95,16 @@ void Polish_notation::push_operation(opcType var_opc)
                     {
                         break;
                     }
+
+                    case dicrimentOpc:
+                    case incrimentOpc:
+                    {
+                        //Достаем только 1 операнд
+                        pop_operand_left = pop_operand();
+                        //устанавливаем в трехадресном коде инструкции Результат данную временную переменную
+                        add_rezult_operand(pop_operation_top,pop_operand_left);
+                        break;
+                    }
                     case minusUnOpc:
                     {
                         //Достаем только 1 операнд
@@ -149,6 +159,63 @@ void Polish_notation::push_operation(opcType var_opc)
     stack_operations.push(instruction_ptr);
 }
 
+void Polish_notation::push_operation(opcType var_opc, label_typ typ)
+{
+    //Создадим иснтрукцию
+    INSTRUCTION* instruction_ptr = Create_new_inctruction(var_opc);
+
+
+    bool flag_push = true;
+    INSTRUCTION* pop_operation_top = nullptr;
+
+    OPERAND* pop_operand_left = nullptr;
+    OPERAND* pop_operand_right = nullptr;
+
+    //Добавляем условие IfZ
+    //
+    switch (instruction_ptr->opc)
+    {
+        case gotoOpc:
+        {
+            //Создаем правый операнд являющийся меткой (куда прыгнуть)
+            OPERAND* tmp = Create_new_operand(labelOpd,nullptr);
+            //Задаем определенный тип метки
+            tmp->val.label->typ = typ;
+            //устанавливаем в трехадресном коде инструкции Левый операнд
+            add_left_operand(instruction_ptr,tmp);
+
+            //Записываем уже сформированные трехадресные команды в стек в виде польской обратной записи
+            vector_polish.push_back(instruction_ptr);
+            //Записываем инструкцию в стек ожидающих определение меток goto
+            stack_goto_labels.push(instruction_ptr);
+
+            break;
+        }
+        case ifZOpc:
+        {
+            //Достаем левй операнд являющийся результатом условия
+            pop_operand_left = pop_operand();
+            //Создаем правый операнд являющийся меткой (куда прыгнуть)
+            OPERAND* tmp = Create_new_operand(labelOpd,nullptr);
+            //Задаем определенный тип метки
+            tmp->val.label->typ = typ;
+
+            pop_operand_right = tmp;
+            //устанавливаем в трехадресном коде инструкции Левый операнд
+            add_left_operand(instruction_ptr,pop_operand_left);
+            //устанавливаем в трехадресном коде инструкции Правый операнд
+            add_right_operand(instruction_ptr,pop_operand_right);
+
+            //Записываем уже сформированные трехадресные команды в стек в виде польской обратной записи
+            vector_polish.push_back(instruction_ptr);
+            //Записываем инструкцию в стек ожидающих определение меток IfZ
+            stack_goto_labels.push(instruction_ptr);
+
+            break;
+        }
+    }
+}
+
 // добавить объект в стек операндов
 OPERAND* Polish_notation::push_operand(opdType typ, void *var_operand)
 {
@@ -180,6 +247,16 @@ void Polish_notation::End()
         {
             cout << "Don't find RCircleOpc: '('"<<endl;
             exit(-1);
+            break;
+        }
+
+        case dicrimentOpc:
+        case incrimentOpc:
+        {
+            //Достаем только 1 операнд
+            pop_operand_left = pop_operand();
+            //устанавливаем в трехадресном коде инструкции Результат данную временную переменную
+            add_rezult_operand(pop_operation_top,pop_operand_left);
             break;
         }
         case minusUnOpc:
@@ -347,7 +424,7 @@ void Polish_notation::out_stek_file(string fileName)
             }
             case labelOpd:
             {
-                str += "_L"+to_string(top->arg1->val.label)+"\t";
+                str += "_L"+to_string(top->arg1->val.label->position)+"\t";
                 break;
             }
             default:
@@ -393,7 +470,7 @@ void Polish_notation::out_stek_file(string fileName)
             }
             case labelOpd:
             {
-                str += "_L"+to_string(top->arg2->val.label)+"\t";
+                str += "_L"+to_string(top->arg2->val.label->position)+"\t";
                 break;
             }
 
@@ -456,6 +533,8 @@ string Polish_notation::opc(opcType typ)
         case starOpc:       str = "*";break;
         case slashOpc:      str = "/";break;
         case  plusOpc:      str = "+";break;
+        case dicrimentOpc:  str = "--";break;
+        case incrimentOpc:  str = "++";break;
         case minusUnOpc:
         case  minusOpc:     str = "-";break;
         case assignOpc:     str = ":=";break;
@@ -476,6 +555,24 @@ void Polish_notation::set_goto_label(for_or_if typ)
 {
     if(stack_goto_labels.empty())
     {
+        switch (typ)
+        {
+            case it_is_for:
+            {
+                //Если мы нашли break
+                if(label_begin_for.empty())
+                {
+                    break;
+                }
+
+                //Установить оператор goto (по достижению закрывающейся скобки)
+                push_operation(gotoOpc);
+                stack_goto_labels.top()->arg1->val.label->position = label_begin_for.top();
+                label_begin_for.pop();
+                stack_goto_labels.pop();
+                break;
+            }
+        }
         return;
     }
 
@@ -483,8 +580,27 @@ void Polish_notation::set_goto_label(for_or_if typ)
     {
         case gotoOpc:
         {
-            stack_goto_labels.top()->arg1->val.label = vector_polish.size();
+            stack_goto_labels.top()->arg1->val.label->position = vector_polish.size();
             stack_goto_labels.pop();
+
+
+            switch (typ)
+            {
+                case it_is_for:
+                {
+                    //Установить оператор goto (по достижению закрывающейся скобки)
+                    push_operation(gotoOpc);
+                    stack_goto_labels.top()->arg1->val.label->position = label_begin_for.top();
+                    label_begin_for.pop();
+                    stack_goto_labels.pop();
+                    break;
+                }
+            }
+
+
+
+
+
             break;
         }
         case ifZOpc:
@@ -493,7 +609,7 @@ void Polish_notation::set_goto_label(for_or_if typ)
             {
                 case it_is_if:
                 {
-                    stack_goto_labels.top()->arg2->val.label = vector_polish.size()+1; //+1  потому что я потом вставляю еще один оператор goto
+                    stack_goto_labels.top()->arg2->val.label->position = vector_polish.size()+1; //+1  потому что я потом вставляю еще один оператор goto
                     stack_goto_labels.pop();
                     //Установить оператор goto (по выходу из положительного условия)
                     push_operation(gotoOpc);
@@ -501,12 +617,12 @@ void Polish_notation::set_goto_label(for_or_if typ)
                 }
                 case it_is_for:
                 {
-                    stack_goto_labels.top()->arg2->val.label = vector_polish.size()+1;
+                    stack_goto_labels.top()->arg2->val.label->position = vector_polish.size()+1;
                     stack_goto_labels.pop();
 
                     //Установить оператор goto (по достижению закрывающейся скобки)
                     push_operation(gotoOpc);
-                    stack_goto_labels.top()->arg1->val.label = label_begin_for.top();
+                    stack_goto_labels.top()->arg1->val.label->position = label_begin_for.top();
                     label_begin_for.pop();
                     stack_goto_labels.pop();
                     break;

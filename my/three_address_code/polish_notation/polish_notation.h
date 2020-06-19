@@ -25,6 +25,8 @@ public:
     Polish_notation();
     // добавить объект в стек операций
     void push_operation(opcType var_opc);
+    // добавить объект в стек операций в виде определенной метки
+    void push_operation(opcType var_opc,label_typ typ);
     // добавить объект в стек операндов
     OPERAND *push_operand(opdType typ,void* var_operand);
     // Строка закончилась вытащить из стека оставшиеся операции

@@ -2312,80 +2312,116 @@ _end:
 
 bool Parser::Addition()
 {
+    InformPosition position;
+    LexClass saveLex;
+
 
     if(Product())
     {
         goto _end;
     }
 
+    position = scanAliend->getPosition();
+    saveLex = lex;
     if(lex == lcPlus)
     {
-
-        if(vvMap_KeyData.rbegin()->size() > 1)
+        //Написать код на проверку инкримента
+        nextLex();
+        //Если следом идет + то это инкримент
+        if(lex == lcPlus)
         {
-            auto item = (vvMap_KeyData.rbegin()->rbegin()+1)->rbegin()->first;
-            if(item == lcId || item == lcIntNum || item == lcRealNum || item == lcRCircle)
+            //Новый код Польской записи (проверяю)
+            polish.push_operation(incrimentOpc);
+        }
+        else
+        {
+            scanAliend->setPosition(position);
+            lex = saveLex;
+
+
+            if(vvMap_KeyData.rbegin()->size() > 1)
+            {
+                auto item = (vvMap_KeyData.rbegin()->rbegin()+1)->rbegin()->first;
+                if(item == lcId || item == lcIntNum || item == lcRealNum || item == lcRCircle)
+                {
+                    //пробую промежуточное представление
+                    //inter.add_opc(plusOpc);
+
+                    //Новый код Польской записи (проверяю)
+                    polish.push_operation(plusOpc);
+
+                }
+                else
+                {
+                    //inter.add_opc(plusUnOpc);
+
+                    //Новый код Польской записи (проверяю)
+                    polish.push_operation(plusUnOpc);
+                }
+            }
+            else
             {
                 //пробую промежуточное представление
                 //inter.add_opc(plusOpc);
 
                 //Новый код Польской записи (проверяю)
                 polish.push_operation(plusOpc);
-
-            }
-            else
-            {
-                //inter.add_opc(plusUnOpc);
-
-                //Новый код Польской записи (проверяю)
-                polish.push_operation(plusUnOpc);
             }
         }
-        else
-        {
-            //пробую промежуточное представление
-            //inter.add_opc(plusOpc);
 
-            //Новый код Польской записи (проверяю)
-            polish.push_operation(plusOpc);
-        }
 
         nextLex();
         goto _end;
     }
 
+    position = scanAliend->getPosition();
+    saveLex = lex;
     if(lex == lcMinus)
     {
 
-        if(vvMap_KeyData.rbegin()->size() > 1)
+        //Написать код на проверку дикримент
+        nextLex();
+        //Если следом идет + то это дикримент
+        if(lex == lcMinus)
         {
-            auto item = (vvMap_KeyData.rbegin()->rbegin()+1)->rbegin()->first;
-            if(item == lcId || item == lcIntNum || item == lcRealNum || item == lcRCircle)
+            //Новый код Польской записи (проверяю)
+            polish.push_operation(dicrimentOpc);
+        }
+        else
+        {
+            scanAliend->setPosition(position);
+            lex = saveLex;
+
+            if(vvMap_KeyData.rbegin()->size() > 1)
+            {
+                auto item = (vvMap_KeyData.rbegin()->rbegin()+1)->rbegin()->first;
+                if(item == lcId || item == lcIntNum || item == lcRealNum || item == lcRCircle)
+                {
+                    //пробую промежуточное представление
+                    //inter.add_opc(minusOpc);
+
+                    //Новый код Польской записи (проверяю)
+                    polish.push_operation(minusOpc);
+
+                }
+                else
+                {
+                   //inter.add_opc(minusUnOpc);
+
+                   //Новый код Польской записи (проверяю)
+                   polish.push_operation(minusUnOpc);
+                }
+            }
+            else
             {
                 //пробую промежуточное представление
                 //inter.add_opc(minusOpc);
 
                 //Новый код Польской записи (проверяю)
                 polish.push_operation(minusOpc);
-
             }
-            else
-            {
-               //inter.add_opc(minusUnOpc);
 
-               //Новый код Польской записи (проверяю)
-               polish.push_operation(minusUnOpc);
-            }
         }
-        else
-        {
-            //пробую промежуточное представление
-            //inter.add_opc(minusOpc);
-
-            //Новый код Польской записи (проверяю)
-            polish.push_operation(minusOpc);
-        }
-
 
 
         nextLex();
@@ -2429,7 +2465,7 @@ _1:
         //Новый код Польской записи (проверяю)
         polish.End();
         //Как только закончится условное вырожение добавить иснтрукцию Отрицательного условия ifZ
-        polish.push_operation(ifZOpc);
+        polish.push_operation(ifZOpc,label_if_false);
 
 
         //Написать код который обрабатывает условие между if и {
@@ -2514,7 +2550,7 @@ _6:
     {
         position = scanAliend->getPosition();
         scanAliend->setPosition(position);
-        //nextLex();
+        nextLex();
 
         goto _end;
     }
@@ -2549,13 +2585,13 @@ bool Parser::loop()
     /////////////
     if(StatementShortInit())
     {
-
+        polish.save_label_begin_for();
     }
-    else
-    {
-        scanAliend->setPosition(position);
-        lex = saveLex;
-    }
+//    else
+//    {
+//        scanAliend->setPosition(position);
+//        lex = saveLex;
+//    }
 
 
     if(lex == lcSemicolon)
@@ -2575,8 +2611,19 @@ _5:
         //Новый код Польской записи (проверяю)
         polish.End();
         //Как только закончится условное вырожение добавить иснтрукцию Отрицательного условия ifZ
-        polish.push_operation(ifZOpc);
+        polish.push_operation(ifZOpc,label_for);
+    }
 
+
+    if(lex == lcSemicolon)
+    {
+        nextLex();
+
+        if(Expression())
+        {
+            //Новый код Польской записи (проверяю)
+            polish.End();
+        }
     }
 
 _12:
@@ -2676,6 +2723,13 @@ _4:
         goto _4;
     }
 
+//    if(lex == keyBreak)
+//    {
+//        polish.set_goto_label(it_is_for);
+//        nextLex();
+//        goto _4;
+//    }
+
     //инициализация атоматическая
     if(StatementShortInit())
     {
@@ -2707,11 +2761,19 @@ _4:
     scanAliend->setPosition(position);
     lex = saveLex;
 
-
     //исправить
     if(IfElse())
     {
         goto _4;
+    }
+    else
+    {
+//        if(lex == keyBreak)
+//        {
+//            polish.set_goto_label(it_is_for);
+//            nextLex();
+//            goto _4;
+//        }
     }
     scanAliend->setPosition(position);
     lex = saveLex;
@@ -2720,6 +2782,15 @@ _4:
     {
         goto _4;
     }
+    else
+    {
+//        if(lex == keyBreak)
+//        {
+//            polish.set_goto_label(it_is_for);
+//            nextLex();
+//            goto _4;
+//        }
+    }
     scanAliend->setPosition(position);
     lex = saveLex;
 
@@ -2727,16 +2798,23 @@ _4:
     {
         goto _4;
     }
+    else
+    {
+//        if(lex == keyBreak)
+//        {
+//            polish.set_goto_label(it_is_for);
+//            nextLex();
+//            goto _4;
+//        }
+    }
     scanAliend->setPosition(position);
     lex = saveLex;
 
 
+
     if(lex == lcRFigure)
     {
-
-//        //Новый код Польской записи (проверяю)
-//        polish.End();
-
+        //Новый код Польской записи (проверяю)
         //Устанавливаем метку
         polish.set_goto_label(it_is_for);
 
@@ -3616,6 +3694,7 @@ _3:
 
         goto _3;
     }
+
 
     //инициализация автоматическая
     if(StatementShortInit())
