@@ -96,8 +96,18 @@ typedef enum {
 
 
     labelOpc,           // метка
+
     gotoOpc,            //goto метка
-    ifZOpc,              //ifZ (если условие отрицательное то перейти по метке на else)
+    gotoOpcIfZ_true, //goto метка для перехода if после истенного условия
+    gotoOpcIfZ_false,//goto метка для перехода if после ложного условия
+    gotoOpcIf_trueBreak,//goto метка для выхода из цикла (for) в истенном условии
+    gotoOpcIf_falseBreak,//goto метка для выхода из цикла (for) в ложном условии
+    gotoOpcFor,         //goto метка для перехода в цикле
+    gotoOpcFor_infinity, //goto метка для перехода в while(1)
+    gotoOpcFor_break,   //goto метка для перехода из цикла for
+
+
+    ifZOpc,              //ifZ (если условие отрицательное то перейти по метке на else) (goto метка для перехода if после отрицательного действия)
     forOpc,             //for
     whileOpc,           //while
     doOpc,              //do {} while()

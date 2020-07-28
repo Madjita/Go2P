@@ -15,6 +15,9 @@ typedef enum
 {
   it_is_if,
   it_is_for,
+  it_is_for_infiniti, //  бесконечный цикл
+  it_is_for_break,
+  it_is_if_break
 } for_or_if;
 
 //RPN - обратная польская запись
@@ -59,6 +62,7 @@ private:
     stack<INSTRUCTION*> stack_goto_labels; // стек хранит инструкции где ожидается определение метки
 
     stack<int> label_begin_for; // сохранненная позиция  метки на начало цикла for
+    stack<INSTRUCTION*> stack_breaks; // сохраняем в стек циклы из которых нужно выйти
 
 };
 

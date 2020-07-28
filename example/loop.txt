@@ -1,6 +1,6 @@
 func sum( max int)
 {
-     for i := 0; i < 10; i++ 
+ /*    for i := 0; i < 10; i++ 
      {
        sum := i
      }
@@ -13,8 +13,20 @@ func sum( max int)
   for sum2 < 15 {
     Y :=12
   }
+*/
   
-  for {
-   X12 := 123
- }
+  for 
+  {
+   if 2<1
+   {
+     break
+     if 5>10 
+     {
+       if 10>10 
+        {
+       
+        }
+     }
+   }
+  }
 }

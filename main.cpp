@@ -12,7 +12,6 @@ using namespace std;
 
 bool ReadAllBytes(string filename,string& data)
 {
-
     ifstream file(filename, ios::binary);
 
     if (file.fail()) {

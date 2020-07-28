@@ -2074,13 +2074,13 @@ bool Parser::Term()
     InformPosition position = scanAliend->getPosition();
 
 
-//    if(lex == lcMinus)
-//    {
-//        find_minusUnOpc = true;
-//        nextLex();
-//    }
+    //    if(lex == lcMinus)
+    //    {
+    //        find_minusUnOpc = true;
+    //        nextLex();
+    //    }
 
-//_1:
+    //_1:
     if(Number())
     {
         goto _end;
@@ -2107,7 +2107,7 @@ bool Parser::Term()
     //    scanAliend->setPosition(position);
     //    nextLex();
 
-   // scanAliend->setPosition(position);
+    // scanAliend->setPosition(position);
 
 
 _2:
@@ -2406,10 +2406,10 @@ bool Parser::Addition()
                 }
                 else
                 {
-                   //inter.add_opc(minusUnOpc);
+                    //inter.add_opc(minusUnOpc);
 
-                   //Новый код Польской записи (проверяю)
-                   polish.push_operation(minusUnOpc);
+                    //Новый код Польской записи (проверяю)
+                    polish.push_operation(minusUnOpc);
                 }
             }
             else
@@ -2484,6 +2484,9 @@ _2:
 
     if(lcLFigure_lcRFigure())
     {
+        position = scanAliend->getPosition();
+        nextLex();
+
         //Новый код Польской записи (проверяю)
         polish.End();
 
@@ -2496,6 +2499,7 @@ _2:
 _5:
     if(lex == lcEnter)
     {
+        //position = scanAliend->getPosition();
         nextLex();
         goto _5;
     }
@@ -2505,7 +2509,7 @@ _5:
         nextLex();
 
         //подумать может быть надо убрать чтоб вложеннасть была
-        if(lex == keyIf)
+     /*   if(lex == keyIf)
         {
             //            nextLex();
             //            goto _1;
@@ -2521,7 +2525,7 @@ _5:
             {
                 return false;
             }
-        }
+        } */
 
         //Код если есть ELSE
 _6:
@@ -2548,31 +2552,28 @@ _6:
     }
     else
     {
-        position = scanAliend->getPosition();
+        //position = scanAliend->getPosition();
         scanAliend->setPosition(position);
-        nextLex();
-
-        goto _end;
     }
 
 _end:
 
-    if(local_if_else != nullptr)
-    {
-        local_if_else->add_vvMap_KeyData(vvMap_KeyData,start_position_vvMap_KeyData);
-    }
     return true;
 
 }
 
+//цикл
 bool Parser::loop()
 {
     InformPosition position;
     LexClass saveLex = lex;
 
+    bool it_is_while_infinity = false;
+
     position = scanAliend->getPosition();
     if(lex == keyFor)
     {
+        // сохраняем позицию метки на начало цикла for
         polish.save_label_begin_for();
         nextLex();
     }
@@ -2581,17 +2582,15 @@ bool Parser::loop()
         return false;
     }
 
-
     /////////////
     if(StatementShortInit())
     {
         polish.save_label_begin_for();
     }
-//    else
-//    {
-//        scanAliend->setPosition(position);
-//        lex = saveLex;
-//    }
+    else
+    {
+        it_is_while_infinity = true;
+    }
 
 
     if(lex == lcSemicolon)
@@ -2606,12 +2605,25 @@ bool Parser::loop()
     }
 
 _5:
+
+    if(lex == lcEnter)
+    {
+        nextLex();
+        position = scanAliend->getPosition();
+        saveLex = lex;
+    }
+
     if(Expression())
     {
         //Новый код Польской записи (проверяю)
         polish.End();
         //Как только закончится условное вырожение добавить иснтрукцию Отрицательного условия ifZ
         polish.push_operation(ifZOpc,label_for);
+    }
+
+    if(lex == lcEnter)
+    {
+        nextLex();
     }
 
 
@@ -2677,21 +2689,21 @@ _1:
     }
 
 
-//_2:
-//    if(lex == lcSemicolon)
-//    {
-//        nextLex();
-//    }
-//    else
-//    {
-//        return false;
-//    }
+    //_2:
+    //    if(lex == lcSemicolon)
+    //    {
+    //        nextLex();
+    //    }
+    //    else
+    //    {
+    //        return false;
+    //    }
 
-//    if(Expression())
-//    {
+    //    if(Expression())
+    //    {
 
-//        goto _3;
-//    }
+    //        goto _3;
+    //    }
 
 
 _3:
@@ -2723,12 +2735,13 @@ _4:
         goto _4;
     }
 
-//    if(lex == keyBreak)
-//    {
-//        polish.set_goto_label(it_is_for);
-//        nextLex();
-//        goto _4;
-//    }
+    //Обработка break
+    if(lex == keyBreak)
+    {
+        polish.set_goto_label(it_is_for_break);
+        nextLex();
+        goto _4;
+    }
 
     //инициализация атоматическая
     if(StatementShortInit())
@@ -2764,16 +2777,9 @@ _4:
     //исправить
     if(IfElse())
     {
+        position = scanAliend->getPosition();
+        nextLex();
         goto _4;
-    }
-    else
-    {
-//        if(lex == keyBreak)
-//        {
-//            polish.set_goto_label(it_is_for);
-//            nextLex();
-//            goto _4;
-//        }
     }
     scanAliend->setPosition(position);
     lex = saveLex;
@@ -2784,12 +2790,12 @@ _4:
     }
     else
     {
-//        if(lex == keyBreak)
-//        {
-//            polish.set_goto_label(it_is_for);
-//            nextLex();
-//            goto _4;
-//        }
+        //        if(lex == keyBreak)
+        //        {
+        //            polish.set_goto_label(it_is_for);
+        //            nextLex();
+        //            goto _4;
+        //        }
     }
     scanAliend->setPosition(position);
     lex = saveLex;
@@ -2800,12 +2806,12 @@ _4:
     }
     else
     {
-//        if(lex == keyBreak)
-//        {
-//            polish.set_goto_label(it_is_for);
-//            nextLex();
-//            goto _4;
-//        }
+        //        if(lex == keyBreak)
+        //        {
+        //            polish.set_goto_label(it_is_for);
+        //            nextLex();
+        //            goto _4;
+        //        }
     }
     scanAliend->setPosition(position);
     lex = saveLex;
@@ -2815,8 +2821,10 @@ _4:
     if(lex == lcRFigure)
     {
         //Новый код Польской записи (проверяю)
-        //Устанавливаем метку
-        polish.set_goto_label(it_is_for);
+        //Устанавливаем метку конца цикла
+
+
+        polish.set_goto_label(it_is_for_infiniti);
 
         nextLex();
         goto _end;
@@ -3670,9 +3678,6 @@ bool Parser::lcLFigure_lcRFigure()
     //Позиция откуда записывать для сохранения информации о написанном коде в объекте
     int start_position_vvMap_KeyData = distance(vvMap_KeyData.begin(),vvMap_KeyData.end()-1);
 
-    //вспомогательные переменные
-    class IfElse* local_if_else = point_if_else; //сохраним указатель (чтоб не переназначать глобальный указатель)
-
 
     if(lex == lcLFigure)
     {
@@ -3692,6 +3697,14 @@ _3:
         position = scanAliend->getPosition();
         saveLex = lex;
 
+        goto _3;
+    }
+
+    //Обработка break
+    if(lex == keyBreak)
+    {
+        polish.set_goto_label(it_is_if_break);
+        nextLex();
         goto _3;
     }
 
@@ -3727,23 +3740,15 @@ _3:
     scanAliend->setPosition(position);
     lex = saveLex;
 
-
-    if(local_if_else != nullptr)
+    if(IfElse())
     {
-        //Подумать над тем что когда я захожу в 2 условие по if во время выхода из последнего нужно указать возвращать на 1
-        local_if_else->add_new_if_else();
-        point_if_else = local_if_else->get_if_else(local_if_else->get_if_else_size());
+        position = scanAliend->getPosition();
+        nextLex();
+        goto _4;
+    }
+    scanAliend->setPosition(position);
+    lex = saveLex;
 
-
-        if(IfElse())
-        {
-            goto _4;
-        }
-        local_if_else->remove_new_if_else();
-        scanAliend->setPosition(position);
-        lex = saveLex;
-
-     }
 
     if(loop())
     {
@@ -3759,9 +3764,6 @@ _3:
     scanAliend->setPosition(position);
     lex = saveLex;
 
-
-
-
 _4:
 
     if(lex == lcEnter)
@@ -3775,20 +3777,6 @@ _4:
         //Новый код Польской записи (проверяю)
         //Устанавливаем метку
         polish.set_goto_label(it_is_if);
-
-
-        //Удалить временные переменные
-        if(newFuncItem != nullptr)
-        {
-            if(local_if_else != nullptr)
-            {
-                local_if_else->variable_clear();
-            }
-        }
-
-
-        position = scanAliend->getPosition();
-        nextLex();
         goto _end;
     }
     else
@@ -3864,6 +3852,16 @@ void Parser::add_vvMap_KeyData()
         if(vvMap_KeyData.size() == row)
         {
             vvMap_KeyData.push_back(col_vvMap_keyData);
+        }
+        else
+        {
+            if(vvMap_KeyData.size() < row)
+            {
+                while(vvMap_KeyData.size()-1 != row)
+                {
+                    vvMap_KeyData.push_back(col_vvMap_keyData);
+                }
+            }
         }
     }
 
