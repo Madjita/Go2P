@@ -19,18 +19,35 @@ func sum( max int)
   {
    if 2<1
    {
-     if 5>10 
-     {
-       break
-       if 10>10 
-        {
-          break
-        }
-     }
+    if 2 > 10
+    {
+      x2 := 1/1
+    }
+    else
+    {
+      x1 := 1-1
+      break
+    }
    }
    else
    {
-     break
+     if 2 > 10
+    {
+      if 2 > 10
+      {
+        x15 := 1/1
+      }
+      else
+      {
+        x51 := 1-1
+        break
+      }
+    }
+    else
+    {
+      x4 := 1*1
+      break
+    }
    }
   }
 }

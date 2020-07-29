@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
 
     //-----Парсер alien------------
     CompileErrors err;
-    Parser pars(data,err);
+    Parser pars(data,&err);
 
     //1 деййствие : Собрать объект table в котором хрнаится вся информация о коде по массивам
     //Не понимаю как составить таблицу с if (почти сделал) ,switch,for

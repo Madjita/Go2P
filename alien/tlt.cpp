@@ -7,11 +7,11 @@ Tlt::Tlt()
 
 
 Tlt::Tlt(string fileData):
-    end_of_file{false},
-    value_{NULL},             // значение текущего символа
-    previous_value_{NULL}     // значение текущего символа
+    value_{'\0'},             // значение текущего символа
+    previous_value_{'\0'}     // значение текущего символа
 {
     streem_in_ = fileData;
+    end_of_file = false;
 
     position_file_str_ = 0;         //Позиция относительно  массива файла
     position_row_str_ = 0;          // текущая строка
@@ -102,6 +102,8 @@ bool Tlt::Prev()
 bool Tlt::PrevRow()
 {
     position_row_str_--;
+
+    return true;
 }
 
 

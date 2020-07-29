@@ -53,10 +53,8 @@ public:
     //Установить метку
     void set_goto_label(for_or_if typ);
 
-    //если не встретили условие Else то снижаем метку на -1
-    void subtract_goto_label_true();
 
-    // сохранение позиция  метки на начало цикла for
+    // сохранненная позиция  метки на начало цикла forƒ
     void save_label_begin_for();
 
 

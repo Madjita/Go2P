@@ -28,7 +28,7 @@ using namespace std;
 class Parser
 {
 public:
-    Parser(string fileData, CompileErrors &errors);
+    Parser(string fileData, CompileErrors *errors = nullptr);
 
     opcType type;
 
@@ -102,7 +102,7 @@ public:
     Table table;
 
     string find_variable_name(vector<map<LexClass,string>> &item);
-    bool expression_between_ifelse(vector<map<LexClass,string>> &item);
+    bool expression_between_ifelse();
 
 private:
     LexClass nextLex(bool flagSetSavePosition = false);

@@ -1,6 +1,6 @@
 #include "parser.h"
 
-Parser::Parser(std::string fileData, CompileErrors &errors)
+Parser::Parser(std::string fileData, CompileErrors *errors)
 {
     scanAliend = new Scanner(fileData); //,errors
 }
@@ -302,7 +302,6 @@ _3:
     }
 
 
-_4:
     if(lex == lcRCircle)
     {
         nextLex();
@@ -683,7 +682,6 @@ bool Parser::StatementArray()
         return false;
     }
 
-_1:
     if(lex == lcId)
     {
         nextLex();
@@ -977,6 +975,7 @@ bool Parser::StatementShortInit()
             type = "float";
             break;
         }
+        default:break;
         }
 
         auto result_expression = table.expression.getResult().rbegin()->second;
@@ -1251,6 +1250,7 @@ _3:
             type = "float";
             break;
         }
+        default:break;
         }
 
         if(type == Object_variable->get_type())
@@ -2071,7 +2071,6 @@ _end:
 
 bool Parser::Term()
 {
-    InformPosition position = scanAliend->getPosition();
 
 
     //    if(lex == lcMinus)
@@ -2110,7 +2109,6 @@ bool Parser::Term()
     // scanAliend->setPosition(position);
 
 
-_2:
     if(lex == lcLCircle)
     {
         //inter.add_opc(LCircleOpc);
@@ -2265,8 +2263,6 @@ bool Parser::Product()
 
     if(lex == lcStar)
     {
-        //пробую промежуточное представление
-        //inter.add_opc(starOpc);
 
         //Новый код Польской записи (проверяю)
         polish.push_operation(starOpc);
@@ -2277,8 +2273,6 @@ bool Parser::Product()
 
     if(lex == lcSlash)
     {
-        //пробую промежуточное представление
-        //inter.add_opc(slashOpc);
 
         //Новый код Польской записи (проверяю)
         polish.push_operation(slashOpc);
@@ -2289,8 +2283,6 @@ bool Parser::Product()
 
     if(lex == lcMod)
     {
-        //пробую промежуточное представление
-        //inter.add_opc(modOpc);
 
         //Новый код Польской записи (проверяю)
         polish.push_operation(modOpc);
@@ -2341,29 +2333,21 @@ bool Parser::Addition()
 
             if(vvMap_KeyData.rbegin()->size() > 1)
             {
-                auto item = (vvMap_KeyData.rbegin()->rbegin()+1)->rbegin()->first;
+                auto item = (vvMap_KeyData.rbegin()->rbegin())->rbegin()->first; //+1
                 if(item == lcId || item == lcIntNum || item == lcRealNum || item == lcRCircle)
                 {
-                    //пробую промежуточное представление
-                    //inter.add_opc(plusOpc);
-
                     //Новый код Польской записи (проверяю)
                     polish.push_operation(plusOpc);
 
                 }
                 else
                 {
-                    //inter.add_opc(plusUnOpc);
-
                     //Новый код Польской записи (проверяю)
                     polish.push_operation(plusUnOpc);
                 }
             }
             else
             {
-                //пробую промежуточное представление
-                //inter.add_opc(plusOpc);
-
                 //Новый код Польской записи (проверяю)
                 polish.push_operation(plusOpc);
             }
@@ -2394,29 +2378,21 @@ bool Parser::Addition()
 
             if(vvMap_KeyData.rbegin()->size() > 1)
             {
-                auto item = (vvMap_KeyData.rbegin()->rbegin()+1)->rbegin()->first;
+                auto item = (vvMap_KeyData.rbegin()->rbegin())->rbegin()->first; //+1
                 if(item == lcId || item == lcIntNum || item == lcRealNum || item == lcRCircle)
                 {
-                    //пробую промежуточное представление
-                    //inter.add_opc(minusOpc);
-
                     //Новый код Польской записи (проверяю)
                     polish.push_operation(minusOpc);
 
                 }
                 else
                 {
-                    //inter.add_opc(minusUnOpc);
-
                     //Новый код Польской записи (проверяю)
                     polish.push_operation(minusUnOpc);
                 }
             }
             else
             {
-                //пробую промежуточное представление
-                //inter.add_opc(minusOpc);
-
                 //Новый код Польской записи (проверяю)
                 polish.push_operation(minusOpc);
             }
@@ -2443,11 +2419,6 @@ _end:
 bool Parser::IfElse()
 {
     InformPosition position;
-    LexClass saveLex;
-    class IfElse* local_if_else = point_if_else; //сохраним указатель (чтоб не переназначать глобальный указатель)
-
-    //Позиция откуда записывать для сохранения информации о написанном коде в объекте
-    int start_position_vvMap_KeyData = distance(vvMap_KeyData.begin(),vvMap_KeyData.end()-1);
 
     if(lex == keyIf)
     {
@@ -2519,7 +2490,8 @@ _6:
         //Условие в else
         if(lcLFigure_lcRFigure(label_if_false))
         {
-
+            //Новый код Польской записи (проверяю)
+            //polish.End();
         }
         else
         {
@@ -2760,6 +2732,7 @@ _4:
     if(IfElse())
     {
         position = scanAliend->getPosition();
+        saveLex = lex;
         nextLex();
         goto _4;
     }
@@ -3627,7 +3600,6 @@ bool Parser::addRecordNewRow()
     scanAliend->setPosition(position);
     lex = lexSave;
 
-_2:
     if(rowRecordStatementKey())
     {
         goto _1;
@@ -3654,16 +3626,16 @@ _end:
 
 bool Parser::lcLFigure_lcRFigure(label_typ typ)
 {
-    InformPosition position;
-    LexClass saveLex;
-
-    //Позиция откуда записывать для сохранения информации о написанном коде в объекте
-    int start_position_vvMap_KeyData = distance(vvMap_KeyData.begin(),vvMap_KeyData.end()-1);
+    InformPosition position = scanAliend->getPosition();
+    LexClass saveLex = lex;
 
 
     if(lex == lcLFigure)
     {
         nextLex();
+        position = scanAliend->getPosition();
+        saveLex = lex;
+
         goto _3;
     }
     else
@@ -3689,13 +3661,14 @@ _3:
         switch (typ)
         {
             case label_if_true:
-            polish.set_goto_label(if_break_t);
-            nextLex();
-            break;
+                polish.set_goto_label(if_break_t);
+                nextLex();
+                break;
             case label_if_false:
-            polish.set_goto_label(if_break_f);
-            nextLex();
-            break;
+                polish.set_goto_label(if_break_f);
+                nextLex();
+                break;
+            default:break;
         }
 
 
@@ -3777,6 +3750,7 @@ _4:
             case label_if_false:
                 polish.set_goto_label(if_false);
             break;
+            default:break;
         }
 
         goto _end;
@@ -3851,15 +3825,15 @@ void Parser::add_vvMap_KeyData()
     }
     else
     {
-        if(vvMap_KeyData.size() == row)
+        if(static_cast<int>(vvMap_KeyData.size()) == row)
         {
             vvMap_KeyData.push_back(col_vvMap_keyData);
         }
         else
         {
-            if(vvMap_KeyData.size() < row)
+            if(static_cast<int>(vvMap_KeyData.size()) < row)
             {
-                while(vvMap_KeyData.size()-1 != row)
+                while(static_cast<int>(vvMap_KeyData.size())-1 != row)
                 {
                     vvMap_KeyData.push_back(col_vvMap_keyData);
                 }
@@ -4094,7 +4068,7 @@ string Parser::find_variable_name(vector<map<LexClass, string> > &item)
     return variable_label;
 }
 
-bool Parser::expression_between_ifelse(vector<map<LexClass, string> > &item)
+bool Parser::expression_between_ifelse()
 {
     //Написать код который обрабатывает условие между if и {
     //примерный код:
@@ -4124,6 +4098,7 @@ bool Parser::expression_between_ifelse(vector<map<LexClass, string> > &item)
         type = "float";
         break;
     }
+    default:break;
     }
 
     auto result_expression = result_item->second;
@@ -4137,9 +4112,6 @@ bool Parser::expression_between_ifelse(vector<map<LexClass, string> > &item)
     }
 
     return true;
-
-    //item.erase(item.begin()+1,item.end()-1);
-    //item.insert(item.begin()+1,newItem);
 
 }
 
