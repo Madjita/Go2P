@@ -2482,7 +2482,7 @@ _2:
         goto _2;
     }
 
-    if(lcLFigure_lcRFigure())
+    if(lcLFigure_lcRFigure(label_if_true))
     {
         position = scanAliend->getPosition();
         nextLex();
@@ -2508,25 +2508,6 @@ _5:
     {
         nextLex();
 
-        //подумать может быть надо убрать чтоб вложеннасть была
-     /*   if(lex == keyIf)
-        {
-            //            nextLex();
-            //            goto _1;
-
-            //Подумать над тем что когда я захожу в 2 условие по if во время выхода из последнего нужно указать возвращать на 1
-            local_if_else->add_new_if_else();
-            point_if_else = local_if_else->get_if_else(local_if_else->get_if_else_size());
-            if(IfElse())
-            {
-
-            }
-            else
-            {
-                return false;
-            }
-        } */
-
         //Код если есть ELSE
 _6:
         if(lex == lcEnter)
@@ -2535,7 +2516,8 @@ _6:
             goto _6;
         }
 
-        if(lcLFigure_lcRFigure())
+        //Условие в else
+        if(lcLFigure_lcRFigure(label_if_false))
         {
 
         }
@@ -2552,7 +2534,7 @@ _6:
     }
     else
     {
-        //position = scanAliend->getPosition();
+
         scanAliend->setPosition(position);
     }
 
@@ -3670,7 +3652,7 @@ _end:
     return true;
 }
 
-bool Parser::lcLFigure_lcRFigure()
+bool Parser::lcLFigure_lcRFigure(label_typ typ)
 {
     InformPosition position;
     LexClass saveLex;
@@ -3703,8 +3685,20 @@ _3:
     //Обработка break
     if(lex == keyBreak)
     {
-        polish.set_goto_label(it_is_if_break);
-        nextLex();
+
+        switch (typ)
+        {
+            case label_if_true:
+            polish.set_goto_label(if_break_t);
+            nextLex();
+            break;
+            case label_if_false:
+            polish.set_goto_label(if_break_f);
+            nextLex();
+            break;
+        }
+
+
         goto _3;
     }
 
@@ -3773,10 +3767,18 @@ _4:
 
     if(lex == lcRFigure)
     {
-
         //Новый код Польской записи (проверяю)
         //Устанавливаем метку
-        polish.set_goto_label(it_is_if);
+        switch (typ)
+        {
+            case label_if_true:
+                polish.set_goto_label(if_true);
+            break;
+            case label_if_false:
+                polish.set_goto_label(if_false);
+            break;
+        }
+
         goto _end;
     }
     else

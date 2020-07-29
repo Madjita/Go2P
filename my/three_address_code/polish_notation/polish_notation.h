@@ -13,7 +13,10 @@ using namespace std;
 
 typedef enum
 {
-  it_is_if,
+  if_true,
+  if_false,
+  if_break_t,
+  if_break_f,
   it_is_for,
   it_is_for_infiniti, //  бесконечный цикл
   it_is_for_break,
@@ -49,6 +52,9 @@ public:
 
     //Установить метку
     void set_goto_label(for_or_if typ);
+
+    //если не встретили условие Else то снижаем метку на -1
+    void subtract_goto_label_true();
 
     // сохранение позиция  метки на начало цикла for
     void save_label_begin_for();

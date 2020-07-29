@@ -44,6 +44,7 @@ struct CONST {
 
 typedef enum
 {
+    label_not,      // не выбран
     label_if_false, // изначальное условие if
     label_if_true,
     label_for,

@@ -23,6 +23,8 @@ using namespace std;
 
 #include "my/three_address_code/polish_notation/polish_notation.h"
 
+
+
 class Parser
 {
 public:
@@ -87,7 +89,7 @@ public:
     bool addRecordNewRow();
 
     //Пробую функцию со скобками как в с++ {}
-    bool lcLFigure_lcRFigure();
+    bool lcLFigure_lcRFigure(label_typ typ = label_not);
 
     vector<vector<map<LexClass,string>>> get_vvMap_KeyData();
 

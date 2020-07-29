@@ -25,151 +25,152 @@ void Polish_notation::push_operation(opcType var_opc)
 
     switch (instruction_ptr->opc)
     {
-        //Добавил новое 08.07.2020
-        //Метка завершения положительного условия (прыгнуть на действие полсе выполнения условия)
-        case gotoOpcIfZ_true:
+    //Добавил новое 08.07.2020
+    //Метка завершения положительного условия (прыгнуть на действие полсе выполнения условия)
+    case gotoOpcIfZ_true:
+    case gotoOpcIfZ_false:
         //Добавил новое 08.07.2020
         //Метка break из истинного условия (прыгнуть в конец цикла)
-        case gotoOpcIf_trueBreak:
+    case gotoOpcIf_trueBreak:
         //Добавил новое 08.07.2020
         //Метка break из ложного условия (прыгнуть в конец цикла)
-        case gotoOpcIf_falseBreak:
+    case gotoOpcIf_falseBreak:
         //Добавил новое 26.07.2020
-        case gotoOpcFor_infinity:
+    case gotoOpcFor_infinity:
         //Добавил новое 08.07.2020
         //goto метка для перехода в цикле
-        case gotoOpcFor:
+    case gotoOpcFor:
         //Добавил новое 08.07.2020
         //goto метка для перехода из цикла for
-        case gotoOpcFor_break:
+    case gotoOpcFor_break:
         //просто метка
-        case gotoOpc:
+    case gotoOpc:
+    {
+        //Создаем правый операнд являющийся меткой (куда прыгнуть)
+        OPERAND* tmp = Create_new_operand(labelOpd,nullptr);
+        //устанавливаем в трехадресном коде инструкции Левый операнд
+        add_left_operand(instruction_ptr,tmp);
+
+        //Записываем уже сформированные трехадресные команды в стек в виде польской обратной записи
+        vector_polish.push_back(instruction_ptr);
+        //Записываем инструкцию в стек ожидающих определение меток goto
+        stack_goto_labels.push(instruction_ptr);
+
+        return;
+    }
+    case ifZOpc:
+    {
+        //Достаем левй операнд являющийся результатом условия
+        pop_operand_left = pop_operand();
+        //Создаем правый операнд являющийся меткой (куда прыгнуть)
+        OPERAND* tmp = Create_new_operand(labelOpd,nullptr);
+        pop_operand_right = tmp;
+        //устанавливаем в трехадресном коде инструкции Левый операнд
+        add_left_operand(instruction_ptr,pop_operand_left);
+        //устанавливаем в трехадресном коде инструкции Правый операнд
+        add_right_operand(instruction_ptr,pop_operand_right);
+
+        //Записываем уже сформированные трехадресные команды в стек в виде польской обратной записи
+        vector_polish.push_back(instruction_ptr);
+        //Записываем инструкцию в стек ожидающих определение меток IfZ
+        stack_goto_labels.push(instruction_ptr);
+
+        return;
+    }
+    default:
+    {
+        //Если стек операций не пустой
+        if(!stack_operations.empty())
         {
-            //Создаем правый операнд являющийся меткой (куда прыгнуть)
-            OPERAND* tmp = Create_new_operand(labelOpd,nullptr);
-            //устанавливаем в трехадресном коде инструкции Левый операнд
-            add_left_operand(instruction_ptr,tmp);
-
-            //Записываем уже сформированные трехадресные команды в стек в виде польской обратной записи
-            vector_polish.push_back(instruction_ptr);
-            //Записываем инструкцию в стек ожидающих определение меток goto
-            stack_goto_labels.push(instruction_ptr);
-
-            return;
-        }
-        case ifZOpc:
-        {
-            //Достаем левй операнд являющийся результатом условия
-            pop_operand_left = pop_operand();
-            //Создаем правый операнд являющийся меткой (куда прыгнуть)
-            OPERAND* tmp = Create_new_operand(labelOpd,nullptr);
-            pop_operand_right = tmp;
-            //устанавливаем в трехадресном коде инструкции Левый операнд
-            add_left_operand(instruction_ptr,pop_operand_left);
-            //устанавливаем в трехадресном коде инструкции Правый операнд
-            add_right_operand(instruction_ptr,pop_operand_right);
-
-            //Записываем уже сформированные трехадресные команды в стек в виде польской обратной записи
-            vector_polish.push_back(instruction_ptr);
-            //Записываем инструкцию в стек ожидающих определение меток IfZ
-            stack_goto_labels.push(instruction_ptr);
-
-            return;
-        }
-        default:
-        {
-            //Если стек операций не пустой
-            if(!stack_operations.empty())
+            do
             {
-                do
+                pop_operation_top = nullptr;
+                pop_operand_left = nullptr;
+                pop_operand_right = nullptr;
+
+                //То проверяем на приоритет ( проверяет нужно ли впихивать иснтрукцию в стек )
+                flag_push = check_priopity(instruction_ptr);
+
+                if(flag_push)
                 {
-                    pop_operation_top = nullptr;
-                    pop_operand_left = nullptr;
-                    pop_operand_right = nullptr;
+                    break;
+                }
 
-                    //То проверяем на приоритет ( проверяет нужно ли впихивать иснтрукцию в стек )
-                    flag_push = check_priopity(instruction_ptr);
+                //Если выявило что не нужно впихивать значит нужно вытащить
+                //инструкции пока не впихнется данная иснструкция
+                pop_operation_top = pop_operation();
 
-                    if(flag_push)
-                    {
-                        break;
-                    }
+                //Если мы хотим положить Закрывающуюся скобочку а наткнулись на открывающуюся , то убрать открывающуюся и выйти из метода
+                if(pop_operation_top->opc == LCircleOpc && instruction_ptr->opc == RCircleOpc)
+                {
+                    delete pop_operation_top;
+                    delete instruction_ptr;
+                    return;
+                }
 
-                    //Если выявило что не нужно впихивать значит нужно вытащить
-                    //инструкции пока не впихнется данная иснструкция
-                    pop_operation_top = pop_operation();
+                switch (pop_operation_top->opc)
+                {
+                case LCircleOpc:
+                {
+                    break;
+                }
 
-                    //Если мы хотим положить Закрывающуюся скобочку а наткнулись на открывающуюся , то убрать открывающуюся и выйти из метода
-                    if(pop_operation_top->opc == LCircleOpc && instruction_ptr->opc == RCircleOpc)
-                    {
-                        delete pop_operation_top;
-                        delete instruction_ptr;
-                        return;
-                    }
+                case dicrimentOpc:
+                case incrimentOpc:
+                {
+                    //Достаем только 1 операнд
+                    pop_operand_left = pop_operand();
+                    //устанавливаем в трехадресном коде инструкции Результат данную временную переменную
+                    add_rezult_operand(pop_operation_top,pop_operand_left);
+                    break;
+                }
+                case minusUnOpc:
+                {
+                    //Достаем только 1 операнд
+                    pop_operand_left = pop_operand();
+                    //Создаем временную переменную операнд и добавляемв в стек операндов
+                    OPERAND* tmp = push_operand(tmpVarOpd,nullptr);
+                    //устанавливаем в трехадресном коде инструкции Результат данную временную переменную
+                    add_rezult_operand(pop_operation_top,tmp);
+                    break;
+                }
+                case assignOpc:
+                {
+                    //Достаем левй операнд
+                    pop_operand_left = pop_operand();
+                    //Достаем результат операнд
+                    OPERAND* tmp  = pop_operand();
+                    //устанавливаем в трехадресном коде инструкции Результат являющийся переменной
+                    add_rezult_operand(pop_operation_top,tmp);
+                    break;
+                }
+                default:
+                {
+                    //Достаем правый операнд
+                    pop_operand_right = pop_operand();
+                    //Достаем левй операнд
+                    pop_operand_left = pop_operand();
+                    //Создаем временную переменную операнд и добавляемв в стек операндов
+                    OPERAND* tmp = push_operand(tmpVarOpd,nullptr);
+                    //устанавливаем в трехадресном коде инструкции Результат данную временную переменную
+                    add_rezult_operand(pop_operation_top,tmp);
+                    break;
+                }
+                }
 
-                    switch (pop_operation_top->opc)
-                    {
-                    case LCircleOpc:
-                    {
-                        break;
-                    }
+                //устанавливаем в трехадресном коде инструкции Левый операнд
+                add_left_operand(pop_operation_top,pop_operand_left);
+                //устанавливаем в трехадресном коде инструкции Правый операнд
+                add_right_operand(pop_operation_top,pop_operand_right);
 
-                    case dicrimentOpc:
-                    case incrimentOpc:
-                    {
-                        //Достаем только 1 операнд
-                        pop_operand_left = pop_operand();
-                        //устанавливаем в трехадресном коде инструкции Результат данную временную переменную
-                        add_rezult_operand(pop_operation_top,pop_operand_left);
-                        break;
-                    }
-                    case minusUnOpc:
-                    {
-                        //Достаем только 1 операнд
-                        pop_operand_left = pop_operand();
-                        //Создаем временную переменную операнд и добавляемв в стек операндов
-                        OPERAND* tmp = push_operand(tmpVarOpd,nullptr);
-                        //устанавливаем в трехадресном коде инструкции Результат данную временную переменную
-                        add_rezult_operand(pop_operation_top,tmp);
-                        break;
-                    }
-                    case assignOpc:
-                    {
-                        //Достаем левй операнд
-                        pop_operand_left = pop_operand();
-                        //Достаем результат операнд
-                        OPERAND* tmp  = pop_operand();
-                        //устанавливаем в трехадресном коде инструкции Результат являющийся переменной
-                        add_rezult_operand(pop_operation_top,tmp);
-                        break;
-                    }
-                    default:
-                    {
-                        //Достаем правый операнд
-                        pop_operand_right = pop_operand();
-                        //Достаем левй операнд
-                        pop_operand_left = pop_operand();
-                        //Создаем временную переменную операнд и добавляемв в стек операндов
-                        OPERAND* tmp = push_operand(tmpVarOpd,nullptr);
-                        //устанавливаем в трехадресном коде инструкции Результат данную временную переменную
-                        add_rezult_operand(pop_operation_top,tmp);
-                        break;
-                    }
-                    }
+                //Записываем уже сформированные трехадресные команды в стек в виде польской обратной записи
+                vector_polish.push_back(pop_operation_top);
 
-                    //устанавливаем в трехадресном коде инструкции Левый операнд
-                    add_left_operand(pop_operation_top,pop_operand_left);
-                    //устанавливаем в трехадресном коде инструкции Правый операнд
-                    add_right_operand(pop_operation_top,pop_operand_right);
-
-                    //Записываем уже сформированные трехадресные команды в стек в виде польской обратной записи
-                    vector_polish.push_back(pop_operation_top);
-
-                }while(!flag_push);
-            }
-
-            break;
+            }while(!flag_push);
         }
+
+        break;
+    }
     }
 
 
@@ -193,44 +194,44 @@ void Polish_notation::push_operation(opcType var_opc, label_typ typ)
     //
     switch (instruction_ptr->opc)
     {
-        case gotoOpc:
-        {
-            //Создаем правый операнд являющийся меткой (куда прыгнуть)
-            OPERAND* tmp = Create_new_operand(labelOpd,nullptr);
-            //Задаем определенный тип метки
-            tmp->val.label->typ = typ;
-            //устанавливаем в трехадресном коде инструкции Левый операнд
-            add_left_operand(instruction_ptr,tmp);
+    case gotoOpc:
+    {
+        //Создаем правый операнд являющийся меткой (куда прыгнуть)
+        OPERAND* tmp = Create_new_operand(labelOpd,nullptr);
+        //Задаем определенный тип метки
+        tmp->val.label->typ = typ;
+        //устанавливаем в трехадресном коде инструкции Левый операнд
+        add_left_operand(instruction_ptr,tmp);
 
-            //Записываем уже сформированные трехадресные команды в стек в виде польской обратной записи
-            vector_polish.push_back(instruction_ptr);
-            //Записываем инструкцию в стек ожидающих определение меток goto
-            stack_goto_labels.push(instruction_ptr);
+        //Записываем уже сформированные трехадресные команды в стек в виде польской обратной записи
+        vector_polish.push_back(instruction_ptr);
+        //Записываем инструкцию в стек ожидающих определение меток goto
+        stack_goto_labels.push(instruction_ptr);
 
-            break;
-        }
-        case ifZOpc:
-        {
-            //Достаем левй операнд являющийся результатом условия
-            pop_operand_left = pop_operand();
-            //Создаем правый операнд являющийся меткой (куда прыгнуть)
-            OPERAND* tmp = Create_new_operand(labelOpd,nullptr);
-            //Задаем определенный тип метки
-            tmp->val.label->typ = typ;
+        break;
+    }
+    case ifZOpc:
+    {
+        //Достаем левй операнд являющийся результатом условия
+        pop_operand_left = pop_operand();
+        //Создаем правый операнд являющийся меткой (куда прыгнуть)
+        OPERAND* tmp = Create_new_operand(labelOpd,nullptr);
+        //Задаем определенный тип метки
+        tmp->val.label->typ = typ;
 
-            pop_operand_right = tmp;
-            //устанавливаем в трехадресном коде инструкции Левый операнд
-            add_left_operand(instruction_ptr,pop_operand_left);
-            //устанавливаем в трехадресном коде инструкции Правый операнд
-            add_right_operand(instruction_ptr,pop_operand_right);
+        pop_operand_right = tmp;
+        //устанавливаем в трехадресном коде инструкции Левый операнд
+        add_left_operand(instruction_ptr,pop_operand_left);
+        //устанавливаем в трехадресном коде инструкции Правый операнд
+        add_right_operand(instruction_ptr,pop_operand_right);
 
-            //Записываем уже сформированные трехадресные команды в стек в виде польской обратной записи
-            vector_polish.push_back(instruction_ptr);
-            //Записываем инструкцию в стек ожидающих определение меток IfZ
-            stack_goto_labels.push(instruction_ptr);
+        //Записываем уже сформированные трехадресные команды в стек в виде польской обратной записи
+        vector_polish.push_back(instruction_ptr);
+        //Записываем инструкцию в стек ожидающих определение меток IfZ
+        stack_goto_labels.push(instruction_ptr);
 
-            break;
-        }
+        break;
+    }
     }
 }
 
@@ -546,30 +547,31 @@ string Polish_notation::opc(opcType typ)
     string str = "";
     switch (typ)
     {
-        case LCircleOpc:    str = "(";break;
-        case RCircleOpc:    str = ")";break;
-        case starOpc:       str = "*";break;
-        case slashOpc:      str = "/";break;
-        case  plusOpc:      str = "+";break;
-        case dicrimentOpc:  str = "--";break;
-        case incrimentOpc:  str = "++";break;
-        case minusUnOpc:
-        case  minusOpc:     str = "-";break;
-        case assignOpc:     str = ":=";break;
-        case modOpc:        str = "%";break;
-        case smallerOpc:    str = "<";break;
-        case smallerEQOpc:  str = "<=";break;
-        case largerOpc:     str = ">";break;
-        case largerEQOpc:   str = ">=";break;
-        case eqOpc:         str = "==";break;
-        case ifZOpc:        str = "ifz";break;
-        case gotoOpc:       str = "goto";break;
-        case gotoOpcIfZ_true: str = "goto_ifz_t";break;          //goto метка для перехода if после истенного условия
-        case gotoOpcIf_trueBreak: str = "goto_ifz_t_B";break;        //goto метка для выхода из цикла (for) в истенном условии
-        case gotoOpcIf_falseBreak: str = "goto_ifz_f_B";break;      //goto метка для выхода из цикла (for) в ложном условии
-        case gotoOpcFor: str = "goto_for";break;                          //goto метка для перехода в цикле
-        case gotoOpcFor_break: str = "goto_for_B";break;              //goto метка для перехода из цикла for
-        case gotoOpcFor_infinity: str = "goto_for_I";break; //goto метка для перехода в while(1)
+    case LCircleOpc:    str = "(";break;
+    case RCircleOpc:    str = ")";break;
+    case starOpc:       str = "*";break;
+    case slashOpc:      str = "/";break;
+    case  plusOpc:      str = "+";break;
+    case dicrimentOpc:  str = "--";break;
+    case incrimentOpc:  str = "++";break;
+    case minusUnOpc:
+    case  minusOpc:     str = "-";break;
+    case assignOpc:     str = ":=";break;
+    case modOpc:        str = "%";break;
+    case smallerOpc:    str = "<";break;
+    case smallerEQOpc:  str = "<=";break;
+    case largerOpc:     str = ">";break;
+    case largerEQOpc:   str = ">=";break;
+    case eqOpc:         str = "==";break;
+    case ifZOpc:        str = "ifz";break;
+    case gotoOpc:       str = "goto";break;
+    case gotoOpcIfZ_false: str ="goto_ifz_f";break;          //goto метка для перехода if после ложного условия
+    case gotoOpcIfZ_true: str = "goto_ifz_t";break;          //goto метка для перехода if после истенного условия
+    case gotoOpcIf_trueBreak: str = "goto_ifz_t_B";break;        //goto метка для выхода из цикла (for) в истенном условии
+    case gotoOpcIf_falseBreak: str = "goto_ifz_f_B";break;      //goto метка для выхода из цикла (for) в ложном условии
+    case gotoOpcFor: str = "goto_for";break;                          //goto метка для перехода в цикле
+    case gotoOpcFor_break: str = "goto_for_B";break;              //goto метка для перехода из цикла for
+    case gotoOpcFor_infinity: str = "goto_for_I";break; //goto метка для перехода в while(1)
     }
 
     return str;
@@ -582,55 +584,56 @@ void Polish_notation::set_goto_label(for_or_if typ)
     {
         switch (typ)
         {
-            case it_is_for_infiniti:
-            case it_is_for:
+        case it_is_for_infiniti:
+        case it_is_for:
+        {
+
+            //Если мы нашли break
+            if(label_begin_for.empty())
+            {
+                break;
+            }
+
+            //Установить оператор goto (по достижению закрывающейся скобки)
+            push_operation(gotoOpc);
+            stack_goto_labels.top()->arg1->val.label->position = label_begin_for.top();
+
+
+            //В стеке есть break
+            if(!stack_breaks.empty())
             {
 
-                //Если мы нашли break
-                if(label_begin_for.empty())
-                {
-                    break;
-                }
-
-                //Установить оператор goto (по достижению закрывающейся скобки)
-                push_operation(gotoOpc);
-                stack_goto_labels.top()->arg1->val.label->position = label_begin_for.top();
-
-
-                //В стеке есть break
-                if(!stack_breaks.empty())
+                while(!stack_breaks.empty())
                 {
                     stack_breaks.top()->arg1->val.label->position = vector_polish.size();
                     stack_breaks.pop();
-                    break;
                 }
-
-                label_begin_for.pop();
-                stack_goto_labels.pop();
-
-
                 break;
             }
 
-            case it_is_for_break:
-            {
-                //Установить оператор goto (по достижению закрывающейся скобки)
-                push_operation(gotoOpc);
-                stack_goto_labels.top()->arg1->val.label->position = vector_polish.size();
-                //stack_breaks.push(label_begin_for.top());
-                stack_goto_labels.pop();
-                break;
-            }
+            label_begin_for.pop();
+            stack_goto_labels.pop();
 
-            case it_is_if_break:
-            {
-                //Установить оператор goto (по достижению закрывающейся скобки)
-                push_operation(gotoOpc);
-                //stack_goto_labels.top()->arg1->val.label->position = vector_polish.size();
-                //stack_breaks.push(label_begin_for.top());
-                //stack_goto_labels.pop();
-                break;
-            }
+
+            break;
+        }
+
+        case it_is_for_break:
+        {
+            //Установить оператор goto (по достижению закрывающейся скобки)
+            push_operation(gotoOpc);
+            stack_goto_labels.top()->arg1->val.label->position = vector_polish.size();
+            //stack_breaks.push(label_begin_for.top());
+            stack_goto_labels.pop();
+            break;
+        }
+
+        case it_is_if_break:
+        {
+            //Установить оператор goto (по достижению закрывающейся скобки)
+            push_operation(gotoOpc);
+            break;
+        }
 
         }
         return;
@@ -638,141 +641,258 @@ void Polish_notation::set_goto_label(for_or_if typ)
 
     switch (stack_goto_labels.top()->opc)
     {
-        case gotoOpcIfZ_true:
-        case gotoOpc:
+
+    //в стеке лежит уже условие истенного перехода из предыдущего условия if
+    case gotoOpcIfZ_false:
+    case gotoOpcIfZ_true:
+    {
+        //если не встретили условие Else то оставляем метку до данного действия
+        if(typ == if_false)
+        {
+            stack_goto_labels.top()->arg1->val.label->position = vector_polish.size()+1;
+            stack_goto_labels.pop();
+            set_goto_label(typ);
+        }
+        else
         {
             stack_goto_labels.top()->arg1->val.label->position = vector_polish.size();
             stack_goto_labels.pop();
+            set_goto_label(typ);
+        }
 
-            switch (typ)
+
+
+        switch (typ)
+        {
+        case it_is_for_infiniti:
+        case it_is_for:
+        {
+            //Установить оператор goto (по достижению закрывающейся скобки)
+            // Конец цикла
+
+            if(typ == it_is_for_infiniti)
             {
-                case it_is_for_infiniti:
-                case it_is_for:
-                {
-                    //Установить оператор goto (по достижению закрывающейся скобки)
-                    // Конец цикла
+                push_operation(gotoOpcFor_infinity);
+            }
+            else
+            {
+                push_operation(gotoOpcFor);
+            }
 
-                    if(typ == it_is_for_infiniti)
-                    {
-                        push_operation(gotoOpcFor_infinity);
-                    }
-                    else
-                    {
-                        push_operation(gotoOpcFor);
-                    }
+            stack_goto_labels.top()->arg1->val.label->position = label_begin_for.top();
 
-                    stack_goto_labels.top()->arg1->val.label->position = label_begin_for.top();
-
-                    //В стеке есть break
-                    if(!stack_breaks.empty())
-                    {
-                        stack_breaks.top()->arg1->val.label->position = vector_polish.size();
-                        stack_breaks.pop();
-                        break;
-                    }
-
-                    label_begin_for.pop();
-                    stack_goto_labels.pop();
-                    break;
-                }
-
-                case it_is_if:
-                {
-                    //проверяем есть ли еще goto
-                    if(!stack_goto_labels.empty())
-                    {
-                        set_goto_label(typ);
-                    }
-                }
+            //В стеке есть break
+            if(!stack_breaks.empty())
+            {
+                stack_breaks.top()->arg1->val.label->position = vector_polish.size();
+                stack_breaks.pop();
                 break;
             }
 
-            break;
-        }
-
-        case gotoOpcIf_trueBreak:
-        case ifZOpc:
-        {
-            switch (typ)
-            {
-                case it_is_if:
-                {
-                    stack_goto_labels.top()->arg2->val.label->position = vector_polish.size()+1; //+1  потому что я потом вставляю еще один оператор goto
-                    stack_goto_labels.pop();
-                    //Установить оператор goto (по выходу из положительного условия)
-                    push_operation(gotoOpcIfZ_true);
-                    break;
-                }
-
-                case it_is_for_infiniti:
-                case it_is_for:
-                {
-                    stack_goto_labels.top()->arg2->val.label->position = vector_polish.size()+1;
-                    stack_goto_labels.pop();
-
-                    //Установить оператор goto (по достижению закрывающейся скобки)
-                    push_operation(gotoOpc);
-                    stack_goto_labels.top()->arg1->val.label->position = label_begin_for.top();
-                    label_begin_for.pop();
-                    stack_goto_labels.pop();
-                    break;
-                }
-
-                //Брейк в положительном условии
-                case it_is_if_break:
-                {
-                    //Установить оператор goto (по достижению закрывающейся скобки)
-                    push_operation(gotoOpcIf_trueBreak);
-                    stack_breaks.push(stack_goto_labels.top());
-                    //Убираем break из массива так как он хранится в стеке break;
-                    stack_goto_labels.pop();
-
-                    break;
-                }
-            }
-            break;
-        }
-//        case gotoOpcIf_trueBreak:
-//        {
-
-//            //Если стек циклов не пустой то
-//            if(!label_begin_for.empty())
-//            {
-//                //устанавливаем выход по ложному условию
-//                stack_goto_labels.top()->arg2->val.label->position = vector_polish.size()+1;
-//                stack_goto_labels.pop();
-//                break;
-//            }
-//        }
-        default:
-        {
+            label_begin_for.pop();
             stack_goto_labels.pop();
             break;
         }
+
+        //break в if ложном когда нет меток
+        case if_break_f:
+        {
+            //Брейк в ложном условии
+            //Установить оператор goto (по достижению закрывающейся скобки)
+            push_operation(gotoOpcIf_falseBreak);
+            stack_breaks.push(stack_goto_labels.top());
+            //Убираем break из массива так как он хранится в стеке break;
+            stack_goto_labels.pop();
+
+            break;
+        }
+
+         //break в if  истенном когда нет меток
+        case if_break_t:
+        {
+            if(stack_goto_labels.top()->opc == gotoOpcIfZ_true)
+            {
+                //Брейк в ложном условии
+                //Установить оператор goto (по достижению закрывающейся скобки)
+                push_operation(gotoOpcIf_trueBreak);
+                stack_breaks.push(stack_goto_labels.top());
+                //Убираем break из массива так как он хранится в стеке break;
+                stack_goto_labels.pop();
+            }
+            break;
+        }
+
+        }
+
+        break;
+
     }
 
+    case gotoOpc:
+    {
+        stack_goto_labels.top()->arg1->val.label->position = vector_polish.size()+1;
+        stack_goto_labels.pop();
+
+        switch (typ)
+        {
+        case it_is_for_infiniti:
+        case it_is_for:
+        {
+            //Установить оператор goto (по достижению закрывающейся скобки)
+            // Конец цикла
+
+            if(typ == it_is_for_infiniti)
+            {
+                push_operation(gotoOpcFor_infinity);
+            }
+            else
+            {
+                push_operation(gotoOpcFor);
+            }
+
+            stack_goto_labels.top()->arg1->val.label->position = label_begin_for.top();
+
+            //В стеке есть break
+            if(!stack_breaks.empty())
+            {
+                stack_breaks.top()->arg1->val.label->position = vector_polish.size();
+                stack_breaks.pop();
+                break;
+            }
+
+            label_begin_for.pop();
+            stack_goto_labels.pop();
+            break;
+        }
+
+
+        //Встретили закрывающуюся фигурную скобку lcRFigure
+        /*case it_is_if:
+        {
+            //проверяем есть ли еще goto
+            if(!stack_goto_labels.empty())
+            {
+                //set_goto_label(typ);
+            }
+            break;
+        }*/
+
+        //break в if ложном когда нет меток
+        case if_break_f:
+        {
+            //Брейк в ложном условии
+            //Установить оператор goto (по достижению закрывающейся скобки)
+            push_operation(gotoOpcIf_falseBreak);
+            stack_breaks.push(stack_goto_labels.top());
+            //Убираем break из массива так как он хранится в стеке break;
+            stack_goto_labels.pop();
+
+            break;
+        }
+
+         //break в if  истенном когда нет меток
+        case if_break_t:
+        {
+            if(stack_goto_labels.top()->opc == gotoOpcIfZ_true)
+            {
+                //Брейк в ложном условии
+                //Установить оператор goto (по достижению закрывающейся скобки)
+                push_operation(gotoOpcIf_trueBreak);
+                stack_breaks.push(stack_goto_labels.top());
+                //Убираем break из массива так как он хранится в стеке break;
+                stack_goto_labels.pop();
+            }
+            break;
+        }
+
+        }
+
+        break;
+    }
+
+    case gotoOpcIf_falseBreak:
+    case gotoOpcIf_trueBreak:
+    case ifZOpc:
+    {
+        switch (typ)
+        {
+
+        case if_true:
+        {
+            stack_goto_labels.top()->arg2->val.label->position = vector_polish.size()+1; //+1  потому что я потом вставляю еще один оператор goto
+            stack_goto_labels.pop();
+            //Установить оператор goto (по выходу из положительного условия)
+            push_operation(gotoOpcIfZ_true);
+            break;
+        }
+        case if_false:
+        {
+            stack_goto_labels.top()->arg2->val.label->position = vector_polish.size()+1; //+1  потому что я потом вставляю еще один оператор goto
+            stack_goto_labels.pop();
+            //Установить оператор goto (по выходу из положительного условия)
+            push_operation(gotoOpcIfZ_false);
+            break;
+        }
+
+        case it_is_for_infiniti:
+        case it_is_for:
+        {
+            stack_goto_labels.top()->arg2->val.label->position = vector_polish.size()+1;
+            stack_goto_labels.pop();
+
+            //Установить оператор goto (по достижению закрывающейся скобки)
+            push_operation(gotoOpc);
+            stack_goto_labels.top()->arg1->val.label->position = label_begin_for.top();
+            label_begin_for.pop();
+            stack_goto_labels.pop();
+            break;
+        }
+
+            //Брейк в положительном условии
+        case if_break_t:
+        {
+            //Установить оператор goto (по достижению закрывающейся скобки)
+            push_operation(gotoOpcIf_trueBreak);
+            stack_breaks.push(stack_goto_labels.top());
+            //Убираем break из массива так как он хранится в стеке break;
+            stack_goto_labels.pop();
+
+            break;
+        }
+
+            //Брейк в ложном условии
+        case if_break_f:
+        {
+            //Установить оператор goto (по достижению закрывающейся скобки)
+            push_operation(gotoOpcIf_falseBreak);
+            stack_breaks.push(stack_goto_labels.top());
+            //Убираем break из массива так как он хранится в стеке break;
+            stack_goto_labels.pop();
+
+            break;
+        }
+        }
+        break;
+    }
+
+    default:
+    {
+        stack_goto_labels.pop();
+        break;
+    }
+    }
+
+}
+
+void Polish_notation::subtract_goto_label_true()
+{
+    auto item_last = vector_polish[vector_polish.size()-1];
+    item_last->arg1->val.label->position -= 1;
 }
 
 void Polish_notation::save_label_begin_for()
 {
 
-     label_begin_for.push(vector_polish.size()); // сохранненная позиция  метки на начало цикла forƒ
+    label_begin_for.push(vector_polish.size()); // сохранненная позиция  метки на начало цикла forƒ
 }
 
-/*
-void lolka()
-{
-    for(int i=0; i < 5;i++)
-    {
-        if(5>2)
-        {
-            int x =5;
-            break;
-
-            if(5 <2)
-            {
-                x = 123;
-            }
-        }
-    }
-}*/
