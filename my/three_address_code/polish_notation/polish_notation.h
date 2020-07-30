@@ -59,7 +59,7 @@ public:
 
 
     // сохранненная позиция  метки на начало цикла forƒ
-    void save_label_begin_for();
+    void save_label_begin_for(for_or_if typ = it_is_for_infiniti);
 
 
 private:

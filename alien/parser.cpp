@@ -2541,7 +2541,8 @@ bool Parser::loop()
     /////////////
     if(StatementShortInit())
     {
-        polish.save_label_begin_for();
+        for_type = it_is_for;
+        polish.save_label_begin_for(for_type);
     }
     else
     {
@@ -2573,11 +2574,17 @@ _5:
     {
         //Новый код Польской записи (проверяю)
         polish.End();
-        //Как только закончится условное вырожение добавить иснтрукцию Отрицательного условия ifZ
-        polish.push_operation(ifZOpc_while,label_for);
 
+        //Как только закончится условное вырожение добавить иснтрукцию Отрицательного условия ifZ
         if(for_type == it_is_for_infiniti)
+        {
             for_type = it_is_for_while;
+            polish.push_operation(ifZOpc_while,label_for);
+        }
+        else
+        {
+            polish.push_operation(ifZOpc_for,label_for);
+        }
     }
 
     if(lex == lcEnter)

@@ -1,15 +1,17 @@
 func sum( max int)
 {
- /*    for i := 0; i < 10; i++ 
+    for i := 0; i < 10; i++ 
      {
        sum := i
      }
-
   
-  for ; sum2 < 1000; {
+/* 
+  sum2 := 1
+  for ; sum2 < 1000; sum2++ {
     x := 12
   }
-  */
+ */
+ /*
   sum2 := 1
   for sum2 < 15 {
     Y :=12
@@ -18,7 +20,7 @@ func sum( max int)
     }
     else
     {
-      
+
     }
     x := 12
     break
@@ -26,7 +28,7 @@ func sum( max int)
       break
     }
   }
-  
+   */
 
   /*
   for 
