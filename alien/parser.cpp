@@ -2506,6 +2506,8 @@ _6:
     }
     else
     {
+        //убираем метку так как условие есть только по истене и метка установленна
+        polish.label_pop();
 
         scanAliend->setPosition(position);
     }

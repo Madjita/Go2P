@@ -9,14 +9,26 @@ func sum( max int)
   for ; sum2 < 1000; {
     x := 12
   }
-  
+  */
   sum2 := 1
   for sum2 < 15 {
     Y :=12
+    if Y > 10
+    {
+    }
+    else
+    {
+      
+    }
+    x := 12
+    break
+    for {
+      break
+    }
   }
-  */
-
   
+
+  /*
   for 
   {
     for
@@ -31,4 +43,5 @@ func sum( max int)
 
     break
   }
+  */
 }

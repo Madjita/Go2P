@@ -54,6 +54,9 @@ public:
     //Установить метку
     void set_goto_label(for_or_if typ);
 
+    //Убрать из стека метку
+    void label_pop();
+
 
     // сохранненная позиция  метки на начало цикла forƒ
     void save_label_begin_for();
@@ -67,7 +70,7 @@ private:
     stack<INSTRUCTION*> stack_goto_labels; // стек хранит инструкции где ожидается определение метки
 
     stack<int> label_begin_for; // сохранненная позиция  метки на начало цикла for
-    stack<INSTRUCTION*> stack_breaks; // сохраняем в стек циклы из которых нужно выйти
+    stack<stack<INSTRUCTION*>*> stack_breaks; // сохраняем в стек циклы из которых нужно выйти
 
 };
 

@@ -51,12 +51,6 @@ public:
     INSTRUCTION* Create_new_inctruction(opcType var_ocp);
     //2) создаем операнд
     OPERAND* Create_new_operand(opdType typ,void* val);
-//    //2) создать левый операнд определив операцию
-//    OPERAND* Create_new_left_operand(void* var);
-//    //3) создать правый операнд
-//    OPERAND* Create_new_right_operand(void* var);
-//    //4) создать результат
-//    OPERAND* Create_new_rezult_operand(void* var);
 
     //Добавить левый оеранд к инструкции
     void add_left_operand(INSTRUCTION* instruction_ptr, OPERAND* operand_ptr);
