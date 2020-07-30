@@ -18,6 +18,7 @@ typedef enum
   if_break_t,
   if_break_f,
   it_is_for,
+  it_is_for_while,    //  цикол с пост условием
   it_is_for_infiniti, //  бесконечный цикл
   it_is_for_break,
   it_is_if_break

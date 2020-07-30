@@ -5,49 +5,30 @@ func sum( max int)
        sum := i
      }
 
-  sum2 := 1
+  
   for ; sum2 < 1000; {
     x := 12
   }
   
+  sum2 := 1
   for sum2 < 15 {
     Y :=12
   }
-*/
+  */
+
   
   for 
   {
-   if 2<1
-   {
-    if 2 > 10
+    for
     {
-      x2 := 1/1
-    }
-    else
-    {
-      x1 := 1-1
       break
     }
-   }
-   else
-   {
-     if 2 > 10
+
+    for
     {
-      if 2 > 10
-      {
-        x15 := 1/1
-      }
-      else
-      {
-        x51 := 1-1
-        break
-      }
-    }
-    else
-    {
-      x4 := 1*1
       break
     }
-   }
+
+    break
   }
 }

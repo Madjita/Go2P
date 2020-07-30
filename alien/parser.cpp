@@ -2522,7 +2522,7 @@ bool Parser::loop()
     InformPosition position;
     LexClass saveLex = lex;
 
-    bool it_is_while_infinity = false;
+    for_or_if for_type;
 
     position = scanAliend->getPosition();
     if(lex == keyFor)
@@ -2543,7 +2543,7 @@ bool Parser::loop()
     }
     else
     {
-        it_is_while_infinity = true;
+        for_type = it_is_for_infiniti;
     }
 
 
@@ -2572,7 +2572,10 @@ _5:
         //Новый код Польской записи (проверяю)
         polish.End();
         //Как только закончится условное вырожение добавить иснтрукцию Отрицательного условия ifZ
-        polish.push_operation(ifZOpc,label_for);
+        polish.push_operation(ifZOpc_while,label_for);
+
+        if(for_type == it_is_for_infiniti)
+            for_type = it_is_for_while;
     }
 
     if(lex == lcEnter)
@@ -2778,8 +2781,8 @@ _4:
         //Новый код Польской записи (проверяю)
         //Устанавливаем метку конца цикла
 
+        polish.set_goto_label(for_type);
 
-        polish.set_goto_label(it_is_for_infiniti);
 
         nextLex();
         goto _end;

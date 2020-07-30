@@ -208,6 +208,8 @@ void Polish_notation::push_operation(opcType var_opc, label_typ typ)
 
         break;
     }
+
+    case ifZOpc_while:
     case ifZOpc:
     {
         //Достаем левй операнд являющийся результатом условия
@@ -566,6 +568,7 @@ string Polish_notation::opc(opcType typ)
     case largerEQOpc:   str = ">=";break;
     case eqOpc:         str = "==";break;
     case ifZOpc:        str = "ifz";break;
+    case ifZOpc_while:    str = "ifZOpc_while";break;
     case gotoOpc:       str = "goto";break;
     case gotoOpcIfZ_false: str ="goto_ifz_f";break;          //goto метка для перехода if после ложного условия
     case gotoOpcIfZ_true: str = "goto_ifz_t";break;          //goto метка для перехода if после истенного условия
@@ -598,7 +601,18 @@ void Polish_notation::set_goto_label(for_or_if typ)
             }
 
             //Установить оператор goto (по достижению закрывающейся скобки)
-            push_operation(gotoOpc);
+            switch (typ)
+            {
+            case it_is_for_infiniti:
+                push_operation(gotoOpcFor_infinity);
+                break;
+            default:
+                push_operation(gotoOpcFor);
+                break;
+            }
+
+
+
             stack_goto_labels.top()->arg1->val.label->position = label_begin_for.top();
 
 
@@ -611,7 +625,6 @@ void Polish_notation::set_goto_label(for_or_if typ)
                     stack_breaks.top()->arg1->val.label->position = vector_polish.size();
                     stack_breaks.pop();
                 }
-                break;
             }
 
             label_begin_for.pop();
@@ -623,10 +636,12 @@ void Polish_notation::set_goto_label(for_or_if typ)
         case it_is_for_break:
         {
             //Установить оператор goto (по достижению закрывающейся скобки)
-            push_operation(gotoOpc);
-            stack_goto_labels.top()->arg1->val.label->position = vector_polish.size();
-            //stack_breaks.push(label_begin_for.top());
+            push_operation(gotoOpcFor_break);
+            //Сохраняем break в стек;
+            stack_breaks.push(stack_goto_labels.top());
+            //Убираем break из массива так как он хранится в стеке break;
             stack_goto_labels.pop();
+
             break;
         }
         case it_is_if_break:
@@ -677,15 +692,22 @@ void Polish_notation::set_goto_label(for_or_if typ)
 
         //Установить оператор goto (по достижению закрывающейся скобки)
         // Конец цикла
+        push_operation(gotoOpcFor_infinity);
 
-        if(typ == it_is_for_infiniti)
+        /*
+        switch(typ)
         {
-            push_operation(gotoOpcFor_infinity);
-        }
-        else
-        {
+            case it_is_for_infiniti:
+                push_operation(gotoOpcFor_infinity);
+                break;
+            case it_is_for_while:
+                push_operation(gotoOpcFor_while);
+                break;
+            default:
             push_operation(gotoOpcFor);
-        }
+            break;
+        }*/
+
 
         stack_goto_labels.top()->arg1->val.label->position = label_begin_for.top();
 
@@ -706,8 +728,49 @@ void Polish_notation::set_goto_label(for_or_if typ)
         return;
     }
 
+    if(typ == it_is_for_while)
+    {
+
+        while (!stack_goto_labels.empty())
+        {
+
+            if(stack_goto_labels.top()->opc == ifZOpc_while)
+            {
+                stack_goto_labels.top()->arg2->val.label->position = vector_polish.size()+1;
+                stack_goto_labels.pop();
+            }
+            else
+            {
+                stack_goto_labels.top()->arg1->val.label->position = vector_polish.size();
+                stack_goto_labels.pop();
+            }
+        }
+
+        //Установить оператор goto (по достижению закрывающейся скобки)
+        // Конец цикла
+        push_operation(gotoOpcFor);
+
+        stack_goto_labels.top()->arg1->val.label->position = label_begin_for.top();
+
+        //В стеке есть break
+        if(!stack_breaks.empty())
+        {
+
+            while(!stack_breaks.empty())
+            {
+                stack_breaks.top()->arg1->val.label->position = vector_polish.size();
+                stack_breaks.pop();
+            }
+        }
+
+        label_begin_for.pop();
+        stack_goto_labels.pop();
+
+        return;
 
 
+
+    }
 
 
     switch (stack_goto_labels.top()->opc)
@@ -844,7 +907,7 @@ void Polish_notation::set_goto_label(for_or_if typ)
             stack_goto_labels.pop();
             break;
         }
-        /*    //break в if ложном когда нет меток
+            /*    //break в if ложном когда нет меток
         case if_break_f:
         {
             //Брейк в ложном условии
@@ -915,7 +978,7 @@ void Polish_notation::set_goto_label(for_or_if typ)
             break;
         }
 
-         /*   //Брейк в положительном условии
+            /*   //Брейк в положительном условии
         case if_break_t:
         {
             //Установить оператор goto (по достижению закрывающейся скобки)
@@ -976,7 +1039,7 @@ void Polish_notation::set_goto_label(for_or_if typ)
             stack_goto_labels.pop();
             break;
         }
-         /*   //Брейк в положительном условии
+            /*   //Брейк в положительном условии
         case if_break_t:
         {
             //Установить оператор goto (по достижению закрывающейся скобки)
