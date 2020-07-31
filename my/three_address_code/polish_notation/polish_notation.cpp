@@ -25,6 +25,10 @@ void Polish_notation::push_operation(opcType var_opc)
 
     switch (instruction_ptr->opc)
     {
+
+    case gotoOpcIf_trueContinue:
+    case gotoOpcIf_falseContinue:
+
     //Добавил новое 08.07.2020
     //Метка завершения положительного условия (прыгнуть на действие полсе выполнения условия)
     case gotoOpcIfZ_true:
@@ -43,6 +47,7 @@ void Polish_notation::push_operation(opcType var_opc)
         //Добавил новое 08.07.2020
         //goto метка для перехода из цикла for
     case gotoOpcFor_break:
+    case gotoOpcFor_continue:
         //просто метка
     case gotoOpc:
     {
@@ -576,7 +581,11 @@ string Polish_notation::opc(opcType typ)
     case gotoOpcIfZ_true: str = "goto_ifz_t";break;          //goto метка для перехода if после истенного условия
     case gotoOpcIf_trueBreak: str = "goto_ifz_t_B";break;        //goto метка для выхода из цикла (for) в истенном условии
     case gotoOpcIf_falseBreak: str = "goto_ifz_f_B";break;      //goto метка для выхода из цикла (for) в ложном условии
+    case gotoOpcIf_trueContinue: str = "goto_ifz_t_C";
+    case gotoOpcIf_falseContinue: str = "goto_ifz_f_C";
+
     case gotoOpcFor: str = "goto_for";break;                          //goto метка для перехода в цикле
+    case gotoOpcFor_continue: str = "goto_for_C";break;
     case gotoOpcFor_break: str = "goto_for_B";break;              //goto метка для перехода из цикла for
     case gotoOpcFor_infinity: str = "goto_for_I";break; //goto метка для перехода в while(1)
     default: break;
@@ -658,9 +667,46 @@ void Polish_notation::set_goto_label(for_or_if typ)
         return;
     }
 
+
+    if(typ == it_is_for_continue)
+    {
+        //continue в цикле
+        //Установить оператор goto (по достижению закрывающейся скобки)
+        push_operation(gotoOpcFor_continue);
+        //Сохраняем Continue в стек;
+        stack_continue.top()->push(stack_goto_labels.top());
+        //Убираем break из массива так как он хранится в стеке break;
+        stack_goto_labels.pop();
+        return;
+    }
+
+    if(typ == if_continue_t)
+    {
+        //continue в истенном условии
+        //Установить оператор goto (по достижению закрывающейся скобки)
+        push_operation(gotoOpcIf_trueContinue);
+        //Сохраняем Continue в стек;
+        stack_continue.top()->push(stack_goto_labels.top());
+        //Убираем break из массива так как он хранится в стеке break;
+        stack_goto_labels.pop();
+        return;
+    }
+
+    if(typ == if_continue_f)
+    {
+        //continue в ложном условии
+        //Установить оператор goto (по достижению закрывающейся скобки)
+        push_operation(gotoOpcIf_falseContinue);
+        //Сохраняем Continue в стек;
+        stack_continue.top()->push(stack_goto_labels.top());
+        //Убираем break из массива так как он хранится в стеке break;
+        stack_goto_labels.pop();
+        return;
+    }
+
     if(typ == if_break_t)
     {
-        //Брейк в ложном условии
+        //Брейк в истенном условии
         //Установить оператор goto (по достижению закрывающейся скобки)
         push_operation(gotoOpcIf_trueBreak);
         //Сохраняем break в стек;
@@ -707,7 +753,6 @@ void Polish_notation::set_goto_label(for_or_if typ)
     if(typ == it_is_for_infiniti)
     {
 
-
         while (!stack_goto_labels.empty())
         {
             if(stack_goto_labels.top()->opc == ifZOpc_while)
@@ -742,6 +787,21 @@ void Polish_notation::set_goto_label(for_or_if typ)
             delete stack_break_for;
             stack_breaks.pop();
         }
+
+        //В стеке есть continue
+        auto stack_continue_for = stack_continue.top();
+        if(!stack_continue.empty())
+        {
+
+            while(!stack_continue_for->empty())
+            {
+                stack_continue_for->top()->arg1->val.label->position = label_begin_for.top();
+                stack_continue_for->pop();
+            }
+            delete stack_continue_for;
+            stack_continue.pop();
+        }
+
 
         label_begin_for.pop();
         stack_goto_labels.pop();
@@ -790,6 +850,20 @@ void Polish_notation::set_goto_label(for_or_if typ)
             stack_breaks.pop();
         }
 
+        //В стеке есть continue
+        auto stack_continue_for = stack_continue.top();
+        if(!stack_continue.empty())
+        {
+
+            while(!stack_continue_for->empty())
+            {
+                stack_continue_for->top()->arg1->val.label->position = label_begin_for.top();
+                stack_continue_for->pop();
+            }
+            delete stack_continue_for;
+            stack_continue.pop();
+        }
+
         label_begin_for.pop();
         stack_goto_labels.pop();
 
@@ -835,6 +909,20 @@ void Polish_notation::set_goto_label(for_or_if typ)
 
             delete stack_break_for;
             stack_breaks.pop();
+        }
+
+        //В стеке есть continue
+        auto stack_continue_for = stack_continue.top();
+        if(!stack_continue.empty())
+        {
+
+            while(!stack_continue_for->empty())
+            {
+                stack_continue_for->top()->arg1->val.label->position = label_begin_for.top();
+                stack_continue_for->pop();
+            }
+            delete stack_continue_for;
+            stack_continue.pop();
         }
 
         label_begin_for.pop();
@@ -1145,5 +1233,6 @@ void Polish_notation::save_label_begin_for(for_or_if typ)
 
     label_begin_for.push(vector_polish.size()); // сохранненная позиция  метки на начало цикла forƒ
     stack_breaks.push(new stack<INSTRUCTION*>); // создаем стек breaks на данный цикл
+    stack_continue.push(new stack<INSTRUCTION*>); // создаем стек continue на данный цикл
 }
 

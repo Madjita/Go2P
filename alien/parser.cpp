@@ -2709,6 +2709,15 @@ _4:
         goto _4;
     }
 
+    //обработка continue
+    if(lex == keyContinue)
+    {
+
+        polish.set_goto_label(it_is_for_continue);
+        nextLex();
+        goto _4;
+    }
+
     //инициализация атоматическая
     if(StatementShortInit())
     {
@@ -3687,6 +3696,25 @@ _3:
         goto _3;
     }
 
+    //обработка continue
+    if(lex == keyContinue)
+    {
+        switch (typ)
+        {
+            case label_if_true:
+                polish.set_goto_label(if_continue_t);
+                nextLex();
+                break;
+            case label_if_false:
+                polish.set_goto_label(if_continue_f);
+                nextLex();
+                break;
+            default:break;
+        }
+
+
+        goto _3;
+    }
 
     //инициализация автоматическая
     if(StatementShortInit())

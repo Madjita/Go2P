@@ -17,10 +17,14 @@ typedef enum
   if_false,
   if_break_t,
   if_break_f,
+  if_continue_t,
+  if_continue_f,
+
   it_is_for,
   it_is_for_while,    //  цикол с пост условием
   it_is_for_infiniti, //  бесконечный цикл
   it_is_for_break,
+  it_is_for_continue,
   it_is_if_break
 } for_or_if;
 
@@ -71,6 +75,7 @@ private:
 
     stack<int> label_begin_for; // сохранненная позиция  метки на начало цикла for
     stack<stack<INSTRUCTION*>*> stack_breaks; // сохраняем в стек циклы из которых нужно выйти
+    stack<stack<INSTRUCTION*>*> stack_continue; // сохраняем в стек циклы в которых нужно прыгнуть на следующий шаг
 
 };
 
