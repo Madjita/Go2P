@@ -41,9 +41,9 @@ bool ReadAllBytes(string filename,string& data)
 
 bool Start_program(Parser* pars);
 
+
 int main(int argc, char *argv[])
 {
-
     string data ="";
     string fileName ="";
     string fileNameOut ="";

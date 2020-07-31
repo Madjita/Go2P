@@ -45,6 +45,8 @@ public:
     bool TypeFloat();
     bool Type();
     bool NewType();
+
+    //определение новой функции
     bool newFunc();
     bool Statement();
     bool StatementArray();

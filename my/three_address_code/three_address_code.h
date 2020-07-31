@@ -5,8 +5,12 @@
 using namespace std;
 #include <stack>
 #include "my/myvariable.h"
+#include "my/functype.h"
 
 #include "my/three_address_code/Type_data.h"
+
+
+
 
 struct INSTRUCTION
 {
@@ -26,6 +30,8 @@ struct OPERAND
 {
     opdType typ; // тип операнда
     union{
+        //ссылка на функцию
+        FuncType* fanc;
         //ссылка на именованную переменную
         MyVariable* var;
         // ссылка на константу

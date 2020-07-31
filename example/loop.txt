@@ -1,6 +1,6 @@
-func sum( max int)
+func sum(x,y int)
 {
-    for i := 0; i < 10; i++ 
+    for i := 0; i < 10; ++i
     {
       sum := i
     }

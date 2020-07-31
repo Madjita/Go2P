@@ -29,6 +29,9 @@ OPERAND *Three_address_code::Create_new_operand(opdType typ, void *val)
     opdPtr->typ = typ;
     switch(typ)
     {
+    case call:
+        opdPtr->val.fanc = (FuncType*)val;
+        break;
     case labelOpd:
         opdPtr->val.label = new LABEL;
         opdPtr->val.label->position = 0;

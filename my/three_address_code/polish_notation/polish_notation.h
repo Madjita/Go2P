@@ -67,8 +67,11 @@ public:
     //Возвращает позицию выполнения действия по окончания тела цикла
     int begin_position_expression();
     int end_position_expression();
-
     void save_expression_for(unsigned int begin, unsigned int end);
+
+    //Добавить функцию в стек объявленных функций
+    void add_function(FuncType *func);
+    //int find_function_in_vector()
 
 private:
     stack<INSTRUCTION*> stack_operations; // стек операций для обратной польской записи
@@ -82,6 +85,8 @@ private:
     stack<stack<INSTRUCTION*>*> stack_continue; // сохраняем в стек циклы в которых нужно прыгнуть на следующий шаг
 
     stack<vector<INSTRUCTION*>*> stack_expression_for; //сохранить действия которые должны быть выполненны в конце цикла
+
+    vector<FuncType*> vector_func; // Сохраняем список объявленных функций
 };
 
 #endif // POLISH_NOTATION_H

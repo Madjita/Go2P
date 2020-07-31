@@ -82,6 +82,27 @@ void Polish_notation::push_operation(opcType var_opc)
 
         return;
     }
+    case callFunc_Begin:
+    {
+        //Добавим созданную инструкцию в стек операций
+        stack_operations.push(instruction_ptr);
+        End();
+        return;
+    }
+    case callFunc_End:
+    {
+        //Добавим созданную инструкцию в стек операций
+        stack_operations.push(instruction_ptr);
+        End();
+        return;
+    }
+    case param:
+    {
+        //Добавим созданную инструкцию в стек операций
+        stack_operations.push(instruction_ptr);
+        End();
+        return;
+    }
     default:
     {
         //Если стек операций не пустой
@@ -264,6 +285,7 @@ void Polish_notation::End()
 
     while(!stack_operations.empty())
     {
+
         pop_operation_top = nullptr;
         pop_operand_left = nullptr;
         pop_operand_right = nullptr;
@@ -306,6 +328,21 @@ void Polish_notation::End()
             OPERAND* tmp  = pop_operand();
             //устанавливаем в трехадресном коде инструкции Результат являющийся переменной
             add_rezult_operand(pop_operation_top,tmp);
+            break;
+        }
+        case param:{
+            //устанавливаем в трехадресном коде инструкции Результат являющийся переменной
+            add_rezult_operand(pop_operation_top,pop_operand());
+            break;
+        }
+        case callFunc_Begin:{
+            //устанавливаем в трехадресном коде инструкции Результат являющийся переменной
+            add_rezult_operand(pop_operation_top,pop_operand());
+            break;
+        }
+        case callFunc_End:{
+            //устанавливаем в трехадресном коде инструкции Результат являющийся переменной
+            add_rezult_operand(pop_operation_top,pop_operand());
             break;
         }
         default:
@@ -456,6 +493,12 @@ void Polish_notation::out_stek_file(string fileName)
                 str += "_L"+to_string(top->arg1->val.label->position)+"\t";
                 break;
             }
+            case call:
+            {
+                str += top->rez->val.fanc->getNameFuncType()+"\t";
+                break;
+            }
+
             default:
                 str += "null\t";
                 break;
@@ -502,6 +545,11 @@ void Polish_notation::out_stek_file(string fileName)
                 str += "_L"+to_string(top->arg2->val.label->position)+"\t";
                 break;
             }
+            case call:
+            {
+                str += top->rez->val.fanc->getNameFuncType()+"\t";
+                break;
+            }
 
             default:
                 str += "null\t";
@@ -532,6 +580,11 @@ void Polish_notation::out_stek_file(string fileName)
             case tmpVarOpd:
             {
                 str += top->rez->val.varTmp->name+"\t";
+                break;
+            }
+            case call:
+            {
+                str += top->rez->val.fanc->getNameFuncType()+"\t";
                 break;
             }
             default:
@@ -589,6 +642,12 @@ string Polish_notation::opc(opcType typ)
     case gotoOpcFor_continue: str = "goto_for_C";       break;
     case gotoOpcFor_break: str = "goto_for_B";          break;              //goto метка для перехода из цикла for
     case gotoOpcFor_infinity: str = "goto_for_I";       break;              //goto метка для перехода в while(1)
+
+
+    case callFunc_Begin:      str = "call_f_begin";     break;
+    case callFunc_End:      str = "call_f_end";     break;
+    case param:     str = "param";      break;
+
     default: break;
     }
 
@@ -1302,6 +1361,11 @@ void Polish_notation::save_expression_for(unsigned int begin, unsigned int end)
 
     vector_polish.erase(vector_polish.begin()+begin,vector_polish.begin()+end);
 
+}
+
+void Polish_notation::add_function(FuncType *func)
+{
+    vector_func.push_back(func);
 }
 
 

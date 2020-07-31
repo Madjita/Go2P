@@ -244,6 +244,7 @@ _end:
 
 }
 
+//определение новой функции
 bool Parser::newFunc()
 {
     InformPosition position;
@@ -289,9 +290,10 @@ _2:
     }
 
 _3:
-
+    //аргументы функции
     if(funcArgsStatement())
     {
+
         nextLex();
     }
 
@@ -330,8 +332,15 @@ _6:
     }
 
 
+    //Начало функции
     if(lex == lcLFigure)
     {
+
+        //Новый код Польской записи (проверяю)
+        polish.push_operand(call,newFuncItem);
+        //Новый код Польской записи (проверяю)
+        polish.push_operation(callFunc_Begin);
+
         nextLex();
         goto _7;
     }
@@ -513,6 +522,11 @@ _var:
 _8:
     if(lex == lcRFigure)
     {
+        //Новый код Польской записи (проверяю)
+        polish.push_operand(call,newFuncItem);
+        //Новый код Польской записи (проверяю)
+        polish.push_operation(callFunc_End);
+
         goto _end;
     }
     else
@@ -1422,6 +1436,7 @@ _end:
     return true;
 }
 
+//Аргументы в функции
 bool Parser::funcArgsStatement()
 {
 
@@ -1441,6 +1456,13 @@ _0:
             cout << "Error: Find repeat label in Func body Statment."<<endl;
             exit(-1);
         }
+
+        //Новый код Польской записи (проверяю)
+        polish.push_operand(nameVarOpd,newFuncItem->get_variable_at(nameId));
+        //Новый код Польской записи (проверяю)
+        polish.push_operation(param);
+
+
         nextLex();
         goto _1;
     }
@@ -1834,9 +1856,6 @@ _2:
     //Дописать чтоб было имя структуры (на данный момент есть лишь указатель на конкретную переменную в нутри стурктуры)
     if(Object_variable != nullptr)
     {
-        //пробую промежуточное представление
-        //inter.add_operand(inter.create_myoperand(nameVarOpd,Object_variable));
-
         //Новый код Польской записи (проверяю)
         polish.push_operand(nameVarOpd,Object_variable);
     }

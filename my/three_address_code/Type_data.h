@@ -62,6 +62,8 @@ typedef enum {
     noOpd,      // не выбранна
     nameVarOpd, // именованная переменная из таблицы имен
     tmpVarOpd,  // промежуточная переменная в выражениях
+    funcVar,    // аргументы функции
+    call,       // функция
     constOpd,   // константный операнд
     labelOpd    // операнд - метка
 } opdType;
@@ -117,7 +119,10 @@ typedef enum {
     whileOpc,           //while
     doOpc,              //do {} while()
     switchOpc,          //switch
-    funcOpc,            //call func
+    param,              // param Xn
+    callFunc_Begin,     // call func
+    callFunc_End
+
 } opcType;
 
 
