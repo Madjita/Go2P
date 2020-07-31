@@ -1,21 +1,9 @@
 func sum( max int)
 {
     for i := 0; i < 10; i++ 
-     {
-      if 5 > 10
-      {
-        continue
-        break
-      }
-      else
-      {
-        break
-        continue
-      }
-      continue
-       
-       sum := i
-     }
+    {
+      sum := i
+    }
   
 /* 
   sum2 := 1

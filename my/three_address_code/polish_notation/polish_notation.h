@@ -61,10 +61,14 @@ public:
     //Убрать из стека метку
     void label_pop();
 
-
     // сохранненная позиция  метки на начало цикла forƒ
     void save_label_begin_for(for_or_if typ = it_is_for_infiniti);
 
+    //Возвращает позицию выполнения действия по окончания тела цикла
+    int begin_position_expression();
+    int end_position_expression();
+
+    void save_expression_for(unsigned int begin, unsigned int end);
 
 private:
     stack<INSTRUCTION*> stack_operations; // стек операций для обратной польской записи
@@ -77,6 +81,7 @@ private:
     stack<stack<INSTRUCTION*>*> stack_breaks; // сохраняем в стек циклы из которых нужно выйти
     stack<stack<INSTRUCTION*>*> stack_continue; // сохраняем в стек циклы в которых нужно прыгнуть на следующий шаг
 
+    stack<vector<INSTRUCTION*>*> stack_expression_for; //сохранить действия которые должны быть выполненны в конце цикла
 };
 
 #endif // POLISH_NOTATION_H

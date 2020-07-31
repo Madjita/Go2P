@@ -69,6 +69,7 @@ public:
 
     //Условия if else
     bool IfElse();
+    //цикл
     bool loop();
     bool switchCase();
 

@@ -759,17 +759,34 @@ void Polish_notation::set_goto_label(for_or_if typ)
         }
 
 
+        if(!stack_expression_for.empty())
+        {
+            //В цикле есть логика по окончанию тела цикла
+            auto expression_for = stack_expression_for.top();
+
+            for(unsigned int i=0; i < expression_for->size(); i++)
+            {
+                vector_polish.push_back(expression_for->at(i));
+            }
+
+            expression_for->clear();
+            delete expression_for;
+
+            stack_breaks.pop();
+        }
+
+
         //Установить оператор goto (по достижению закрывающейся скобки)
         // Конец цикла
         push_operation(gotoOpcFor_infinity);
 
         stack_goto_labels.top()->arg1->val.label->position = label_begin_for.top();
 
-        //В стеке есть break
-        auto stack_break_for = stack_breaks.top();
 
         if(!stack_breaks.empty())
         {
+            //В стеке есть break
+            auto stack_break_for = stack_breaks.top();
 
             while(!stack_break_for->empty())
             {
@@ -820,17 +837,34 @@ void Polish_notation::set_goto_label(for_or_if typ)
             }
         }
 
+        if(!stack_expression_for.empty())
+        {
+            //В цикле есть логика по окончанию тела цикла
+            auto expression_for = stack_expression_for.top();
+
+            for(unsigned int i=0; i < expression_for->size(); i++)
+            {
+                vector_polish.push_back(expression_for->at(i));
+            }
+
+            expression_for->clear();
+            delete expression_for;
+
+            stack_breaks.pop();
+        }
+
         //Установить оператор goto (по достижению закрывающейся скобки)
         // Конец цикла
         push_operation(gotoOpcFor);
 
         stack_goto_labels.top()->arg1->val.label->position = label_begin_for.top();
 
-        //В стеке есть break
-        auto stack_break_for = stack_breaks.top();
+
 
         if(!stack_breaks.empty())
         {
+            //В стеке есть break
+            auto stack_break_for = stack_breaks.top();
 
             while(!stack_break_for->empty())
             {
@@ -842,10 +876,11 @@ void Polish_notation::set_goto_label(for_or_if typ)
             stack_breaks.pop();
         }
 
-        //В стеке есть continue
-        auto stack_continue_for = stack_continue.top();
+
         if(!stack_continue.empty())
         {
+            //В стеке есть continue
+            auto stack_continue_for = stack_continue.top();
 
             while(!stack_continue_for->empty())
             {
@@ -881,17 +916,34 @@ void Polish_notation::set_goto_label(for_or_if typ)
             }
         }
 
+        if(!stack_expression_for.empty())
+        {
+            //В цикле есть логика по окончанию тела цикла
+            auto expression_for = stack_expression_for.top();
+
+            for(unsigned int i=0; i < expression_for->size(); i++)
+            {
+                vector_polish.push_back(expression_for->at(i));
+            }
+
+            expression_for->clear();
+            delete expression_for;
+
+            stack_breaks.pop();
+        }
+
         //Установить оператор goto (по достижению закрывающейся скобки)
         // Конец цикла
         push_operation(gotoOpcFor);
 
         stack_goto_labels.top()->arg1->val.label->position = label_begin_for.top();
 
-        //В стеке есть break
-        auto stack_break_for = stack_breaks.top();
+
 
         if(!stack_breaks.empty())
         {
+            //В стеке есть break
+            auto stack_break_for = stack_breaks.top();
 
             while(!stack_break_for->empty())
             {
@@ -903,10 +955,11 @@ void Polish_notation::set_goto_label(for_or_if typ)
             stack_breaks.pop();
         }
 
-        //В стеке есть continue
-        auto stack_continue_for = stack_continue.top();
+
         if(!stack_continue.empty())
         {
+            //В стеке есть continue
+            auto stack_continue_for = stack_continue.top();
 
             while(!stack_continue_for->empty())
             {
@@ -1226,5 +1279,29 @@ void Polish_notation::save_label_begin_for(for_or_if typ)
     label_begin_for.push(vector_polish.size()); // сохранненная позиция  метки на начало цикла forƒ
     stack_breaks.push(new stack<INSTRUCTION*>); // создаем стек breaks на данный цикл
     stack_continue.push(new stack<INSTRUCTION*>); // создаем стек continue на данный цикл
+    stack_expression_for.push(new vector<INSTRUCTION*>); // создаем стек для сохранения действий которые должны выполниться в конце цикла
 }
+
+int Polish_notation::begin_position_expression()
+{
+    return vector_polish.size();
+}
+
+int Polish_notation::end_position_expression()
+{
+    return vector_polish.size();
+}
+
+void Polish_notation::save_expression_for(unsigned int begin, unsigned int end)
+{
+
+    for(unsigned int i=begin;i < end;i++)
+    {
+        stack_expression_for.top()->push_back(vector_polish[i]);
+    }
+
+    vector_polish.erase(vector_polish.begin()+begin,vector_polish.begin()+end);
+
+}
+
 

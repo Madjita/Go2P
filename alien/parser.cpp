@@ -2525,6 +2525,8 @@ bool Parser::loop()
     LexClass saveLex = lex;
 
     for_or_if for_type;
+    unsigned int begin_position_expression = 0;
+    unsigned int end_position_expression = 0;
 
     position = scanAliend->getPosition();
     if(lex == keyFor)
@@ -2597,10 +2599,15 @@ _5:
     {
         nextLex();
 
+        begin_position_expression  = polish.begin_position_expression();
+
         if(Expression())
         {
             //Новый код Польской записи (проверяю)
             polish.End();
+
+            end_position_expression = polish.end_position_expression();
+            polish.save_expression_for(begin_position_expression,end_position_expression);
         }
     }
 
