@@ -557,37 +557,38 @@ string Polish_notation::opc(opcType typ)
     string str = "";
     switch (typ)
     {
-    case LCircleOpc:    str = "(";break;
-    case RCircleOpc:    str = ")";break;
-    case starOpc:       str = "*";break;
-    case slashOpc:      str = "/";break;
-    case  plusOpc:      str = "+";break;
-    case dicrimentOpc:  str = "--";break;
-    case incrimentOpc:  str = "++";break;
-    case minusUnOpc:
-    case  minusOpc:     str = "-";break;
-    case assignOpc:     str = ":=";break;
-    case modOpc:        str = "%";break;
-    case smallerOpc:    str = "<";break;
-    case smallerEQOpc:  str = "<=";break;
-    case largerOpc:     str = ">";break;
-    case largerEQOpc:   str = ">=";break;
-    case eqOpc:         str = "==";break;
-    case ifZOpc:        str = "ifz";break;
-    case ifZOpc_for:    str = "ifZOpc_for";break;
-    case ifZOpc_while:    str = "ifZOpc_while";break;
-    case gotoOpc:       str = "goto";break;
-    case gotoOpcIfZ_false: str ="goto_ifz_f";break;          //goto метка для перехода if после ложного условия
-    case gotoOpcIfZ_true: str = "goto_ifz_t";break;          //goto метка для перехода if после истенного условия
-    case gotoOpcIf_trueBreak: str = "goto_ifz_t_B";break;        //goto метка для выхода из цикла (for) в истенном условии
-    case gotoOpcIf_falseBreak: str = "goto_ifz_f_B";break;      //goto метка для выхода из цикла (for) в ложном условии
-    case gotoOpcIf_trueContinue: str = "goto_ifz_t_C";
-    case gotoOpcIf_falseContinue: str = "goto_ifz_f_C";
+    case LCircleOpc:    str = "(";                      break;
+    case RCircleOpc:    str = ")";                      break;
+    case starOpc:       str = "*";                      break;
+    case slashOpc:      str = "/";                      break;
+    case  plusOpc:      str = "+";                      break;
+    case dicrimentOpc:  str = "--";                     break;
+    case incrimentOpc:  str = "++";                     break;
 
-    case gotoOpcFor: str = "goto_for";break;                          //goto метка для перехода в цикле
-    case gotoOpcFor_continue: str = "goto_for_C";break;
-    case gotoOpcFor_break: str = "goto_for_B";break;              //goto метка для перехода из цикла for
-    case gotoOpcFor_infinity: str = "goto_for_I";break; //goto метка для перехода в while(1)
+    case minusUnOpc:
+    case  minusOpc:     str = "-";                      break;
+
+    case assignOpc:     str = ":=";                     break;
+    case modOpc:        str = "%";                      break;
+    case smallerOpc:    str = "<";                      break;
+    case smallerEQOpc:  str = "<=";                     break;
+    case largerOpc:     str = ">";                      break;
+    case largerEQOpc:   str = ">=";                     break;
+    case eqOpc:         str = "==";                     break;
+    case ifZOpc:        str = "ifz";                    break;
+    case ifZOpc_for:    str = "ifZOpc_for";             break;
+    case ifZOpc_while:    str = "ifZOpc_while";         break;
+    case gotoOpc:       str = "goto";                   break;
+    case gotoOpcIfZ_false: str ="goto_ifz_f";           break;              //goto метка для перехода if после ложного условия
+    case gotoOpcIfZ_true: str = "goto_ifz_t";           break;              //goto метка для перехода if после истенного условия
+    case gotoOpcIf_trueBreak: str = "goto_ifz_t_B";     break;              //goto метка для выхода из цикла (for) в истенном условии
+    case gotoOpcIf_falseBreak: str = "goto_ifz_f_B";    break;              //goto метка для выхода из цикла (for) в ложном условии
+    case gotoOpcIf_trueContinue: str = "goto_ifz_t_C";  break;
+    case gotoOpcIf_falseContinue: str = "goto_ifz_f_C"; break;
+    case gotoOpcFor: str = "goto_for";                  break;               //goto метка для перехода в цикле
+    case gotoOpcFor_continue: str = "goto_for_C";       break;
+    case gotoOpcFor_break: str = "goto_for_B";          break;              //goto метка для перехода из цикла for
+    case gotoOpcFor_infinity: str = "goto_for_I";       break;              //goto метка для перехода в while(1)
     default: break;
     }
 
@@ -731,15 +732,6 @@ void Polish_notation::set_goto_label(for_or_if typ)
     if(typ == it_is_for_break)
     {
         //Брейк в ложном условии
-
-        //Если предыдущий прыжок является выход if по истенному условию а else нет
-        /*if(stack_goto_labels.top()->opc == gotoOpcIfZ_true)
-        {
-            stack_goto_labels.top()->arg1->val.label->position = vector_polish.size();
-            stack_goto_labels.pop();
-        }*/
-
-
 
         //Установить оператор goto (по достижению закрывающейся скобки)
         push_operation(gotoOpcFor_break);
