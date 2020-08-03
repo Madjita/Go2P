@@ -390,6 +390,7 @@ _7:
         goto _7;
     }
 
+    //return function
     if(funcReturn())
     {
         nextLex();
@@ -1327,6 +1328,8 @@ bool Parser::funcReturn()
 
     if(Expression())
     {
+        polish.End();
+
         //nextLex();
 
         //Нужно добавить код который вычисляет пример если он есть и запимсывает в результат фукнции
@@ -1335,6 +1338,12 @@ bool Parser::funcReturn()
 
     if(End())
     {
+        //Новый код Польской записи (проверяю)
+        polish.push_operation(returnOpc);
+
+        //Добавляем прыжок в конец цикла
+        polish.set_goto_label(func_return);
+
         goto _end;
     }
     else {
@@ -2790,15 +2799,6 @@ _4:
     {
         goto _4;
     }
-    else
-    {
-        //        if(lex == keyBreak)
-        //        {
-        //            polish.set_goto_label(it_is_for);
-        //            nextLex();
-        //            goto _4;
-        //        }
-    }
     scanAliend->setPosition(position);
     lex = saveLex;
 
@@ -2806,14 +2806,36 @@ _4:
     {
         goto _4;
     }
-    else
+    scanAliend->setPosition(position);
+    lex = saveLex;
+
+    //return function
+    if(lex == keyReturn)
     {
-        //        if(lex == keyBreak)
-        //        {
-        //            polish.set_goto_label(it_is_for);
-        //            nextLex();
-        //            goto _4;
-        //        }
+        nextLex();
+
+
+        //    if(lex == keyString)
+        //    {
+        //        nextLex();
+        //    }
+
+        if(lex == lcCharConst)
+        {
+            nextLex();
+        }
+
+        if(Expression())
+        {
+            polish.End();
+        }
+
+        //Новый код Польской записи (проверяю)
+        polish.push_operation(returnOpc);
+        //Добавляем прыжок в конец цикла
+        polish.set_goto_label(for_return);
+
+        goto _4;
     }
     scanAliend->setPosition(position);
     lex = saveLex;
@@ -3211,6 +3233,7 @@ bool Parser::End()
     {
         goto _end;
     }
+
 
     //    if(nextLex() == lcEof)
     //    {
@@ -3792,6 +3815,52 @@ _3:
 
     if(switchCase())
     {
+        goto _4;
+    }
+    scanAliend->setPosition(position);
+    lex = saveLex;
+
+    //return function
+    if(lex == keyReturn)
+    {
+        nextLex();
+
+
+        //    if(lex == keyString)
+        //    {
+        //        nextLex();
+        //    }
+
+        if(lex == lcCharConst)
+        {
+            nextLex();
+        }
+
+        if(Expression())
+        {
+            polish.End();
+        }
+
+        switch (typ)
+        {
+            case label_if_true:
+                //Новый код Польской записи (проверяю)
+                polish.push_operation(returnOpc);
+                //Добавляем прыжок в конец цикла
+                polish.set_goto_label(if_return_t);
+            break;
+            case label_if_false:
+                //Новый код Польской записи (проверяю)
+                polish.push_operation(returnOpc);
+                //Добавляем прыжок в конец цикла
+                polish.set_goto_label(if_return_f);
+            break;
+            default:break;
+        }
+
+
+
+
         goto _4;
     }
     scanAliend->setPosition(position);

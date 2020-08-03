@@ -107,10 +107,17 @@ typedef enum {
     gotoOpcIf_falseBreak,//goto метка для выхода из цикла (for) в ложном условии
     gotoOpcIf_trueContinue,
     gotoOpcIf_falseContinue,
+    gotoOpcIf_trueReturn,
+    gotoOpcIf_falseReturn,
+
     gotoOpcFor,         //goto метка для перехода в цикле
     gotoOpcFor_infinity, //goto метка для перехода в while(1)
     gotoOpcFor_break,   //goto метка для перехода из цикла for
     gotoOpcFor_continue,
+    gotoOpc_return,
+    gotoOpcFor_return,
+    gotoOpcIf_true_return,
+    gotoOpcIf_false_return,
 
     ifZOpc_for,           //ifZ (если условие отрицательное то перейти по метке выйти из цикла)
     ifZOpc_while,         //ifZ (если условие отрицательное то перейти по метке выйти из цикла)
@@ -121,7 +128,8 @@ typedef enum {
     switchOpc,          //switch
     param,              // param Xn
     callFunc_Begin,     // call func
-    callFunc_End
+    callFunc_End,
+    returnOpc           //return
 
 } opcType;
 

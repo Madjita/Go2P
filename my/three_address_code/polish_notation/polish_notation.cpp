@@ -26,6 +26,10 @@ void Polish_notation::push_operation(opcType var_opc)
     switch (instruction_ptr->opc)
     {
 
+    case gotoOpcIf_trueReturn:
+    case gotoOpcIf_falseReturn:
+    case gotoOpc_return:
+    case gotoOpcFor_return:
     case gotoOpcIf_trueContinue:
     case gotoOpcIf_falseContinue:
 
@@ -91,12 +95,30 @@ void Polish_notation::push_operation(opcType var_opc)
     }
     case callFunc_End:
     {
+
+
+        //Заполняем переходы по return
+        //В стеке есть return
+
+        while(!stack_return.empty())
+        {
+            stack_return.top()->arg1->val.label->position = vector_polish.size();
+            stack_return.pop();
+        }
+
         //Добавим созданную инструкцию в стек операций
         stack_operations.push(instruction_ptr);
         End();
         return;
     }
     case param:
+    {
+        //Добавим созданную инструкцию в стек операций
+        stack_operations.push(instruction_ptr);
+        End();
+        return;
+    }
+    case returnOpc:
     {
         //Добавим созданную инструкцию в стек операций
         stack_operations.push(instruction_ptr);
@@ -345,6 +367,12 @@ void Polish_notation::End()
             add_rezult_operand(pop_operation_top,pop_operand());
             break;
         }
+        case returnOpc:
+        {
+            //устанавливаем в трехадресном коде инструкции Результат являющийся переменной
+            add_rezult_operand(pop_operation_top,pop_operand());
+            break;
+        }
         default:
         {
             //Достаем правый операнд
@@ -460,18 +488,19 @@ void Polish_notation::out_stek_file(string fileName)
         //            str +="\t";
         //        }
 
-        str+=to_string(positionIn_vvector_polish)+":\t";
+        str+=to_string(positionIn_vvector_polish)+":\t\t";
         if(top->arg1 != nullptr)
         {
             switch (top->arg1->typ)
             {
             case constOpd:
             {
-                str += to_string(top->arg1->val.cons->val.unum)+"\t";
+                str += to_string(top->arg1->val.cons->val.unum)+"\t\t\t";
                 break;
             }
             case nameVarOpd:
             {
+
                 auto tmpItem = top->arg1->val.var;
 
                 while(!tmpItem->parent_empty())
@@ -480,37 +509,48 @@ void Polish_notation::out_stek_file(string fileName)
                     tmpItem = top->arg1->val.var->parent_get();
                 }
 
-                str += top->arg1->val.var->get_name()+"\t";
+                str += top->arg1->val.var->get_name()+"\t\t\t";
                 break;
             }
             case tmpVarOpd:
             {
-                str += top->arg1->val.varTmp->name+"\t";
+                str += top->arg1->val.varTmp->name+"\t\t\t";
                 break;
             }
             case labelOpd:
             {
-                str += "_L"+to_string(top->arg1->val.label->position)+"\t";
+                str += "_L"+to_string(top->arg1->val.label->position);
+
+                if(str.size() > 3)
+                {
+                   str +="\t\t";
+                }
+                else
+                {
+                   str +="\t\t\t";
+                }
+
+
                 break;
             }
             case call:
             {
-                str += top->rez->val.fanc->getNameFuncType()+"\t";
+                str += top->rez->val.fanc->getNameFuncType()+"\t\t\t";
                 break;
             }
 
             default:
-                str += "null\t";
+                str += "null\t\t";
                 break;
             }
 
         }
         else
         {
-            str += "null\t";
+            str += "null\t\t";
         }
 
-        str +=opc(top->opc)+"\t";
+        str +=opc(top->opc)+"\t\t\t\t";
 
         if(top->arg2 != nullptr)
         {
@@ -558,7 +598,7 @@ void Polish_notation::out_stek_file(string fileName)
         }
         else
         {
-            str += "null\t";
+            str += "null\t\t";
         }
 
         str +="\t=\t";
@@ -638,6 +678,8 @@ string Polish_notation::opc(opcType typ)
     case gotoOpcIf_falseBreak: str = "goto_ifz_f_B";    break;              //goto метка для выхода из цикла (for) в ложном условии
     case gotoOpcIf_trueContinue: str = "goto_ifz_t_C";  break;
     case gotoOpcIf_falseContinue: str = "goto_ifz_f_C"; break;
+    case gotoOpcIf_trueReturn:      str = "goto_ifz_t_r"; break;
+    case gotoOpcIf_falseReturn:     str = "goto_ifz_f_r"; break;
     case gotoOpcFor: str = "goto_for";                  break;               //goto метка для перехода в цикле
     case gotoOpcFor_continue: str = "goto_for_C";       break;
     case gotoOpcFor_break: str = "goto_for_B";          break;              //goto метка для перехода из цикла for
@@ -647,7 +689,9 @@ string Polish_notation::opc(opcType typ)
     case callFunc_Begin:      str = "call_f_begin";     break;
     case callFunc_End:      str = "call_f_end";     break;
     case param:     str = "param";      break;
-
+    case returnOpc: str ="return";break;
+    case gotoOpc_return: str = "goto_return";break;
+    case gotoOpcFor_return: str = "goto_for_return";break;
     default: break;
     }
 
@@ -722,11 +766,90 @@ void Polish_notation::set_goto_label(for_or_if typ)
             push_operation(gotoOpc);
             break;
         }
+
+        case func_return:
+        {
+            //Установить оператор goto (по достижению закрывающейся скобки функции)
+            push_operation(gotoOpc_return);
+            //Сохраняем return в стек;
+            stack_return.push(stack_goto_labels.top());
+            //Убираем break из массива так как он хранится в стеке return;
+            stack_goto_labels.pop();
+            break;
+        }
+        case for_return: {
+            //Установить оператор goto (по достижению закрывающейся скобки функции)
+            push_operation(gotoOpcFor_return);
+            //Сохраняем return в стек;
+            stack_return.push(stack_goto_labels.top());
+            //Убираем break из массива так как он хранится в стеке return;
+            stack_goto_labels.pop();
+            break;
+        }
+        case if_return_t:
+        {
+            //Установить оператор goto (по достижению закрывающейся скобки функции)
+            push_operation(gotoOpcIf_trueReturn);
+            //Сохраняем return в стек;
+            stack_return.push(stack_goto_labels.top());
+            //Убираем break из массива так как он хранится в стеке return;
+            stack_goto_labels.pop();
+        }
+        case if_return_f:
+        {
+            //Установить оператор goto (по достижению закрывающейся скобки функции)
+            push_operation(gotoOpcIf_falseReturn);
+            //Сохраняем return в стек;
+            stack_return.push(stack_goto_labels.top());
+            //Убираем break из массива так как он хранится в стеке return;
+            stack_goto_labels.pop();
+        }
         default: break;
         }
         return;
     }
 
+    if (typ == if_return_t)
+    {
+        //Установить оператор goto (по достижению закрывающейся скобки функции)
+        push_operation(gotoOpcIf_trueReturn);
+        //Сохраняем return в стек;
+        stack_return.push(stack_goto_labels.top());
+        //Убираем break из массива так как он хранится в стеке return;
+        stack_goto_labels.pop();
+    }
+
+    if (typ == if_return_f)
+    {
+        //Установить оператор goto (по достижению закрывающейся скобки функции)
+        push_operation(gotoOpcIf_falseReturn);
+        //Сохраняем return в стек;
+        stack_return.push(stack_goto_labels.top());
+        //Убираем break из массива так как он хранится в стеке return;
+        stack_goto_labels.pop();
+    }
+
+    if(typ == func_return)
+    {
+        //Установить оператор goto (по достижению закрывающейся скобки цикла)
+        push_operation(gotoOpc_return);
+        //Сохраняем return в стек;
+        stack_return.push(stack_goto_labels.top());
+        //Убираем break из массива так как он хранится в стеке return;
+        stack_goto_labels.pop();
+        return;
+    }
+
+    if(typ == for_return)
+    {
+        //Установить оператор goto (по достижению закрывающейся скобки цикла)
+        push_operation(gotoOpcFor_return);
+        //Сохраняем return в стек;
+        stack_return.push(stack_goto_labels.top());
+        //Убираем break из массива так как он хранится в стеке return;
+        stack_goto_labels.pop();
+        return;
+    }
 
     if(typ == it_is_for_continue)
     {
