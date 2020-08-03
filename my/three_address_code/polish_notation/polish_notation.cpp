@@ -125,6 +125,19 @@ void Polish_notation::push_operation(opcType var_opc)
         End();
         return;
     }
+    case arg_call_func:
+    {
+        //Добавим созданную инструкцию в стек операций
+        stack_operations.push(instruction_ptr);
+        End();
+        return;
+    }
+    case call_func:{
+        //Добавим созданную инструкцию в стек операций
+        stack_operations.push(instruction_ptr);
+        End();
+        return;
+    }
     default:
     {
         //Если стек операций не пустой
@@ -322,7 +335,6 @@ void Polish_notation::End()
             exit(-1);
             break;
         }
-
         case dicrimentOpc:
         case incrimentOpc:
         {
@@ -371,6 +383,20 @@ void Polish_notation::End()
         {
             //устанавливаем в трехадресном коде инструкции Результат являющийся переменной
             add_rezult_operand(pop_operation_top,pop_operand());
+            break;
+        }
+        case arg_call_func:
+        {
+            //устанавливаем в трехадресном коде инструкции Результат являющийся переменной
+            pop_operand_left = pop_operand();
+            break;
+        }
+        case call_func:{
+            //Достаем правый операнд
+            pop_operand_right = pop_operand();
+            //Достаем левый операнд
+            pop_operand_left = pop_operand();
+            //Создаем временную переменную операнд и добавляемв в стек операндов
             break;
         }
         default:
@@ -535,7 +561,7 @@ void Polish_notation::out_stek_file(string fileName)
             }
             case call:
             {
-                str += top->rez->val.fanc->getNameFuncType()+"\t\t\t";
+                str += top->arg1->val.fanc->getNameFuncType()+"\t\t\t";
                 break;
             }
 
@@ -556,6 +582,8 @@ void Polish_notation::out_stek_file(string fileName)
         {
             switch (top->arg2->typ)
             {
+
+            case funcVar_count:
             case constOpd:
             {
                 str += to_string(top->arg2->val.cons->val.unum)+"\t";
@@ -690,6 +718,8 @@ string Polish_notation::opc(opcType typ)
     case callFunc_End:      str = "call_f_end";     break;
     case param:     str = "param";      break;
     case returnOpc: str ="return";break;
+    case arg_call_func: str ="arg_call_func";break;
+    case call_func: str = "call_func";break;
     case gotoOpc_return: str = "goto_return";break;
     case gotoOpcFor_return: str = "goto_for_return";break;
     default: break;

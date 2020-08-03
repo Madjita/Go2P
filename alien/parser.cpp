@@ -1509,12 +1509,23 @@ _end:
 
 bool Parser::funcArgsCall()
 {
+    unsigned int count_arg = 0;
 _0:
     if(Expression())
     {
+        polish.push_operation(arg_call_func);
+        count_arg++;
 
         if(lex == lcRCircle)
         {
+            polish.push_operand(call,call_function->call_func_type_);
+
+            CONST *val = new CONST;
+            val->val.unum = count_arg;
+            val->typ = INTTYP;
+            polish.push_operand(funcVar_count,val);
+
+            polish.push_operation(call_func);
             goto _end;
         }
 
@@ -1699,6 +1710,8 @@ bool Parser::Variable()
     FuncType* find_func = nullptr;
     MyVariable* Object_variable = nullptr;
 
+
+
     vector<string> save_name_hard_type;
     vector<string> save_type;
     vector<MyVariable*> save_object_hard_type;
@@ -1747,6 +1760,8 @@ _0:
                                 {
                                     // мы нашли функцию
                                     //Значит данное имя явлется вызовом функции
+                                    call_function = new FuncCall(find_func);
+                                    newFuncItem->add_callFun_name(call_function);
                                 }
                                 else
                                 {
@@ -1890,11 +1905,14 @@ _1:
 
 
 _3:
+    //вызов функции
     if(funcArgsCall())
     {
+
+
         if(lex == lcRCircle)
         {
-            nextLex();
+            //nextLex();
             goto _end;
         }
     }
@@ -2072,9 +2090,6 @@ bool Parser::Number()
         CONST* item = new CONST;
         item->typ =  INTTYP;
         item->val.unum = scanAliend->GetIntValue();
-
-
-        //inter.add_operand(inter.create_myoperand(constOpd,item));
 
         //Новый код Польской записи (проверяю)
         polish.push_operand(constOpd,item);
@@ -3086,6 +3101,7 @@ _0:
     newHardTypeItem = nullptr;
     newFuncItem = nullptr;
     point_if_else = nullptr;
+    call_function = nullptr;
 
     position = scanAliend->getPosition();
     saveLex = lex;

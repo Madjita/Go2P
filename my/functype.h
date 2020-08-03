@@ -17,7 +17,7 @@ using namespace std;
 
 #include "my/myvariable.h"
 
-
+class FuncCall;
 class IfElse;
 
 class FuncType
@@ -86,6 +86,8 @@ public:
 //    vector<MyVariable*>  for_variables;
 
 
+    //vectorCallFun
+    void add_callFun_name(FuncCall* call_func);
 private:
     string nameFun;
     string returnType;
@@ -103,7 +105,7 @@ private:
     vector<vector<map<LexClass,string>>> vvMap_KeyData;
 
 
-    vector<FuncCall> vectorCallFun;
+    vector<FuncCall*> vectorCallFun;
 };
 
 #endif // FUNCTYPE_H

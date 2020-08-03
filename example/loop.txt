@@ -1,19 +1,15 @@
 func add(a,b int) int
 { 
-    for
-    {
-      if 2 > 10
-      {
-        return a-b
-      }
-      else
-      {
-        return a*b
-      }
-    }
     return a+b
 }
 
+func main() 
+{
+  x := 5
+  add(1,x)
+}
+
+/* 
 func sum(x,y int)
 {
     for i := 0; i < 10; ++i
@@ -21,7 +17,7 @@ func sum(x,y int)
       sum := i
     }
   
-/* 
+
   sum2 := 1
   for ; sum2 < 1000; sum2++ {
     x := 12
@@ -60,5 +56,6 @@ func sum(x,y int)
 
     break
   }
-  */
+
 }
+  */

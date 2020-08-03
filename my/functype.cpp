@@ -283,6 +283,11 @@ IfElse *FuncType::get_if_else(int position)
     return if_else[position];
 }
 
+void FuncType::add_callFun_name(FuncCall *call_func)
+{
+    vectorCallFun.push_back(call_func);
+}
+
 void FuncType::add_new_if_else()
 {
     IfElse* last_item = nullptr;

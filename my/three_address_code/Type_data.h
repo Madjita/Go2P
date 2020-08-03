@@ -64,6 +64,7 @@ typedef enum {
     tmpVarOpd,  // промежуточная переменная в выражениях
     funcVar,    // аргументы функции
     call,       // функция
+    funcVar_count, // количество аргументов переданных в функцию
     constOpd,   // константный операнд
     labelOpd    // операнд - метка
 } opdType;
@@ -129,7 +130,9 @@ typedef enum {
     param,              // param Xn
     callFunc_Begin,     // call func
     callFunc_End,
-    returnOpc           //return
+    returnOpc,           //return
+    arg_call_func,       //Передача аргументов в функцию
+    call_func,           //Вызов функции
 
 } opcType;
 

@@ -15,6 +15,7 @@ using namespace std;
 #include "my/functype.h"
 #include "my/recordhardtype.h"
 #include "my/ifelse.h"
+#include "my/funccall.h"
 
 #include "alien/CompileErrors.h"
 
@@ -119,6 +120,8 @@ private:
     FuncType* newFuncItem;
     HardType* newHardTypeItem;
     RecordHardType* newRecordHardTypeItem;
+
+    FuncCall* call_function;
 
     //Не знаю нужен ли тут указать на условия но его сложно передавать по функциям
     class IfElse* point_if_else; //временный указатель на актуальное условие

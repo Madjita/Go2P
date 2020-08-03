@@ -36,6 +36,8 @@ OPERAND *Three_address_code::Create_new_operand(opdType typ, void *val)
         opdPtr->val.label = new LABEL;
         opdPtr->val.label->position = 0;
         break;
+
+    case funcVar_count:
     case constOpd:
         opdPtr->val.cons = (struct CONST *)val;
         break;
