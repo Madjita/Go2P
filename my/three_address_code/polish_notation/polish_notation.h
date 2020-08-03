@@ -61,7 +61,7 @@ public:
     vector<INSTRUCTION*> get_vector_polish();
 
     //Преобразование операции в строку операции
-    string opc(opcType typ);
+    static string opc(opcType typ);
 
     //Установить метку
     void set_goto_label(for_or_if typ);
@@ -97,6 +97,8 @@ private:
     stack<vector<INSTRUCTION*>*> stack_expression_for; //сохранить действия которые должны быть выполненны в конце цикла
 
     vector<FuncType*> vector_func; // Сохраняем список объявленных функций
+
+    bool flag_lCircle;
 };
 
 #endif // POLISH_NOTATION_H

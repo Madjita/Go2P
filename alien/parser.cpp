@@ -359,16 +359,6 @@ _7:
         position = scanAliend->getPosition();
         saveLex = lex;
         saveValue = scanAliend->GetTxtValue();
-        //saveValue = scanAliend->GetTxtValue();
-
-        //        string value = scanAliend->GetTxtValue();
-        //        if(lex == lcId && scanAliend->GetLex() != lcId)
-        //        {
-        //            position.value = *value.begin();
-        //            position.position_file_str = position.position_file_str - (value.size()-1);
-        //            position.position_col_char_str = position.position_col_char_str - (value.size()-1);
-        //            scanAliend->setPosition(position);
-        //        }
 
         //Ищим имя в функциях
         if(lex == lcId)
@@ -2377,7 +2367,7 @@ bool Parser::Addition()
             if(vvMap_KeyData.rbegin()->size() > 1)
             {
                 auto item = (vvMap_KeyData.rbegin()->rbegin())->rbegin()->first; //+1
-                if(item == lcId || item == lcIntNum || item == lcRealNum || item == lcRCircle)
+                if(item == lcId || item == lcIntNum || item == lcRealNum || item == lcRCircle || item == lcLCircle)
                 {
                     //Новый код Польской записи (проверяю)
                     polish.push_operation(plusOpc);
@@ -2422,7 +2412,7 @@ bool Parser::Addition()
             if(vvMap_KeyData.rbegin()->size() > 1)
             {
                 auto item = (vvMap_KeyData.rbegin()->rbegin())->rbegin()->first; //+1
-                if(item == lcId || item == lcIntNum || item == lcRealNum || item == lcRCircle)
+                if(item == lcId || item == lcIntNum || item == lcRealNum || item == lcRCircle || item == lcLCircle)
                 {
                     //Новый код Польской записи (проверяю)
                     polish.push_operation(minusOpc);

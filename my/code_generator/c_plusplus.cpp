@@ -14,6 +14,7 @@ bool C_PlusPlus::generate(vector<INSTRUCTION *> vector_polish)
 
     vector<INSTRUCTION*> vector_func_args;
     vector<INSTRUCTION*> vector_return;
+    stack<INSTRUCTION*> stack_expression;
 
     for(INSTRUCTION* item: vector_polish)
     {
@@ -31,15 +32,15 @@ bool C_PlusPlus::generate(vector<INSTRUCTION *> vector_polish)
                 str += return_type+" ";
             }
             else {
-               str += "void ";
+                str += "void ";
             }
 
-             //Вставляем имя функции
-             str += item->rez->val.fanc->getNameFuncType()+" ";
-             str += "(";
+            //Вставляем имя функции
+            str += item->rez->val.fanc->getNameFuncType()+" ";
+            str += "(";
 
-             if(!vector_func_args.empty())
-             {
+            if(!vector_func_args.empty())
+            {
                 str += " ";
 
                 for(int i=0; i < vector_func_args.size();i++)
@@ -53,17 +54,17 @@ bool C_PlusPlus::generate(vector<INSTRUCTION *> vector_polish)
                         str += ", ";
 
                     //Находим локальную переменную
-                   //auto item_local = item->rez->val.fanc->get_variable_at();
+                    //auto item_local = item->rez->val.fanc->get_variable_at();
                 }
 
                 vector_func_args.clear();
-             }
+            }
 
-             str+= ")";
-             str+= "\n";
-             str+= "{";
-             str+= "\n";
-             str+= "\t";
+            str+= ")";
+            str+= "\n";
+            str+= "{";
+            str+= "\n";
+            str+= "\t";
 
             break;
         }
@@ -91,11 +92,38 @@ bool C_PlusPlus::generate(vector<INSTRUCTION *> vector_polish)
 
             break;
         }
-
         case callFunc_End:{
             str+= "}\n";
             str+= "\n";
             break;
+        }
+
+        case LCircleOpc:
+        case RCircleOpc:
+        case slashOpc:
+        case starOpc:
+        case minusOpc:
+        case plusOpc:
+        case minusUnOpc:
+        case plusUnOpc:
+        {
+            stack_expression.push(item);
+            break;
+        }
+        case assignOpc:
+        {
+            str += "auto ";
+            str += item->rez->val.var->get_name()+" ";
+            str += "= ";
+            //expression
+            expression(str,stack_expression,item->arg1->val.varTmp->name);
+
+
+
+            str += "\n";
+            str +="\t";
+
+
         }
         default:
             break;
@@ -106,3 +134,193 @@ bool C_PlusPlus::generate(vector<INSTRUCTION *> vector_polish)
 
     fileOut2.close();
 }
+
+void C_PlusPlus::expression(string &str, stack<INSTRUCTION *> &stack_expression, string tmp)
+{
+    stack<INSTRUCTION *> stack_;
+
+    while(!stack_expression.empty())
+    {
+        auto item = stack_expression.top();
+
+
+        stack<INSTRUCTION *> copy = stack_expression;
+
+
+        if(item->rez != nullptr)
+        {
+            if(item->rez->val.varTmp->name != tmp)
+            {
+                stack_.push(stack_expression.top());
+                stack_expression.pop();
+                continue;
+            }
+        }
+
+
+        if(item->arg1 != nullptr && item->arg2 != nullptr)
+        {
+            if(item->arg1->typ == tmpVarOpd && item->arg2->typ == tmpVarOpd)
+            {
+
+                copy.pop();
+
+                bool flag = false;
+                int priority = item->priority_rang;
+                if(priority < copy.top()->priority_rang)
+                {
+                    str += "(";
+                    flag = true;
+                }
+
+
+                expression(str,copy,item->arg1->val.varTmp->name);
+
+                if(flag)
+                {
+                    str += ")";
+                }
+
+            }
+            else
+            {
+                switch (item->arg1->typ)
+                {
+                case nameVarOpd:
+                {
+                    str += item->arg1->val.var->get_name();
+                    break;
+                }
+                case constOpd:
+                {
+
+                    switch (item->arg1->val.cons->typ)
+                    {
+                    case INTTYP:
+                        str += to_string(item->arg1->val.cons->val.unum);
+                        break;
+
+                    default:break;
+                    }
+                    break;
+                }
+                case tmpVarOpd:
+                {
+
+                    int priority = item->priority_rang;
+                    stack_expression.pop();
+
+                    bool flag = false;
+                    if(priority < stack_expression.top()->priority_rang)
+                    {
+                        str += "(";
+                        flag = true;
+                    }
+
+
+                    expression(str,stack_expression,item->arg1->val.varTmp->name);
+
+                    if(flag)
+                    {
+                        str += ")";
+                    }
+
+                    break;
+                }
+                default:break;
+                }
+
+            }
+
+        }
+
+        str += Polish_notation::opc(item->opc);
+
+        if(item->arg2 != nullptr)
+        {
+            if(item->arg1->typ == tmpVarOpd && item->arg2->typ == tmpVarOpd)
+            {
+                bool flag = false;
+                int priority = item->priority_rang;
+                if(priority < copy.top()->priority_rang)
+                {
+                    str += "(";
+                    flag = true;
+                }
+
+                expression(str,copy,item->arg2->val.varTmp->name);
+
+                if(flag)
+                {
+                    str += ")";
+                }
+
+                stack_expression = copy;
+            }
+            else
+            {
+                switch (item->arg2->typ)
+                {
+                case nameVarOpd:
+                    str += item->arg2->val.var->get_name();
+                    break;
+                case constOpd:
+                {
+
+                    switch (item->arg2->val.cons->typ)
+                    {
+                    case INTTYP:
+                        str += to_string(item->arg2->val.cons->val.unum);
+                        break;
+
+                    default:break;
+                    }
+                    break;
+                }
+                case tmpVarOpd:
+                {
+
+                    int priority = item->priority_rang;
+                    stack_expression.pop();
+
+                    bool flag = false;
+                    if(priority < stack_expression.top()->priority_rang)
+                    {
+                        str += "(";
+                        flag = true;
+                    }
+
+                    expression(str,stack_expression,item->arg2->val.varTmp->name);
+
+                    if(flag)
+                    {
+                        str += ")";
+                    }
+
+                    break;
+                }
+                default:break;
+                }
+            }
+
+        }
+
+        if(item->arg2 != nullptr && item->arg1 != nullptr)
+        {
+            if(item->arg1->typ != tmpVarOpd && item->arg2->typ != tmpVarOpd)
+            {
+                stack_expression.pop();
+            }
+        }
+
+
+        while(!stack_.empty())
+        {
+            stack_expression.push(stack_.top());
+            stack_.pop();
+        }
+
+        return;
+    }
+}
+

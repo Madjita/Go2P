@@ -161,6 +161,8 @@ void Polish_notation::push_operation(opcType var_opc)
                 //инструкции пока не впихнется данная иснструкция
                 pop_operation_top = pop_operation();
 
+
+
                 //Если мы хотим положить Закрывающуюся скобочку а наткнулись на открывающуюся , то убрать открывающуюся и выйти из метода
                 if(pop_operation_top->opc == LCircleOpc && instruction_ptr->opc == RCircleOpc)
                 {
@@ -173,6 +175,7 @@ void Polish_notation::push_operation(opcType var_opc)
                 {
                 case LCircleOpc:
                 {
+
                     break;
                 }
 

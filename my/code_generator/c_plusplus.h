@@ -12,6 +12,8 @@ public:
 
     virtual bool generate(vector<INSTRUCTION *> vector_polish);
 
+    void expression(string &str, stack<INSTRUCTION *> &stack_expression,string tmp);
+
 private:
     ofstream fileOut2;
 
