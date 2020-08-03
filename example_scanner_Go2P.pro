@@ -20,6 +20,8 @@ SOURCES += \
         alien/parser.cpp \
         alien/scanner.cpp \
         alien/tlt.cpp \
+        my/code_generator/c_plusplus.cpp \
+        my/code_generator/codegenerator.cpp \
         my/funccall.cpp \
         my/functype.cpp \
         my/hardtype.cpp \
@@ -45,6 +47,8 @@ HEADERS += \
     alien/scanner.h \
     alien/tlt.h \
     hardtype.h \
+    my/code_generator/c_plusplus.h \
+    my/code_generator/codegenerator.h \
     my/funccall.h \
     my/functype.h \
     my/hardtype.h \

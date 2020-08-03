@@ -57,6 +57,9 @@ public:
 
     //Записать в файл результат
     void out_stek_file(string fileName);
+
+    vector<INSTRUCTION*> get_vector_polish();
+
     //Преобразование операции в строку операции
     string opc(opcType typ);
 

@@ -38,6 +38,7 @@ bool ReadAllBytes(string filename,string& data)
 
 #include <my/myvariable.h>
 
+#include "my/code_generator/codegenerator.h"
 
 bool Start_program(Parser* pars);
 
@@ -180,6 +181,12 @@ int main(int argc, char *argv[])
      fileOut << pars.getWorkData();
 
      fileOut.close();
+
+
+     //Код генератор
+     CodeGenerator generator;
+     generator.generate(pars.polish.get_vector_polish(),all);
+
 
     system("pause");
     return 0;

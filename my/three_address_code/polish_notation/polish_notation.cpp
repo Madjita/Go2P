@@ -673,6 +673,11 @@ void Polish_notation::out_stek_file(string fileName)
 
 }
 
+vector<INSTRUCTION *> Polish_notation::get_vector_polish()
+{
+    return vector_polish;
+}
+
 string Polish_notation::opc(opcType typ)
 {
     string str = "";

@@ -205,7 +205,16 @@ bool FuncType::add_variables_to_vector(string name)
 
 bool FuncType::add_variables_type(string type)
 {
-    get_variable_at(variables.size()-1)->set_type(type); //установка типа
+
+    for(int i=0; i < variables.size();i++)
+    {
+        if(get_variable_at(i)->get_type() == "")
+        {
+            get_variable_at(i)->set_type(type); //установка типа
+        }
+    }
+
+    //get_variable_at(variables.size()-1)->set_type(type); //установка типа
 }
 
 bool FuncType::add_variables_expression(string expression)
