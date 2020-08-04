@@ -14,6 +14,8 @@ public:
 
     void expression(string &str, stack<INSTRUCTION *> &stack_expression,string tmp);
 
+    string expression(INSTRUCTION * item);
+
 private:
     ofstream fileOut2;
 

@@ -115,7 +115,6 @@ private:
 
     int savePosition;
 
-
     //
     FuncType* newFuncItem;
     HardType* newHardTypeItem;

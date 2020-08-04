@@ -22,12 +22,6 @@ struct INSTRUCTION
     struct OPERAND *rez;
 
     int priority_rang; //ранг приоритета операции
-
-    enum{
-        none,
-        leftCircle,
-        rightCircle
-    } circle;
 };
 
 

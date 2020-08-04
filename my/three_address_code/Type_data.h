@@ -111,6 +111,10 @@ typedef enum {
     gotoOpcIf_trueReturn,
     gotoOpcIf_falseReturn,
 
+    elseOpc,
+
+    loop_begin,
+    lopp_end,
     gotoOpcFor,         //goto метка для перехода в цикле
     gotoOpcFor_infinity, //goto метка для перехода в while(1)
     gotoOpcFor_break,   //goto метка для перехода из цикла for

@@ -1,7 +1,28 @@
 func add(a,b int) int
 {
-  c := 2+3*5
-  f := (5*(4-2)/1)*(2+3)
+  
+  f := (5-(4-2)/1)*(2+3)
+
+  for {
+      if 5 < 10
+      {
+        for {
+            if 5 < 10
+            {
+              break
+            }
+            else
+            {
+              break
+            }
+        }
+      }
+      else
+      {
+        break
+      }
+  }
+
   return 0
 }
 

@@ -16,14 +16,23 @@ bool C_PlusPlus::generate(vector<INSTRUCTION *> vector_polish)
     vector<INSTRUCTION*> vector_return;
     stack<INSTRUCTION*> stack_expression;
 
-    for(INSTRUCTION* item: vector_polish)
+    stack<stack<INSTRUCTION*>*> loop;
+
+
+    int tabs = 0;
+
+    for(int i =0 ; i < vector_polish.size();i++)
     {
+        auto item = vector_polish[i];
+
         switch (item->opc)
         {
         case param:{
             vector_func_args.push_back(item);
             break;
         }
+
+
         case callFunc_Begin:{
             //Берем возвращяемое значение функции
             auto return_type = item->rez->val.fanc->getReturnFuncType();
@@ -64,12 +73,20 @@ bool C_PlusPlus::generate(vector<INSTRUCTION *> vector_polish)
             str+= "\n";
             str+= "{";
             str+= "\n";
-            str+= "\t";
+
+            tabs++;
+
 
             break;
         }
         case returnOpc:
         {
+            for(int i=0; i < tabs; i++)
+            {
+                str+= "\t";
+            }
+
+
             str+= "return ";
 
             switch (item->rez->typ)
@@ -87,17 +104,110 @@ bool C_PlusPlus::generate(vector<INSTRUCTION *> vector_polish)
             default:
                 break;
             }
-
+            str += ";";
             str += "\n";
 
             break;
         }
         case callFunc_End:{
+            tabs--;
             str+= "}\n";
             str+= "\n";
             break;
         }
+        case loop_begin:{
 
+            for(int i=0; i < tabs; i++)
+            {
+                str+= "\t";
+            }
+
+            str += "for {";
+            str += "\n";
+            tabs++;
+
+
+            break;
+        }
+        case gotoOpcFor_infinity:
+        {
+            tabs--;
+
+            for(int i=0; i < tabs; i++)
+            {
+                str+= "\t";
+            }
+
+            str += "}\n";
+
+            break;
+        }
+        case ifZOpc:
+        {
+            for(int i=0; i < tabs; i++)
+            {
+                str+= "\t";
+            }
+
+            str += "if ( ";
+
+            auto prev_item = vector_polish[i-1];
+
+            str += expression(prev_item);
+
+            str += " )";
+            str += "\n";
+
+            for(int i=0; i < tabs; i++)
+            {
+                str+= "\t";
+            }
+
+            str += "{";
+            str += "\n";
+            tabs++;
+
+            break;
+        }
+        case gotoOpcIfZ_false:
+        case gotoOpcIfZ_true:
+        {
+            tabs--;
+            for(int i=0; i < tabs; i++)
+            {
+                str+= "\t";
+            }
+            str += "}";
+            str += "\n";
+
+            break;
+        }
+        case elseOpc:
+        {
+            for(int i=0; i < tabs; i++)
+            {
+                str+= "\t";
+            }
+
+            str += "else";
+            str += "\n";
+
+            for(int i=0; i < tabs; i++)
+            {
+                str+= "\t";
+            }
+
+            str += "{";
+            str += "\n";
+            tabs++;
+
+
+            break;
+        }
+        case smallerOpc:
+        {
+            break;
+        }
         case LCircleOpc:
         case RCircleOpc:
         case slashOpc:
@@ -112,6 +222,11 @@ bool C_PlusPlus::generate(vector<INSTRUCTION *> vector_polish)
         }
         case assignOpc:
         {
+            for(int i=0; i < tabs; i++)
+            {
+                str+= "\t";
+            }
+
             str += "auto ";
             str += item->rez->val.var->get_name()+" ";
             str += "= ";
@@ -119,11 +234,25 @@ bool C_PlusPlus::generate(vector<INSTRUCTION *> vector_polish)
             expression(str,stack_expression,item->arg1->val.varTmp->name);
 
 
-
+            str += ";";
             str += "\n";
-            str +="\t";
 
+            break;
+        }
 
+        case gotoOpcIf_falseBreak:
+        case gotoOpcIf_trueBreak:
+        case gotoOpcFor_break:
+        {
+            for(int i=0; i < tabs; i++)
+            {
+                str+= "\t";
+            }
+
+            str += "break;";
+            str += "\n";
+
+            break;
         }
         default:
             break;
@@ -138,6 +267,7 @@ bool C_PlusPlus::generate(vector<INSTRUCTION *> vector_polish)
 void C_PlusPlus::expression(string &str, stack<INSTRUCTION *> &stack_expression, string tmp)
 {
     stack<INSTRUCTION *> stack_;
+
 
     while(!stack_expression.empty())
     {
@@ -322,5 +452,64 @@ void C_PlusPlus::expression(string &str, stack<INSTRUCTION *> &stack_expression,
 
         return;
     }
+}
+
+string C_PlusPlus::expression(INSTRUCTION *item)
+{
+    string str = "";
+
+    switch (item->arg1->typ)
+    {
+    case nameVarOpd:
+    {
+        str += item->arg1->val.var->get_name();
+        break;
+    }
+    case constOpd:
+    {
+        switch (item->arg1->val.cons->typ)
+        {
+        case INTTYP:
+            str += to_string(item->arg1->val.cons->val.unum);
+            break;
+        default:break;
+        }
+        break;
+    }
+    case tmpVarOpd:
+    {
+        break;
+    }
+    default:break;
+    }
+
+    str += Polish_notation::opc(item->opc);
+
+    switch (item->arg2->typ)
+    {
+    case nameVarOpd:
+    {
+        str += item->arg2->val.var->get_name();
+        break;
+    }
+    case constOpd:
+    {
+        switch (item->arg2->val.cons->typ)
+        {
+        case INTTYP:
+            str += to_string(item->arg2->val.cons->val.unum);
+            break;
+        default:break;
+        }
+        break;
+    }
+    case tmpVarOpd:
+    {
+        break;
+    }
+    default:break;
+    }
+
+    return str;
 }
 

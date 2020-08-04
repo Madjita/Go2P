@@ -2510,6 +2510,9 @@ _5:
 
     if(lex == keyElse)
     {
+
+       polish.push_operation(elseOpc);
+
         nextLex();
 
         //Код если есть ELSE
@@ -2566,6 +2569,10 @@ bool Parser::loop()
     {
         // сохраняем позицию метки на начало цикла for
         polish.save_label_begin_for();
+
+        //Новый код Польской записи (проверяю)
+        polish.push_operation(loop_begin);
+
         nextLex();
     }
     else
