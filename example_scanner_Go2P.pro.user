@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.12.1, 2020-08-04T00:05:57. -->
+<!-- Written by QtCreator 4.12.1, 2020-08-06T11:19:52. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -306,15 +306,14 @@
     </valuelist>
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">example_scanner_Go2P2</value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/Users/serg/Documents/QtProject/example_scanner_Go2P/Go2P/example_scanner_Go2P.pro</value>
-    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/Users/serg/Documents/QtProject/example_scanner_Go2P/Go2P/example_scanner_Go2P.pro</value>
-    <value type="QString" key="RunConfiguration.Arguments">-in /Users/serg/Documents/QtProject/example_scanner_Go2P/Go2P/example/codeGen.txt</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/Users/serg/Documents/QtProject/Go2P/example_scanner_Go2P.pro</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/Users/serg/Documents/QtProject/Go2P/example_scanner_Go2P.pro</value>
+    <value type="QString" key="RunConfiguration.Arguments">-in /Users/serg/Documents/QtProject/Go2P/example/codeGen.txt</value>
     <value type="bool" key="RunConfiguration.Arguments.multi">false</value>
     <value type="QString" key="RunConfiguration.OverrideDebuggerStartup"></value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
-    <value type="bool" key="RunConfiguration.UseDyldImageSuffix">true</value>
+    <value type="bool" key="RunConfiguration.UseDyldImageSuffix">false</value>
     <value type="bool" key="RunConfiguration.UseLibrarySearchPath">true</value>
     <value type="bool" key="RunConfiguration.UseMultiProcess">false</value>
     <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>

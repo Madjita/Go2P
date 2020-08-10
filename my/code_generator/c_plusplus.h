@@ -16,6 +16,8 @@ public:
 
     string expression(INSTRUCTION * item);
 
+    string reverse(stack<char> stroka);
+
 private:
     ofstream fileOut2;
 

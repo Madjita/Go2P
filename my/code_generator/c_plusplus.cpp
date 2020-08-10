@@ -8,6 +8,86 @@ C_PlusPlus::C_PlusPlus(CodeGenerator* parent)
     fileOut2.open("C_PlusPlus.txt", ios::binary | ios::app); //| ios::trunc
     str = "";
 }
+/*
+bool C_PlusPlus::generate(vector<INSTRUCTION *> vector_polish)
+{
+   int tabs = 0;
+   vector<vector<string>> row_str;
+
+   string str;
+
+
+   //
+   vector<INSTRUCTION*> vector_func_args;
+
+   for(int i =0 ; i < vector_polish.size();i++)
+   {
+       auto item = vector_polish[i];
+
+       switch (item->opc)
+       {
+       case param:{
+           vector_func_args.push_back(item);
+           break;
+       }
+
+
+       case callFunc_Begin:{
+           //Берем возвращяемое значение функции
+           auto return_type = item->rez->val.fanc->getReturnFuncType();
+
+           if(return_type != ""){
+               str += return_type+" ";
+
+               vector<string> column;
+               column.push_back(str);
+               row_str.push_back(column);
+           }
+           else {
+               str += "void ";
+           }
+
+           //Вставляем имя функции
+           str += item->rez->val.fanc->getNameFuncType()+" ";
+           str += "(";
+
+           if(!vector_func_args.empty())
+           {
+               str += " ";
+
+               for(int i=0; i < vector_func_args.size();i++)
+               {
+                   auto item_arg = vector_func_args[i]->rez->val.var;
+                   str += item_arg->get_type();
+                   str += " ";
+                   str += item_arg->get_name();
+
+                   if(i+1 != vector_func_args.size())
+                       str += ", ";
+
+                   //Находим локальную переменную
+                   //auto item_local = item->rez->val.fanc->get_variable_at();
+               }
+
+               vector_func_args.clear();
+           }
+
+           str+= ")";
+           str+= "\n";
+           str+= "{";
+           str+= "\n";
+
+           tabs++;
+
+
+           break;
+       }
+       default:break;
+       }
+
+   }
+}
+*/
 
 bool C_PlusPlus::generate(vector<INSTRUCTION *> vector_polish)
 {
@@ -129,6 +209,69 @@ bool C_PlusPlus::generate(vector<INSTRUCTION *> vector_polish)
 
             break;
         }
+        case loop_short_init:
+        {
+            int j = str.size();
+            stack<char> find_str;
+            while(1)
+            {
+
+                if(str[j] == ' ')
+                {
+                    while(!find_str.empty())
+                    {
+                        find_str.pop();
+                    }
+
+                    j--;
+                    continue;
+                }
+
+                if(reverse(find_str) == "for")
+                {
+                    j += 5; // позиция вставки левой скобки
+                    str.insert(j,"( ");
+                    j += 2; // позиция удаления фигурной скобки и переноса строки
+                    str.erase(j,2);
+
+                    //Удаление лишних табуляций
+                    while(str[j] == '\t')
+                    {
+                        str.erase(j,1);
+                    }
+
+                    break;
+                }
+                find_str.push(str[j]);
+
+                j--;
+
+            }
+            break;
+        }
+        case gotoOpcFor:
+        {
+
+            if(!stack_expression.empty())
+            {
+                auto prev_item = vector_polish[i-1];
+                str += expression(prev_item);
+                str += " ;";
+                str += ") {";
+                str += "\n";
+            }
+
+            tabs--;
+
+            for(int i=0; i < tabs; i++)
+            {
+                str+= "\t";
+            }
+
+            str += "}\n";
+
+            break;
+        }
         case gotoOpcFor_infinity:
         {
             tabs--;
@@ -142,6 +285,17 @@ bool C_PlusPlus::generate(vector<INSTRUCTION *> vector_polish)
 
             break;
         }
+
+        case ifZOpc_for:
+        {
+            str.erase(str.size()-1,1);
+            str +=" ";
+            auto prev_item = vector_polish[i-1];
+            str += expression(prev_item);
+            str += ";";
+            break;
+        }
+
         case ifZOpc:
         {
             for(int i=0; i < tabs; i++)
@@ -214,6 +368,7 @@ bool C_PlusPlus::generate(vector<INSTRUCTION *> vector_polish)
         case starOpc:
         case minusOpc:
         case plusOpc:
+        case incrimentOpc:
         case minusUnOpc:
         case plusUnOpc:
         {
@@ -230,8 +385,39 @@ bool C_PlusPlus::generate(vector<INSTRUCTION *> vector_polish)
             str += "auto ";
             str += item->rez->val.var->get_name()+" ";
             str += "= ";
-            //expression
-            expression(str,stack_expression,item->arg1->val.varTmp->name);
+
+            if(stack_expression.empty())
+            {
+                switch (item->arg1->typ)
+                {
+                case nameVarOpd:
+                {
+                    str += item->arg1->val.var->get_name();
+                    break;
+                }
+                case constOpd:
+                {
+
+                    switch (item->arg1->val.cons->typ)
+                    {
+                    case INTTYP:
+                        str += to_string(item->arg1->val.cons->val.unum);
+                        break;
+
+                    default:break;
+                    }
+                    break;
+                }
+                default:break;
+                }
+
+            }
+            else
+            {
+                //expression
+                expression(str,stack_expression,item->arg1->val.varTmp->name);
+            }
+
 
 
             str += ";";
@@ -263,6 +449,7 @@ bool C_PlusPlus::generate(vector<INSTRUCTION *> vector_polish)
 
     fileOut2.close();
 }
+
 
 void C_PlusPlus::expression(string &str, stack<INSTRUCTION *> &stack_expression, string tmp)
 {
@@ -485,6 +672,8 @@ string C_PlusPlus::expression(INSTRUCTION *item)
 
     str += Polish_notation::opc(item->opc);
 
+    if(item->arg2 != nullptr)
+    {
     switch (item->arg2->typ)
     {
     case nameVarOpd:
@@ -508,6 +697,19 @@ string C_PlusPlus::expression(INSTRUCTION *item)
         break;
     }
     default:break;
+    }
+    }
+    return str;
+}
+
+string C_PlusPlus::reverse(stack<char> stroka)
+{
+    string str = "";
+
+    while(!stroka.empty())
+    {
+        str += stroka.top();
+        stroka.pop();
     }
 
     return str;

@@ -2583,6 +2583,9 @@ bool Parser::loop()
     /////////////
     if(StatementShortInit())
     {
+        //Новый код Польской записи (проверяю)
+        polish.push_operation(loop_short_init);
+
         for_type = it_is_for;
         polish.save_label_begin_for(for_type);
     }

@@ -114,6 +114,7 @@ typedef enum {
     elseOpc,
 
     loop_begin,
+    loop_short_init,
     lopp_end,
     gotoOpcFor,         //goto метка для перехода в цикле
     gotoOpcFor_infinity, //goto метка для перехода в while(1)
