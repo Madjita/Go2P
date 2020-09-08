@@ -541,10 +541,8 @@ _1:
                 return false;
             }
 
-            //Новый код Польской записи (проверяю)
-            //polish.push_operand(nameVarOpd,newFuncItem->get_variable_at(nameId));
-
         }
+
 
         nextLex();
         goto _2;
@@ -582,17 +580,22 @@ _2:
             //Новый код Польской записи (проверяю)
             //polish.push_operand(typeNameOpd,newFuncItem->get_variable_at(nameId));
 
-            if(flag_statement_one)
-            {
-                //Новый код Польской записи (проверяю)
-                polish.push_operation(var_statement_one);
-            }
-            else
-            {
-                //Новый код Польской записи (проверяю)
-                polish.push_operation(var_statement_more);
-            }
+
         }
+
+//        //Новый код Польской записи (проверяю)
+//        polish.push_operand(typeNameOpd,table.get_variable_in_globals(nameId));
+
+//        if(flag_statement_one)
+//        {
+//            //Новый код Польской записи (проверяю)
+//            polish.push_operation(var_statement_more);
+//        }
+//        else
+//        {
+//            //Новый код Польской записи (проверяю)
+//            polish.push_operation(var_statement_one);
+//        }
 
         nextLex();
         goto _3;
@@ -613,20 +616,25 @@ _3:
             {
                 //Добавить глобальную переменную в таблицу, так как находимся не в функции и данный тип существует как структра (сложный тип данных)
                 table.add_gloabals(lcId,nameId,lcHardType,type,newObject);
+            }
+            else
+            {
+                //Добавить глобальную переменную в таблицу, так как находимся не в функции и данный тип существует как структра (сложный тип данных)
+                table.add_gloabals(lcId,nameId,lcId,type,nullptr);
+            }
 
+            //Новый код Польской записи (проверяю)
+            polish.push_operand(nameVarOpd,table.get_variable_in_globals(nameId));
+
+            if(!flag_statement_one)
+            {
                 //Новый код Польской записи (проверяю)
-                polish.push_operand(typeNameOpd,table.get_variable_in_globals(nameId));
-
-                if(flag_statement_one)
-                {
-                    //Новый код Польской записи (проверяю)
-                    polish.push_operation(var_statement_one);
-                }
-                else
-                {
-                    //Новый код Польской записи (проверяю)
-                    polish.push_operation(var_statement_more);
-                }
+                polish.push_operation(var_statement_one);
+            }
+            else
+            {
+                //Новый код Польской записи (проверяю)
+                polish.push_operation(var_statement_more);
             }
         }
         goto _end;

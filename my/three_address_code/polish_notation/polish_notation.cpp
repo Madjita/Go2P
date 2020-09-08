@@ -142,6 +142,12 @@ void Polish_notation::push_operation(opcType var_opc)
         End();
         return;
     }
+    case var_statement_one:{
+        //Добавим созданную инструкцию в стек операций
+        stack_operations.push(instruction_ptr);
+        End();
+        return;
+    }
     default:
     {
         //Если стек операций не пустой
@@ -377,6 +383,12 @@ void Polish_notation::End()
             break;
         }
 
+        case var_statement_one:
+        {
+            //устанавливаем в трехадресном коде инструкции Результат являющийся переменной
+            add_rezult_operand(pop_operation_top,pop_operand());
+            break;
+        }
         case elseOpc:
         case loop_begin:
         case loop_short_init:
@@ -723,6 +735,7 @@ string Polish_notation::opc(opcType typ)
 
     case elseOpc:       str = "elseOpc";                break;
 
+
     case gotoOpcIfZ_false: str ="goto_ifz_f";           break;              //goto метка для перехода if после ложного условия
     case gotoOpcIfZ_true: str = "goto_ifz_t";           break;              //goto метка для перехода if после истенного условия
     case gotoOpcIf_trueBreak: str = "goto_ifz_t_B";     break;              //goto метка для выхода из цикла (for) в истенном условии
@@ -739,13 +752,15 @@ string Polish_notation::opc(opcType typ)
     case loop_begin:          str = "loop_begin";       break;
     case loop_short_init:     str = "loop_short_init";  break;
     case callFunc_Begin:      str = "call_f_begin";     break;
-    case callFunc_End:      str = "call_f_end";     break;
-    case param:     str = "param";      break;
-    case returnOpc: str ="return";break;
-    case arg_call_func: str ="arg_call_func";break;
-    case call_func: str = "call_func";break;
-    case gotoOpc_return: str = "goto_return";break;
-    case gotoOpcFor_return: str = "goto_for_return";break;
+    case callFunc_End:        str = "call_f_end";       break;
+    case param:               str = "param";            break;
+    case returnOpc:           str ="return";            break;
+    case arg_call_func:       str ="arg_call_func";     break;
+    case call_func:           str = "call_func";        break;
+    case gotoOpc_return:      str = "goto_return";      break;
+    case gotoOpcFor_return:   str = "goto_for_return";  break;
+
+    case var_statement_one:   str = "var_statement_one";break;
     default: break;
     }
 
