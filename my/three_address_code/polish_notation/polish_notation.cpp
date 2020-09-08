@@ -615,6 +615,7 @@ void Polish_notation::out_stek_file(string fileName)
 
         str +=opc(top->opc)+"\t\t\t";
 
+
         if(top->arg2 != nullptr)
         {
             switch (top->arg2->typ)

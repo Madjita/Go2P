@@ -440,6 +440,42 @@ bool C_PlusPlus::generate(vector<INSTRUCTION *> vector_polish)
 
             break;
         }
+
+        case var_statement_one:{
+
+            for(int i=0; i < tabs; i++)
+            {
+                str+= "\t";
+            }
+
+            string type = item->rez->val.var->get_type();
+
+            if(type == "int")
+            {
+                str += "int ";
+            }
+
+            if(type == "string")
+            {
+                str += "string ";
+            }
+
+            str += item->rez->val.var->get_name()+" ";
+
+            if(type == "int")
+            {
+                 str +="= 0;";
+            }
+
+            if(type == "string")
+            {
+                str +="= \" \";";
+            }
+
+            str +="\n";
+
+            break;
+        }
         default:
             break;
         }
