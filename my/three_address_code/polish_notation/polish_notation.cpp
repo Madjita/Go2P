@@ -600,10 +600,20 @@ void Polish_notation::out_stek_file(string fileName)
         }
         else
         {
-            str += "null\t\t";
+
+            switch (top->opc) {
+            case var_statement_one:
+            {
+                 str += top->rez->val.var->get_type()+"\t\t";
+                break;
+            }
+            default:
+                str += "null\t";
+                break;
+            }
         }
 
-        str +=opc(top->opc)+"\t\t\t\t";
+        str +=opc(top->opc)+"\t\t\t";
 
         if(top->arg2 != nullptr)
         {

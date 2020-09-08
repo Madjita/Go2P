@@ -578,7 +578,7 @@ _2:
             newFuncItem->add_variables_type(type);
 
             //Новый код Польской записи (проверяю)
-            //polish.push_operand(typeNameOpd,newFuncItem->get_variable_at(nameId));
+            polish.push_operand(nameVarOpd,newFuncItem->get_variable_at(nameId));
 
 
         }
@@ -625,18 +625,19 @@ _3:
 
             //Новый код Польской записи (проверяю)
             polish.push_operand(nameVarOpd,table.get_variable_in_globals(nameId));
-
-            if(!flag_statement_one)
-            {
-                //Новый код Польской записи (проверяю)
-                polish.push_operation(var_statement_one);
-            }
-            else
-            {
-                //Новый код Польской записи (проверяю)
-                polish.push_operation(var_statement_more);
-            }
         }
+
+        if(!flag_statement_one)
+        {
+            //Новый код Польской записи (проверяю)
+            polish.push_operation(var_statement_one);
+        }
+        else
+        {
+            //Новый код Польской записи (проверяю)
+            polish.push_operation(var_statement_more);
+        }
+
         goto _end;
     }
 
