@@ -1232,9 +1232,17 @@ void Polish_notation::set_goto_label(for_or_if typ)
             }
 
             expression_for->clear();
-            delete expression_for;
 
-            stack_breaks.pop();
+            if(expression_for != nullptr)
+            {
+                delete expression_for;
+            }
+
+            if(!stack_breaks.empty())
+            {
+                stack_breaks.pop();
+            }
+            stack_expression_for.pop();
         }
 
         //Установить оператор goto (по достижению закрывающейся скобки)

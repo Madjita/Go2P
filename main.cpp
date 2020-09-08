@@ -6,6 +6,9 @@
 #include "alien/CompileErrors.h"
 #include "alien/parser.h"
 
+#include "my/myvariable.h"
+#include "my/code_generator/codegenerator.h"
+
 using namespace std;
 #include <fstream>
 #include <vector>
@@ -35,12 +38,12 @@ bool ReadAllBytes(string filename,string& data)
     return true;
 }
 
+bool Start_program(Parser* pars)
+{
+    auto main = pars->table.find_name_func("main");
 
-#include <my/myvariable.h>
-
-#include "my/code_generator/codegenerator.h"
-
-bool Start_program(Parser* pars);
+    return main;
+}
 
 
 int main(int argc, char *argv[])
@@ -129,7 +132,6 @@ int main(int argc, char *argv[])
     Parser pars(data,&err);
 
     //1 деййствие : Собрать объект table в котором хрнаится вся информация о коде по массивам
-    //Не понимаю как составить таблицу с if (почти сделал) ,switch,for
     pars.Do();
 
 
@@ -171,10 +173,6 @@ int main(int argc, char *argv[])
     fileOutScaner_keyStr.close();
 
 
-    //ofstream fileOutScaner("scaner_out.txt", ios::binary | ios::trunc);
-    //fileOutScaner << pars.scanAliend->debugOutLex;
-    //fileOutScaner.close();
-
 // //----Вывести разобранный код в файл----------
      ofstream fileOut(fileNameOut, ios::binary | ios::trunc);
 
@@ -192,9 +190,5 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-bool Start_program(Parser* pars)
-{
-    auto main = pars->table.find_name_func("main");
 
-    return main;
-}
+

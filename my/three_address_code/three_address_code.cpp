@@ -24,7 +24,7 @@ INSTRUCTION *Three_address_code::Create_new_inctruction(opcType var_ocp)
 OPERAND *Three_address_code::Create_new_operand(opdType typ, void *val)
 {
     OPERAND *opdPtr = new OPERAND;
-    memset(opdPtr,0,sizeof (opdPtr));
+    memset(opdPtr,0,sizeof(*opdPtr));
 
     opdPtr->typ = typ;
     switch(typ)
@@ -128,6 +128,8 @@ int Three_address_code::get_auto_rang(opcType typ)
             priority_rang = 15;
             break;
         }
+        default:
+            break;
     }
 
     return priority_rang;

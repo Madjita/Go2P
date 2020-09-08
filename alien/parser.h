@@ -49,6 +49,7 @@ public:
 
     //определение новой функции
     bool newFunc();
+    //var <name> <type>
     bool Statement();
     bool StatementArray();
     bool StatementArrayInit();
@@ -112,8 +113,6 @@ private:
     LexClass nextLex(bool flagSetSavePosition = false);
 
     void add_vvMap_KeyData();
-
-    int savePosition;
 
     //
     FuncType* newFuncItem;

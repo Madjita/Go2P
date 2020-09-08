@@ -2,81 +2,36 @@
 
 Parser::Parser(std::string fileData, CompileErrors *errors)
 {
+    errors = nullptr;
     scanAliend = new Scanner(fileData); //,errors
 }
 
-//bool Parser::TypeInteger()
-//{
-//    auto position = scanAliend->getPosition();
-
-//    if(nextLex() == keyInt)
-//    {
-//        goto _end;
-//    }
-//    scanAliend->setPosition(position);
-
-//    if(nextLex() == keyInt8)
-//    {
-//        goto _end;
-//    }
-//    scanAliend->setPosition(position);
-
-//    if(nextLex() == keyInt16)
-//    {
-//        goto _end;
-//    }
-//    scanAliend->setPosition(position);
-
-//    if(nextLex() == keyInt32)
-//    {
-//        goto _end;
-//    }
-//    scanAliend->setPosition(position);
-
-//    if(nextLex() == keyInt64)
-//    {
-//        goto _end;
-//    }
-//    scanAliend->setPosition(position);
-
-//    return false;
-
-//_end:
-//    return true;
-//}
-
 bool Parser::TypeInteger()
 {
-    //auto position = scanAliend->getPosition();
     if(lex == keyInt)
     {
         goto _end;
     }
-    //scanAliend->setPosition(position);
 
     if(lex == keyInt8)
     {
         goto _end;
     }
-    //scanAliend->setPosition(position);
 
     if(lex == keyInt16)
     {
         goto _end;
     }
-    //scanAliend->setPosition(position);
 
     if(lex == keyInt32)
     {
         goto _end;
     }
-    // scanAliend->setPosition(position);
 
     if(lex == keyInt64)
     {
         goto _end;
     }
-    //scanAliend->setPosition(position);
 
     return false;
 
@@ -538,11 +493,14 @@ _end:
 //var <name> <type>
 bool Parser::Statement()
 {
+    bool flag_statement_one = false;
+
     //Позиция откуда записывать для сохранения информации о написанном коде в объекте
     int start_position_vvMap_KeyData = distance(vvMap_KeyData.begin(),vvMap_KeyData.end()-1);
 
     string nameId = "";
     string type = "";
+
     if(lex == keyVar)
     {
         nextLex();
@@ -566,9 +524,10 @@ _1:
                 return false;
             }
 
+            //Новый код Польской записи (проверяю)
+            //polish.push_operand(nameVarOpd,newFuncItem->get_variable_at(nameId));
+
         }
-
-
 
         nextLex();
         goto _2;
@@ -582,12 +541,15 @@ _1:
 _2:
     if(lex == lcComma)
     {
+        flag_statement_one = true;
+
         nextLex();
         goto _1;
     }
 
     if(Type())
     {
+
         type = scanAliend->GetTxtValue();
 
         if(newFuncItem != nullptr)
@@ -599,6 +561,20 @@ _2:
             }
 
             newFuncItem->add_variables_type(type);
+
+            //Новый код Польской записи (проверяю)
+            //polish.push_operand(typeNameOpd,newFuncItem->get_variable_at(nameId));
+
+            if(flag_statement_one)
+            {
+                //Новый код Польской записи (проверяю)
+                polish.push_operation(var_statement_one);
+            }
+            else
+            {
+                //Новый код Польской записи (проверяю)
+                polish.push_operation(var_statement_more);
+            }
         }
 
         nextLex();
@@ -620,6 +596,20 @@ _3:
             {
                 //Добавить глобальную переменную в таблицу, так как находимся не в функции и данный тип существует как структра (сложный тип данных)
                 table.add_gloabals(lcId,nameId,lcHardType,type,newObject);
+
+                //Новый код Польской записи (проверяю)
+                polish.push_operand(typeNameOpd,table.get_variable_in_globals(nameId));
+
+                if(flag_statement_one)
+                {
+                    //Новый код Польской записи (проверяю)
+                    polish.push_operation(var_statement_one);
+                }
+                else
+                {
+                    //Новый код Польской записи (проверяю)
+                    polish.push_operation(var_statement_more);
+                }
             }
         }
         goto _end;
