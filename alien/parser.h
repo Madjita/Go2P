@@ -55,6 +55,9 @@ public:
     bool StatementArrayInit();
     //инициализация атоматическая
     bool StatementShortInit();
+    // второй вариант автоматической инициализации
+    bool StatementShortInit_var();
+
     bool StatementInit();
     bool funcReturn();
     bool rowStructStatement();

@@ -343,6 +343,23 @@ _7:
     }
 
 
+    //инициализация атоматическая 2 с var
+    if(StatementShortInit_var())
+    {
+        auto item = *vvMap_KeyData.rbegin();
+        item.erase(item.begin(),item.begin()+2);
+        newFuncItem->setExpression(item);
+        if(newFuncItem != nullptr)
+        {
+            newFuncItem->addNewVariables();
+        }
+
+         goto _7;
+    }
+    scanAliend->setPosition(position);
+    lex = saveLex;
+    (*vvMap_KeyData.rbegin()) = saveItem;
+
 
     //инициализация атоматическая
     if(StatementShortInit())
@@ -861,7 +878,10 @@ bool Parser::StatementShortInit()
     //Позиция откуда записывать для сохранения информации о написанном коде в объекте
     int start_position_vvMap_KeyData = distance(vvMap_KeyData.begin(),vvMap_KeyData.end()-1);
 
-    string nameId;
+    string nameId = "";
+    string variable_label = "";
+    string type = "auto";
+
     if(lex == lcId)
     {
         nameId = scanAliend->GetTxtValue();
@@ -873,6 +893,193 @@ bool Parser::StatementShortInit()
 
     if(lex == lcAssign)
     {
+
+        auto item = *vvMap_KeyData.rbegin();
+
+        if(newFuncItem == nullptr)
+        {
+            variable_label = find_variable_name(item);
+            table.expression.setExpression(item);
+        }
+        else
+        {
+            item.erase(item.begin(),item.begin()+2);
+            newFuncItem->setExpression(item);
+            newFuncItem->addNewVariables();
+            table.expression.setExpression(item);
+
+        }
+
+
+        if(newFuncItem != nullptr)
+        {
+
+            if(point_if_else != nullptr)
+            {
+                point_if_else->add_variables_to_vector(nameId);
+
+                //Новый код Польской записи (проверяю)
+                polish.push_operand(nameVarOpd,newFuncItem->get_variable_at(nameId));
+                polish.push_operation(assignOpc);
+            }
+            else
+            {
+                if(!newFuncItem->addVectorNameThisLabel(nameId))
+                {
+                    cout << "Error: Find repeat label in Func body Statment."<<endl;
+                    exit(-1);
+                }
+
+                //новое пробую
+                if(!newFuncItem->add_variables_to_vector(nameId))
+                {
+                    cout << "Error: Find repeat label in Func body Statment."<<endl;
+                    exit(-1);
+                }
+
+
+                //Новый код Польской записи (проверяю)
+                polish.push_operand(nameVarOpd,newFuncItem->get_variable_at(nameId));
+                polish.push_operation(assignOpc);
+
+            }
+        }
+        else
+        {
+            // Так как мы не в функции
+            //Если это не функция то значит глобальная переменная
+            table.add_gloabals(lcId,variable_label,lcAuto,type,nullptr);
+
+            //Новый код Польской записи (проверяю)
+            polish.push_operand(nameVarOpd,table.get_variable_in_globals(nameId));
+            polish.push_operation(assignOpc);
+        }
+
+        //Если это не функция то значит глобальная переменная
+
+        nextLex();
+
+    }
+    else {
+        return false;
+    }
+
+    if(Expression())
+    {
+        //inter.add_last_oper();
+        if(newFuncItem != nullptr)
+        {
+            newFuncItem->addNameThisType("auto");
+        }
+    }
+    else
+    {
+        return false;
+    }
+
+    if(End())
+    {
+        //inter.out_list();
+
+        //Новый код Польской записи (проверяю)
+        polish.End();
+        ///
+
+
+        auto result_item = table.expression.getResult().rbegin();
+        auto result_item_type = result_item->first;
+        switch (result_item_type) {
+        case lcIntNum: {
+            type = "int";
+            break;
+        }
+        case lcRealNum: {
+            type = "float";
+            break;
+        }
+        default:break;
+        }
+
+
+
+        if(newFuncItem == nullptr)
+        {
+            //Если это не функция то значит глобальная переменная
+            table.add_gloabals(lcId,variable_label,result_item_type,type,nullptr);
+        }
+        else
+        {
+            auto result_expression = table.expression.getResult().rbegin()->second;
+
+            newFuncItem->add_variables_type(type);
+            newFuncItem->add_variables_expression(result_expression);
+        }
+
+
+        goto _end;
+    }
+    else {
+        return false;
+    }
+
+_end:
+    if(newFuncItem != nullptr)
+    {
+        newFuncItem->get_variable_las()->add_vvMap_KeyData(vvMap_KeyData,start_position_vvMap_KeyData);
+    }
+    return true;
+}
+
+bool Parser::StatementShortInit_var()
+{
+    //Позиция откуда записывать для сохранения информации о написанном коде в объекте
+    int start_position_vvMap_KeyData = distance(vvMap_KeyData.begin(),vvMap_KeyData.end()-1);
+
+    string nameId = "";
+    string variable_label = "";
+    string type = "auto";
+
+
+    if(lex == keyVar)
+    {
+        nextLex();
+    }
+    else
+    {
+        return false;
+    }
+
+
+    if(lex == lcId)
+    {
+        nameId = scanAliend->GetTxtValue();
+        nextLex();
+    }
+    else {
+        return false;
+    }
+
+
+    if(lex == lcEqual)
+    {
+
+        auto item = *vvMap_KeyData.rbegin();
+
+
+        if(newFuncItem == nullptr)
+        {
+            variable_label = find_variable_name(item);
+            table.expression.setExpression(item);
+        }
+        else
+        {
+            item.erase(item.begin(),item.begin()+2);
+            newFuncItem->setExpression(item);
+            newFuncItem->addNewVariables();
+            table.expression.setExpression(item);
+        }
+
+
         if(newFuncItem != nullptr)
         {
 
@@ -906,10 +1113,18 @@ bool Parser::StatementShortInit()
 
             }
 
+        }
+        else
+        {
+            // Так как мы не в функции
+            //Если это не функция то значит глобальная переменная
+            table.add_gloabals(lcId,variable_label,lcAuto,type,nullptr);
+
+            //Новый код Польской записи (проверяю)
+            polish.push_operand(nameVarOpd,table.get_variable_in_globals(nameId));
+            polish.push_operation(assignOpc);
 
         }
-
-        //Если это не функция то значит глобальная переменная
 
         nextLex();
 
@@ -920,7 +1135,6 @@ bool Parser::StatementShortInit()
 
     if(Expression())
     {
-        //inter.add_last_oper();
         if(newFuncItem != nullptr)
         {
             newFuncItem->addNameThisType("auto");
@@ -933,59 +1147,9 @@ bool Parser::StatementShortInit()
 
     if(End())
     {
-        //inter.out_list();
 
         //Новый код Польской записи (проверяю)
         polish.End();
-        ///
-
-        auto item = *vvMap_KeyData.rbegin();
-        string variable_label = "";
-
-
-        if(newFuncItem == nullptr)
-        {
-            variable_label = find_variable_name(item);
-            table.expression.setExpression(item);
-        }
-        else
-        {
-            item.erase(item.begin(),item.begin()+2);
-            newFuncItem->setExpression(item);
-            newFuncItem->addNewVariables();
-
-            table.expression.setExpression(item);
-
-        }
-
-        string type = "auto";
-        auto result_item = table.expression.getResult().rbegin();
-        auto result_item_type = result_item->first;
-        switch (result_item_type) {
-        case lcIntNum: {
-            type = "int";
-            break;
-        }
-        case lcRealNum: {
-            type = "float";
-            break;
-        }
-        default:break;
-        }
-
-        auto result_expression = table.expression.getResult().rbegin()->second;
-
-        if(newFuncItem == nullptr)
-        {
-            //Если это не функция то значит глобальная переменная
-            table.add_gloabals(lcId,variable_label,result_item_type,type,result_expression);
-        }
-        else
-        {
-            newFuncItem->add_variables_type(type);
-            newFuncItem->add_variables_expression(result_expression);
-        }
-
 
         goto _end;
     }
@@ -999,6 +1163,7 @@ _end:
         newFuncItem->get_variable_las()->add_vvMap_KeyData(vvMap_KeyData,start_position_vvMap_KeyData);
     }
     return true;
+
 }
 
 bool Parser::StatementInit()
@@ -3132,6 +3297,16 @@ _1:
     lex = saveLex;
     vvMap_KeyData = saveItem;
 
+
+    //инициализация атоматическая 2 с var
+    if(StatementShortInit_var())
+    {
+        goto _0;
+    }
+    scanAliend->setPosition(position);
+    lex = saveLex;
+    vvMap_KeyData = saveItem;
+
     //инициализация атоматическая
     if(StatementShortInit())
     {
@@ -4199,7 +4374,10 @@ string Parser::find_variable_name(vector<map<LexClass, string> > &item)
         {
             for(auto it_variable = item.begin(); it_variable != it;it_variable++)
             {
-                variable_label += it_variable->begin()->second;
+                if(it_variable->rbegin()->first != keyVar)
+                {
+                    variable_label += it_variable->begin()->second;
+                }
             }
             item.erase(item.begin(),it+1);
             break;
