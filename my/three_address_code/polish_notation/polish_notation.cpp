@@ -198,6 +198,16 @@ void Polish_notation::push_operation(opcType var_opc)
                     add_rezult_operand(pop_operation_top,pop_operand_left);
                     break;
                 }
+                case plusUnOpc:
+                {
+                    //Достаем только 1 операнд
+                    pop_operand_left = pop_operand();
+                    //Создаем временную переменную операнд и добавляемв в стек операндов
+                    OPERAND* tmp = push_operand(tmpVarOpd,nullptr);
+                    //устанавливаем в трехадресном коде инструкции Результат данную временную переменную
+                    add_rezult_operand(pop_operation_top,tmp);
+                    break;
+                }
                 case minusUnOpc:
                 {
                     //Достаем только 1 операнд
@@ -357,6 +367,7 @@ void Polish_notation::End()
             add_rezult_operand(pop_operation_top,pop_operand_left);
             break;
         }
+        case plusUnOpc:
         case minusUnOpc:
         {
             //Достаем только 1 операнд
@@ -369,12 +380,24 @@ void Polish_notation::End()
         }
         case assignOpc:
         {
-            //Достаем левй операнд
-            pop_operand_left = pop_operand();
-            //Достаем результат операнд
-            OPERAND* tmp  = pop_operand();
-            //устанавливаем в трехадресном коде инструкции Результат являющийся переменной
-            add_rezult_operand(pop_operation_top,tmp);
+
+//            if(stack_operand.size() == 1)
+//            {
+//                //Достаем результат операнд
+//                OPERAND* tmp  = pop_operand();
+//                //устанавливаем в трехадресном коде инструкции Результат являющийся переменной
+//                add_rezult_operand(pop_operation_top,tmp);
+//            }
+//            else
+//            {
+                //Достаем левй операнд
+                pop_operand_left = pop_operand();
+                //Достаем результат операнд
+                OPERAND* tmp  = pop_operand();
+                //устанавливаем в трехадресном коде инструкции Результат являющийся переменной
+                add_rezult_operand(pop_operation_top,tmp);
+            //}
+
             break;
         }
         case param:{

@@ -2530,8 +2530,9 @@ bool Parser::Addition()
 
             if(vvMap_KeyData.rbegin()->size() > 1)
             {
-                auto item = (vvMap_KeyData.rbegin()->rbegin())->rbegin()->first; //+1
-                if(item == lcId || item == lcIntNum || item == lcRealNum || item == lcRCircle || item == lcLCircle)
+                //auto item = (vvMap_KeyData.rbegin()->rbegin())->rbegin()->first; //+1
+                auto item = (vvMap_KeyData.rbegin()->end()-3)->rbegin()->first; //+1
+                if(item == lcId || item == lcIntNum || item == lcRealNum ) // || item == lcRCircle || item == lcLCircle
                 {
                     //Новый код Польской записи (проверяю)
                     polish.push_operation(plusOpc);
@@ -2575,8 +2576,10 @@ bool Parser::Addition()
 
             if(vvMap_KeyData.rbegin()->size() > 1)
             {
-                auto item = (vvMap_KeyData.rbegin()->rbegin())->rbegin()->first; //+1
-                if(item == lcId || item == lcIntNum || item == lcRealNum || item == lcRCircle || item == lcLCircle)
+                //auto item = (vvMap_KeyData.rbegin()->rbegin())->rbegin()->first; //+1
+
+                auto item = (vvMap_KeyData.rbegin()->end()-3)->rbegin()->first; //+1
+                if(item == lcId || item == lcIntNum || item == lcRealNum ) //|| item == lcRCircle || item == lcLCircle
                 {
                     //Новый код Польской записи (проверяю)
                     polish.push_operation(minusOpc);
