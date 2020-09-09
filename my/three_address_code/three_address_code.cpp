@@ -122,6 +122,11 @@ int Three_address_code::get_auto_rang(opcType typ)
             break;
         }
 
+        case equalOpc:      // равно '='
+        {
+            priority_rang = 13;
+            break;
+        }
 
         case assignOpc:         // авто присваивание ':='
         {

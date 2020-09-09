@@ -35,8 +35,6 @@ public:
 
     Polish_notation polish;
 
-
-
     Scanner* scanAliend;
     LexClass lex;
     LexClass prevLex;
@@ -57,7 +55,7 @@ public:
     bool StatementShortInit();
     // второй вариант автоматической инициализации
     bool StatementShortInit_var();
-
+    // инициализаци объявленной переменной ранее
     bool StatementInit();
     bool funcReturn();
     bool rowStructStatement();

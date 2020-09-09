@@ -375,6 +375,56 @@ bool C_PlusPlus::generate(vector<INSTRUCTION *> vector_polish)
             stack_expression.push(item);
             break;
         }
+
+        case equalOpc:
+        {
+            for(int i=0; i < tabs; i++)
+            {
+                str+= "\t";
+            }
+
+            str += item->rez->val.var->get_name()+" ";
+            str += "= ";
+
+            if(stack_expression.empty())
+            {
+                switch (item->arg1->typ)
+                {
+                case nameVarOpd:
+                {
+                    str += item->arg1->val.var->get_name();
+                    break;
+                }
+                case constOpd:
+                {
+
+                    switch (item->arg1->val.cons->typ)
+                    {
+                    case INTTYP:
+                        str += to_string(item->arg1->val.cons->val.unum);
+                        break;
+
+                    default:break;
+                    }
+                    break;
+                }
+                default:break;
+                }
+
+            }
+            else
+            {
+                //expression
+                expression(str,stack_expression,item->arg1->val.varTmp->name);
+            }
+
+
+
+            str += ";";
+            str += "\n";
+
+            break;
+        }
         case assignOpc:
         {
             for(int i=0; i < tabs; i++)

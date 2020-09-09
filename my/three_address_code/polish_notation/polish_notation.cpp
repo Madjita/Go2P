@@ -378,25 +378,16 @@ void Polish_notation::End()
             add_rezult_operand(pop_operation_top,tmp);
             break;
         }
+
+        case equalOpc:
         case assignOpc:
         {
-
-//            if(stack_operand.size() == 1)
-//            {
-//                //Достаем результат операнд
-//                OPERAND* tmp  = pop_operand();
-//                //устанавливаем в трехадресном коде инструкции Результат являющийся переменной
-//                add_rezult_operand(pop_operation_top,tmp);
-//            }
-//            else
-//            {
                 //Достаем левй операнд
                 pop_operand_left = pop_operand();
                 //Достаем результат операнд
                 OPERAND* tmp  = pop_operand();
                 //устанавливаем в трехадресном коде инструкции Результат являющийся переменной
                 add_rezult_operand(pop_operation_top,tmp);
-            //}
 
             break;
         }
@@ -756,6 +747,7 @@ string Polish_notation::opc(opcType typ)
     case  minusOpc:     str = "-";                      break;
 
     case assignOpc:     str = ":=";                     break;
+    case equalOpc:      str = "=";                      break;
     case modOpc:        str = "%";                      break;
     case smallerOpc:    str = "<";                      break;
     case smallerEQOpc:  str = "<=";                     break;

@@ -98,7 +98,7 @@ private:
 
     vector<FuncType*> vector_func; // Сохраняем список объявленных функций
 
-    bool flag_lCircle;
+    //bool flag_lCircle;
 };
 
 #endif // POLISH_NOTATION_H

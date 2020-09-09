@@ -1175,6 +1175,7 @@ _end:
 
 }
 
+// инициализаци объявленной переменной ранее
 bool Parser::StatementInit()
 {
     vector<string> save_name_hard_type;
@@ -1223,6 +1224,14 @@ _0:
                         }
                     }
                 }
+                else
+                {
+                    //Нашли объявленную переменную в глобальной таблице
+
+                    //Новый код Польской записи (проверяю)
+                    polish.push_operand(nameVarOpd,Object_variable);
+                    polish.push_operation(equalOpc);
+                }
 
             }
             else
@@ -1241,6 +1250,14 @@ _0:
                     //не нашли объявленную переменную в глобальной таблице значит ищем в локальной
                     cout << "Error: Find repeat label in Func body Statment."<<endl;
                     exit(-1);
+                }
+                else
+                {
+                    //Нашли объявленную переменную в глобальной таблице
+
+                    //Новый код Польской записи (проверяю)
+                    polish.push_operand(nameVarOpd,Object_variable);
+                    polish.push_operation(equalOpc);
                 }
             }
             else
@@ -1430,6 +1447,9 @@ _3:
         auto result_expression = result_item->second;
         Object_variable->set_expression(result_expression);
         Object_variable->set_lex_type(result_item_type);
+
+        ////////
+        polish.End();
 
         goto _end;
     }
