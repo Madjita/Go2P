@@ -2724,7 +2724,7 @@ _6:
 
         position = scanAliend->getPosition();
         scanAliend->setPosition(position);
-        //nextLex();
+        nextLex();
 
         goto _end;
     }
