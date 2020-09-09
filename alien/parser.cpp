@@ -444,6 +444,7 @@ _7:
     point_if_else = newFuncItem->get_if_else(newFuncItem->get_if_else_size());
     if(IfElse())
     {
+
         goto _7;
     }
     point_if_else = nullptr;
@@ -2733,6 +2734,7 @@ _6:
         polish.label_pop();
 
         scanAliend->setPosition(position);
+        nextLex();
     }
 
 _end:
@@ -3977,6 +3979,14 @@ _3:
 
         goto _3;
     }
+
+    //инициализация автоматическая 2
+    if(StatementShortInit_var())
+    {
+        goto _3;
+    }
+    scanAliend->setPosition(position);
+    lex = saveLex;
 
     //инициализация автоматическая
     if(StatementShortInit())
