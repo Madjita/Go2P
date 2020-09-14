@@ -1061,27 +1061,46 @@ string C_PlusPlus::loop(stack<INSTRUCTION*>* stack_expression,int n,int& positio
     switch (item->opc)
     {
     case loop_begin:{
-        stack<INSTRUCTION*> stack_expression;
+        stack<INSTRUCTION*> stack_expression_2;
         position_loop_begin = position;
         int position_str_add_2 = 0;
 
-        for(int i=0; i < tabs; i++)
-        {
-            code+= "\t";
-        }
+
+//        for(int i=0; i < tabs; i++)
+//        {
+//            code+= "\t";
+//        }
 
         code += "for ";
 
         position++;
+        tabs++;
 
         string code_add = "";
 
-        code += loop(&stack_expression,position,position_str_add_2,code_add);
-        //tabs++;
+        int position_str_add = 0;
+        while(item->opc != loop_end)
+        {
+            loop(&stack_expression_2,position,position_str_add_2,code_add);
+            item = vector_polish[position];
+        }
 
+        tabs--;
+        code_add += "\n";
+        for(int i=0; i < tabs; i++)
+        {
+            code_add+= "\t";
+        }
+
+        code_add += "}";
+        code_add += "\n";
+
+        code += code_add;
+        position++;
         break;
     }
     case loop_end:{
+        position++;
         break;
     }
         ////
@@ -1177,6 +1196,11 @@ string C_PlusPlus::loop(stack<INSTRUCTION*>* stack_expression,int n,int& positio
         code += " ";
         position_str_add = code.size();
         code += ")";
+        code += "\n";
+        for(int i=0; i < tabs-1; i++)
+        {
+            code+= "\t";
+        }
         code += "{";
         code += "\n";
 
@@ -1199,7 +1223,7 @@ string C_PlusPlus::loop(stack<INSTRUCTION*>* stack_expression,int n,int& positio
 
             for(int i= code.size(); i > 0; i--)
             {
-                if(code[i] ==';')
+                if(code[i] ==';' || code[i] =='}')
                 {
                     find_semicolon++;
                     if(find_semicolon == 2)
