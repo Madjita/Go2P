@@ -2576,6 +2576,9 @@ bool Parser::IfElse()
     if(lex == keyIf)
     {
         nextLex();
+
+        //Новый код Польской записи (проверяю)
+        polish.push_operation(ifZOpc_begin);
         goto _1;
     }
     else
@@ -2670,6 +2673,9 @@ _6:
     }
 
 _end:
+
+    //Новый код Польской записи (проверяю)
+    polish.push_operation(ifZOpc_end);
 
     return true;
 

@@ -129,6 +129,8 @@ typedef enum {
     ifZOpc_for,           //ifZ (если условие отрицательное то перейти по метке выйти из цикла)
     ifZOpc_while,         //ifZ (если условие отрицательное то перейти по метке выйти из цикла)
     ifZOpc,              //ifZ (если условие отрицательное то перейти по метке на else) (goto метка для перехода if после отрицательного действия)
+    ifZOpc_begin,
+    ifZOpc_end,
     forOpc,             //for
     whileOpc,           //while
     doOpc,              //do {} while()

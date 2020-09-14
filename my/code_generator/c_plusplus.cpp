@@ -892,7 +892,7 @@ string C_PlusPlus::worker(stack<INSTRUCTION *>* stack_expression, int n)
         break;
     }
     case loop_begin:{
-        stack<INSTRUCTION *>* stack_expression = new stack<INSTRUCTION *>();
+        stack<INSTRUCTION *>* stack_expression_2 = new stack<INSTRUCTION *>();
         position_loop_begin = position;
 
         for(int i=0; i < tabs; i++)
@@ -913,7 +913,7 @@ string C_PlusPlus::worker(stack<INSTRUCTION *>* stack_expression, int n)
         string code_add = "";
         while(item->opc != loop_end)
         {
-            loop(stack_expression,position,position_str_add,code_add);
+            loop(stack_expression_2,position,position_str_add,code_add);
             item = vector_polish[position];
         }
 
@@ -932,12 +932,14 @@ string C_PlusPlus::worker(stack<INSTRUCTION *>* stack_expression, int n)
 
         position++;
         code_add = "";
-        delete stack_expression;
+        delete stack_expression_2;
 
         break;
     }
 
         ////
+    case largerOpc:
+    case smallerOpc:
     case LCircleOpc:
     case RCircleOpc:
     case slashOpc:
@@ -951,7 +953,6 @@ string C_PlusPlus::worker(stack<INSTRUCTION *>* stack_expression, int n)
 
         code += expression(stack_expression,position);
 
-        //stack_expression->push(item);
         position++;
         break;
     }
@@ -1007,6 +1008,225 @@ string C_PlusPlus::worker(stack<INSTRUCTION *>* stack_expression, int n)
         break;
     }
         ///
+
+    case var_statement_one:
+    {
+
+        for(int i=0; i < tabs; i++)
+        {
+            code+= "\t";
+        }
+
+        string type = item->rez->val.var->get_type();
+
+        if(type == "int")
+        {
+            code += "int ";
+        }
+
+        if(type == "string")
+        {
+            code += "string ";
+        }
+
+        code += item->rez->val.var->get_name()+" ";
+
+        if(type == "int")
+        {
+            code +="= 0;";
+        }
+
+        if(type == "string")
+        {
+            code +="= \" \";";
+        }
+
+        code +="\n";
+
+        position++;
+
+        break;
+    }
+    case ifZOpc_begin:
+    {
+        string code_add = "";
+
+        for(int i=0; i < tabs; i++)
+        {
+            code+= "\t";
+        }
+
+        code += "if";
+        code +=" ";
+        code += "( ";
+        position++;
+
+
+        code += expression(stack_expression,position);
+
+        item = vector_polish[position];
+
+        if(stack_expression->empty())
+        {
+            switch (item->arg1->typ)
+            {
+            case nameVarOpd:
+            {
+                code_add += item->arg1->val.var->get_name();
+                break;
+            }
+            case constOpd:
+            {
+
+                switch (item->arg1->val.cons->typ)
+                {
+                case INTTYP:
+                    code_add += to_string(item->arg1->val.cons->val.unum);
+                    break;
+
+                default:break;
+                }
+                break;
+            }
+            default:break;
+            }
+
+        }
+        else
+        {
+            //expression
+            expression(code_add,*stack_expression,item->arg1->val.varTmp->name);
+        }
+
+        code += code_add;
+        code += " )";
+        code += "\n";
+
+        for(int i=0; i < tabs; i++)
+        {
+            code+= "\t";
+        }
+        code += "{";
+        code += "\n";
+        tabs++;
+        for(int i=0; i < tabs; i++)
+        {
+            code+= "\t";
+        }
+
+        break;
+    }
+    case ifZOpc:
+    {
+
+        string code_add = "";
+
+        position++;
+
+        while(item->opc != gotoOpcIfZ_true)
+        {
+            if_else(stack_expression,position,code_add);
+            item = vector_polish[position];
+        }
+
+        if(code_add[code_add.size()-1] != '}')
+        {
+            int find = find_word("\n",code_add,true);
+            if(find != -1)
+            {
+                code_add.erase(find,code_add.size());
+            }
+        }
+
+        code_add += "\n";
+        for(int i=0; i < tabs-1; i++)
+        {
+            code_add+= "\t";
+        }
+
+
+        code +=code_add;
+        code += "}";
+        code += "\n";
+        tabs--;
+
+
+        position++;
+        break;
+    }
+    case elseOpc:{
+
+        string code_add = "";
+        position++;
+
+        for(int i=0; i < tabs; i++)
+        {
+            code+= "\t";
+        }
+        code += "else";
+        code += " {";
+        code += "\n";
+
+        tabs++;
+        for(int i=0; i < tabs; i++)
+        {
+            code+= "\t";
+        }
+
+        item = vector_polish[position];
+
+        code += expression(stack_expression,position);
+
+        code += code_add;
+        code += "\n";
+
+        code_add ="";
+
+
+        item = vector_polish[position];
+        while(item->opc != gotoOpcIfZ_true)
+        {
+            if(item->opc == gotoOpcIfZ_true)
+            {
+                break ;
+            }
+            if(item->opc == gotoOpcIfZ_false)
+            {
+                break ;
+            }
+            if(item->opc == ifZOpc_end)
+            {
+                break ;
+            }
+            if_else(stack_expression,position,code_add);
+            item = vector_polish[position];
+        }
+
+        if(code_add[code_add.size()-1] != '}')
+        {
+            int find = find_word("\n",code_add,true);
+            if(find != -1)
+            {
+                code_add.erase(find,code_add.size());
+            }
+        }
+
+        code_add += "\n";
+        for(int i=0; i < tabs-1; i++)
+        {
+            code_add+= "\t";
+        }
+
+
+        code +=code_add;
+        code += "}";
+        code += "\n";
+        tabs--;
+
+
+        position++;
+        break;
+    }
     default:
         position++;
         break;
@@ -1494,7 +1714,7 @@ string C_PlusPlus::if_else(stack<INSTRUCTION *> *stack_expression, int n,string 
         tabs--;
 
 
-        position++;
+        //position++;
         break;
     }
         ////
@@ -1563,6 +1783,7 @@ string C_PlusPlus::expression(stack<INSTRUCTION*>* stack_expression,int n)
     switch (item->opc)
     {
     ////
+    case largerOpc:
     case smallerOpc:
     case LCircleOpc:
     case RCircleOpc:
@@ -1714,6 +1935,117 @@ string C_PlusPlus::expression(stack<INSTRUCTION*>* stack_expression,int n)
 
         break;
     }
+    case ifZOpc:
+    {
+        //position--;
+        break;
+    }
+    /*case ifZOpc:
+    {
+
+
+        string code_add = "";
+
+
+        for(int i=0; i < tabs; i++)
+        {
+            code+= "\t";
+        }
+
+        code += "if";
+        code +=" ";
+        code += "( ";
+
+        if(stack_expression->empty())
+        {
+
+        }
+        else
+        {
+            if(stack_expression->empty())
+            {
+                switch (item->arg1->typ)
+                {
+                case nameVarOpd:
+                {
+                    code_add += item->arg1->val.var->get_name();
+                    break;
+                }
+                case constOpd:
+                {
+
+                    switch (item->arg1->val.cons->typ)
+                    {
+                    case INTTYP:
+                        code_add += to_string(item->arg1->val.cons->val.unum);
+                        break;
+
+                    default:break;
+                    }
+                    break;
+                }
+                default:break;
+                }
+
+            }
+            else
+            {
+                //expression
+                expression(code_add,*stack_expression,item->arg1->val.varTmp->name);
+            }
+        }
+
+        code += code_add;
+        code += " )";
+        code += "\n";
+        tabs++;
+        for(int i=0; i < tabs-1; i++)
+        {
+            code+= "\t";
+        }
+        code += "{";
+        code += "\n";
+        for(int i=0; i < tabs; i++)
+        {
+            code+= "\t";
+        }
+
+        code_add ="";
+
+        position++;
+
+        while(item->opc != gotoOpcIfZ_true)
+        {
+            if_else(stack_expression,position,code_add);
+            item = vector_polish[position];
+        }
+
+        if(code_add[code_add.size()-1] != '}')
+        {
+            int find = find_word("\n",code_add,true);
+            if(find != -1)
+            {
+                code_add.erase(find,code_add.size());
+            }
+        }
+
+        code_add += "\n";
+        for(int i=0; i < tabs-1; i++)
+        {
+            code_add+= "\t";
+        }
+
+
+        code +=code_add;
+        code += "}";
+        code += "\n";
+        tabs--;
+
+
+        position++;
+        break;
+    }
+    */
     default:
         break;
     }
