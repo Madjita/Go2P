@@ -4335,6 +4335,12 @@ string Parser::getWorkData()
                         if(item.second.getExpression().size() > 0)
                         {
 
+                            auto it = item.second.getResult();
+                            if (it.empty())
+                            {
+                                continue;
+                            }
+
                             result += " = ";
                             result += item.second.getResult().rbegin()->second;
 
