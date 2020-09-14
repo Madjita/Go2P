@@ -901,12 +901,13 @@ string C_PlusPlus::worker(stack<INSTRUCTION *>* stack_expression, int n)
         }
 
         code += "for ";
+        code += "( ";
 
         position++;
 
         tabs++;
 
-        code += "( ";
+
 
         int position_str_add = 0;
         string code_add = "";
@@ -1054,8 +1055,6 @@ string C_PlusPlus::loop(stack<INSTRUCTION*>* stack_expression,int n,int& positio
 
     int position_loop_begin = 0;
 
-
-
     INSTRUCTION* item = vector_polish[n];
 
     switch (item->opc)
@@ -1065,13 +1064,9 @@ string C_PlusPlus::loop(stack<INSTRUCTION*>* stack_expression,int n,int& positio
         position_loop_begin = position;
         int position_str_add_2 = 0;
 
-
-//        for(int i=0; i < tabs; i++)
-//        {
-//            code+= "\t";
-//        }
-
         code += "for ";
+        code += "( ";
+
 
         position++;
         tabs++;
