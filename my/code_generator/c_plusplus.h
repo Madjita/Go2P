@@ -26,6 +26,9 @@ public:
     //обработка цикла
     string loop(stack<INSTRUCTION*>* stack_expression, int n, int &position_str_add, string &code);
 
+    //Обработка if
+    string if_else(stack<INSTRUCTION*>* stack_expression, int n,string &code);
+
     //Обработка выражения
     string expression(stack<INSTRUCTION*>* stack_expression,int n);
 
@@ -33,7 +36,7 @@ public:
     //Вспомогательная функция указывающая на принадлежность к Операции
     bool get_opcType(INSTRUCTION * item);
 
-    int find_word(string need_find,string data);
+    int find_word(string need_find, string data, bool revers = false);
 
 
 private:

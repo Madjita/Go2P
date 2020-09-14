@@ -3882,6 +3882,8 @@ bool Parser::lcLFigure_lcRFigure(label_typ typ)
 {
     InformPosition position = scanAliend->getPosition();
     LexClass saveLex = lex;
+    vector<vector<map<LexClass,string>>> saveItem;
+
 
 
     if(lex == lcLFigure)
@@ -3904,6 +3906,7 @@ _3:
 
         position = scanAliend->getPosition();
         saveLex = lex;
+        saveItem = vvMap_KeyData;
 
         goto _3;
     }
@@ -3972,6 +3975,7 @@ _3:
     }
     scanAliend->setPosition(position);
     lex = saveLex;
+    vvMap_KeyData = saveItem;
 
     if(StatementInit())
     {
