@@ -1154,6 +1154,12 @@ string C_PlusPlus::loop(stack<INSTRUCTION*>* stack_expression,int n,int& positio
 
     case ifZOpc_for:
     {
+        int find = find_word(";",code);
+        if(find != -1)
+        {
+            code.erase(find+1,code.size());
+        }
+
 
         if(stack_expression->empty())
         {
@@ -1186,6 +1192,7 @@ string C_PlusPlus::loop(stack<INSTRUCTION*>* stack_expression,int n,int& positio
             //expression
             expression(code,*stack_expression,item->arg1->val.varTmp->name);
         }
+
 
         code += ";";
         code += " ";
@@ -1399,7 +1406,7 @@ string C_PlusPlus::expression(stack<INSTRUCTION*>* stack_expression,int n)
         }
 
         code += ";";
-
+        position++;
 
         break;
     }
@@ -1484,5 +1491,37 @@ bool C_PlusPlus::get_opcType(INSTRUCTION *item)
     default:
         return false;
     }
+}
+
+int C_PlusPlus::find_word(string need_find, string data)
+{
+    int j = 0;
+    string str = "";
+    for(int i=0; j < data.size(); i++)
+    {
+
+
+        if (str.size() == need_find.size())
+        {
+              if(str == need_find)
+              {
+                  return j;
+              }
+              str = "";
+              str +=data[i];
+              j++;
+        }
+        else
+        {
+            str +=data[i];
+        }
+
+        if(i >= data.size())
+        {
+            break;
+        }
+    }
+
+    return  -1;
 }
 

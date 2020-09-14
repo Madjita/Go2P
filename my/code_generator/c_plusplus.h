@@ -33,6 +33,7 @@ public:
     //Вспомогательная функция указывающая на принадлежность к Операции
     bool get_opcType(INSTRUCTION * item);
 
+    int find_word(string need_find,string data);
 
 
 private:
