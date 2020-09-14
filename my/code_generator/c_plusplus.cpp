@@ -89,21 +89,27 @@ bool C_PlusPlus::generate(vector<INSTRUCTION *> vector_polish)
 }
 */
 
-bool C_PlusPlus::generate(vector<INSTRUCTION *> vector_polish)
+bool C_PlusPlus::generate() //vector<INSTRUCTION *> vector_polish
 {
 
-    vector<INSTRUCTION*> vector_func_args;
     vector<INSTRUCTION*> vector_return;
     stack<INSTRUCTION*> stack_expression;
 
     stack<stack<INSTRUCTION*>*> loop;
 
+    position = 0;
 
-    int tabs = 0;
+    while (vector_polish.size() > position) {
+        str += worker(&stack_expression,position);
+    }
 
+
+    /*
     for(int i =0 ; i < vector_polish.size();i++)
     {
         auto item = vector_polish[i];
+
+
 
         switch (item->opc)
         {
@@ -514,7 +520,7 @@ bool C_PlusPlus::generate(vector<INSTRUCTION *> vector_polish)
 
             if(type == "int")
             {
-                 str +="= 0;";
+                str +="= 0;";
             }
 
             if(type == "string")
@@ -529,7 +535,9 @@ bool C_PlusPlus::generate(vector<INSTRUCTION *> vector_polish)
         default:
             break;
         }
+
     }
+   */
 
     fileOut2 << str;
 
@@ -760,30 +768,30 @@ string C_PlusPlus::expression(INSTRUCTION *item)
 
     if(item->arg2 != nullptr)
     {
-    switch (item->arg2->typ)
-    {
-    case nameVarOpd:
-    {
-        str += item->arg2->val.var->get_name();
-        break;
-    }
-    case constOpd:
-    {
-        switch (item->arg2->val.cons->typ)
+        switch (item->arg2->typ)
         {
-        case INTTYP:
-            str += to_string(item->arg2->val.cons->val.unum);
+        case nameVarOpd:
+        {
+            str += item->arg2->val.var->get_name();
             break;
+        }
+        case constOpd:
+        {
+            switch (item->arg2->val.cons->typ)
+            {
+            case INTTYP:
+                str += to_string(item->arg2->val.cons->val.unum);
+                break;
+            default:break;
+            }
+            break;
+        }
+        case tmpVarOpd:
+        {
+            break;
+        }
         default:break;
         }
-        break;
-    }
-    case tmpVarOpd:
-    {
-        break;
-    }
-    default:break;
-    }
     }
     return str;
 }
@@ -799,5 +807,663 @@ string C_PlusPlus::reverse(stack<char> stroka)
     }
 
     return str;
+}
+
+string C_PlusPlus::worker(stack<INSTRUCTION *>* stack_expression, int n)
+{
+    vector<INSTRUCTION*> vector_func_args;
+    vector<INSTRUCTION*> vector_return;
+
+
+    string code = "";
+    int position_loop_begin = 0;
+
+    INSTRUCTION* item = vector_polish[n];
+
+    switch (item->opc)
+    {
+    case callFunc_Begin:{
+        //Берем возвращяемое значение функции
+        auto return_type = item->rez->val.fanc->getReturnFuncType();
+
+        vector<INSTRUCTION*> vector_func_args;
+
+        if(return_type != ""){
+            code += return_type+" ";
+        }
+        else {
+            code += "void ";
+        }
+
+        //Вставляем имя функции
+        code += item->rez->val.fanc->getNameFuncType()+" ";
+        code += "(";
+
+        position++;
+        code += processing_func_arg(position);
+        code.erase(code.size()-1,code.size());
+
+        code+= " ";
+        code+= ")";
+        code+= "\n";
+        code+= "{";
+        code+= "\n";
+
+        tabs++;
+
+        break;
+    }
+    case returnOpc:
+    {
+        for(int i=0; i < tabs; i++)
+        {
+            code+= "\t";
+        }
+
+
+        code+= "return ";
+
+        switch (item->rez->typ)
+        {
+        case constOpd:
+            switch (item->rez->val.cons->typ)
+            {
+            case INTTYP:
+                code+= to_string(item->rez->val.cons->val.unum);
+                break;
+            default:
+                break;
+            }
+            break;
+        default:
+            break;
+        }
+        code += ";";
+        code += "\n";
+        position++;
+        break;
+    }
+    case callFunc_End:{
+        position++;
+
+        tabs--;
+        code += "}\n";
+        code += "\n";
+        break;
+    }
+    case loop_begin:{
+        stack<INSTRUCTION *>* stack_expression = new stack<INSTRUCTION *>();
+        position_loop_begin = position;
+
+        for(int i=0; i < tabs; i++)
+        {
+            code+= "\t";
+        }
+
+        code += "for ";
+
+        position++;
+
+        tabs++;
+
+        code += "( ";
+
+        int position_str_add = 0;
+        string code_add = "";
+        while(item->opc != loop_end)
+        {
+            loop(stack_expression,position,position_str_add,code_add);
+            item = vector_polish[position];
+        }
+
+        code += code_add;
+
+        tabs--;
+        code += "\n";
+        for(int i=0; i < tabs; i++)
+        {
+            code+= "\t";
+        }
+
+        code += "}";
+        code += "\n";
+
+
+        position++;
+
+        delete stack_expression;
+
+        break;
+    }
+
+        ////
+    case LCircleOpc:
+    case RCircleOpc:
+    case slashOpc:
+    case starOpc:
+    case minusOpc:
+    case plusOpc:
+    case incrimentOpc:
+    case minusUnOpc:
+    case plusUnOpc:
+    {
+
+        code += expression(stack_expression,position);
+
+        //stack_expression->push(item);
+        position++;
+        break;
+    }
+        ////
+    case assignOpc:
+    {
+        for(int i=0; i < tabs; i++)
+        {
+            str+= "\t";
+        }
+
+        code += "auto ";
+        code += item->rez->val.var->get_name()+" ";
+        code += "= ";
+
+        if(stack_expression->empty())
+        {
+            switch (item->arg1->typ)
+            {
+            case nameVarOpd:
+            {
+                code += item->arg1->val.var->get_name();
+                break;
+            }
+            case constOpd:
+            {
+
+                switch (item->arg1->val.cons->typ)
+                {
+                case INTTYP:
+                    code += to_string(item->arg1->val.cons->val.unum);
+                    break;
+
+                default:break;
+                }
+                break;
+            }
+            default:break;
+            }
+
+        }
+        else
+        {
+            //expression
+            expression(code,*stack_expression,item->arg1->val.varTmp->name);
+        }
+
+        code += ";";
+        code += "\n";
+
+        position++;
+
+        break;
+    }
+        ///
+    default:
+        position++;
+        break;
+    }
+
+
+    return code;
+}
+
+string C_PlusPlus::processing_func_arg(int n)
+{
+    stack<INSTRUCTION*> stack_expression;
+
+    string code = "";
+
+    INSTRUCTION* item = vector_polish[position];
+
+    switch (item->opc)
+    {
+    case param:{
+
+        code += " ";
+
+        auto item_arg = item->rez->val.var;
+        code += item_arg->get_type();
+        code += " ";
+        code += item_arg->get_name();
+
+        position++;
+        code +=",";
+        code += processing_func_arg(position);
+
+        break;
+    }
+
+    default:
+        break;
+    }
+
+    return code;
+}
+
+string C_PlusPlus::loop(stack<INSTRUCTION*>* stack_expression,int n,int& position_str_add,string& code)
+{
+
+
+    int position_loop_begin = 0;
+
+
+
+    INSTRUCTION* item = vector_polish[n];
+
+    switch (item->opc)
+    {
+    case loop_begin:{
+        stack<INSTRUCTION*> stack_expression;
+        position_loop_begin = position;
+        int position_str_add_2 = 0;
+
+        for(int i=0; i < tabs; i++)
+        {
+            code+= "\t";
+        }
+
+        code += "for ";
+
+        position++;
+
+        string code_add = "";
+
+        code += loop(&stack_expression,position,position_str_add_2,code_add);
+        //tabs++;
+
+        break;
+    }
+    case loop_end:{
+        break;
+    }
+        ////
+    case largerEQOpc:
+    case smallerEQOpc:
+    case largerOpc:
+    case smallerOpc:
+    case LCircleOpc:
+    case RCircleOpc:
+    case slashOpc:
+    case starOpc:
+    case minusOpc:
+    case plusOpc:
+    case incrimentOpc:
+    case minusUnOpc:
+    case plusUnOpc:
+    {
+        code += expression(stack_expression,position);
+
+        if(code != "")
+        {
+            code += "\n";
+            for(int i=0; i < tabs; i++)
+            {
+                code+= "\t";
+            }
+        }
+
+        //position++;
+        break;
+    }
+        ////
+    case equalOpc:
+    {
+        code += expression(stack_expression,position);
+        //stack_expression->push(item);
+        position++;
+        break;
+    }
+    case assignOpc:
+    {
+
+        code += expression(stack_expression,position);
+
+        position++;
+        break;
+    }
+        ///
+    case loop_short_init:
+    {
+        position++;
+        code += expression(stack_expression,position);
+        code += " ";
+        break;
+    }
+
+    case ifZOpc_for:
+    {
+
+        if(stack_expression->empty())
+        {
+            switch (item->arg1->typ)
+            {
+            case nameVarOpd:
+            {
+                code += item->arg1->val.var->get_name();
+                break;
+            }
+            case constOpd:
+            {
+
+                switch (item->arg1->val.cons->typ)
+                {
+                case INTTYP:
+                    code += to_string(item->arg1->val.cons->val.unum);
+                    break;
+
+                default:break;
+                }
+                break;
+            }
+            default:break;
+            }
+
+        }
+        else
+        {
+            //expression
+            expression(code,*stack_expression,item->arg1->val.varTmp->name);
+        }
+
+        code += ";";
+        code += " ";
+        position_str_add = code.size();
+        code += ")";
+        code += "{";
+        code += "\n";
+
+        for(int i=0; i < tabs; i++)
+        {
+            code+= "\t";
+        }
+        position++;
+        break;
+    }
+    case gotoOpcFor:
+    {
+
+        string code_add = "";
+
+        if(stack_expression->empty())
+        {
+            int find_position = 0;
+            int find_semicolon = 0;
+
+            for(int i= code.size(); i > 0; i--)
+            {
+                if(code[i] ==';')
+                {
+                    find_semicolon++;
+                    if(find_semicolon == 2)
+                    {
+                        find_position = i+1;
+                        break;
+                    }
+                }
+
+                if(code[i] == '{')
+                {
+                    break;
+                }
+            }
+
+            if(find_position > 0)
+            {
+                for(int i=find_position; i < code.size();i++)
+                {
+                    if(code[i] == '\n' || code[i] == '\t' )
+                    {
+
+                    }
+                    else
+                    {
+                        code_add +=code[i];
+                    }
+                }
+                code.erase(find_position);
+            }
+        }
+        else
+        {
+            if(stack_expression->size() == 1)
+            {
+                auto it = stack_expression[0].top();
+                if ( it->opc == incrimentOpc)
+                {
+                    code_add += it->arg1->val.var->get_name();
+                    code_add += "++";
+                    code_add += "; ";
+                }
+            }
+            else
+            {
+                code_add += expression(stack_expression,position);
+            }
+
+        }
+
+
+        code.insert(position_str_add,code_add);
+        position++;
+        break;
+    }
+
+    default:{
+        position++;
+        break;
+    }
+    }
+
+    return code;
+}
+
+
+
+string C_PlusPlus::expression(stack<INSTRUCTION*>* stack_expression,int n)
+{
+    string code = "";
+
+    INSTRUCTION* item = vector_polish[n];
+
+    switch (item->opc)
+    {
+    ////
+    case smallerOpc:
+    case LCircleOpc:
+    case RCircleOpc:
+    case slashOpc:
+    case starOpc:
+    case minusOpc:
+    case plusOpc:
+    case incrimentOpc:
+    case minusUnOpc:
+    case plusUnOpc:
+    {
+        stack_expression->push(item);
+        position++;
+
+        code += expression(stack_expression,position);
+
+        break;
+    }
+        ///
+    case equalOpc:
+    {
+        code += item->rez->val.var->get_name()+" ";
+        code += "= ";
+
+        if(stack_expression->empty())
+        {
+            switch (item->arg1->typ)
+            {
+            case nameVarOpd:
+            {
+                code += item->arg1->val.var->get_name();
+                break;
+            }
+            case constOpd:
+            {
+
+                switch (item->arg1->val.cons->typ)
+                {
+                case INTTYP:
+                    code += to_string(item->arg1->val.cons->val.unum);
+                    break;
+
+                default:break;
+                }
+                break;
+            }
+            default:break;
+            }
+
+        }
+        else
+        {
+            //expression
+            expression(code,*stack_expression,item->arg1->val.varTmp->name);
+        }
+
+        code += ";";
+        position++;
+
+        break;
+    }
+        ///
+        ////
+    case assignOpc:
+    {
+
+
+        code += "auto ";
+        code += item->rez->val.var->get_name()+" ";
+        code += "= ";
+
+        if(stack_expression->empty())
+        {
+            switch (item->arg1->typ)
+            {
+            case nameVarOpd:
+            {
+                code += item->arg1->val.var->get_name();
+                break;
+            }
+            case constOpd:
+            {
+
+                switch (item->arg1->val.cons->typ)
+                {
+                case INTTYP:
+                    code += to_string(item->arg1->val.cons->val.unum);
+                    break;
+
+                default:break;
+                }
+                break;
+            }
+            default:break;
+            }
+
+        }
+        else
+        {
+            //expression
+            expression(code,*stack_expression,item->arg1->val.varTmp->name);
+        }
+
+        code += ";";
+
+
+        break;
+    }
+        ///
+    case gotoOpcFor:
+    {
+        item = stack_expression->top();
+        code += item->rez->val.var->get_name()+" ";
+        code += "= ";
+
+        if(stack_expression->empty())
+        {
+            switch (item->arg1->typ)
+            {
+            case nameVarOpd:
+            {
+                code += item->arg1->val.var->get_name();
+                break;
+            }
+            case constOpd:
+            {
+
+                switch (item->arg1->val.cons->typ)
+                {
+                case INTTYP:
+                    code += to_string(item->arg1->val.cons->val.unum);
+                    break;
+
+                default:break;
+                }
+                break;
+            }
+            default:break;
+            }
+
+        }
+        else
+        {
+            //expression
+            expression(code,*stack_expression,item->arg1->val.varTmp->name);
+        }
+
+        code += ";";
+
+        break;
+    }
+    default:
+        break;
+    }
+
+    return code;
+}
+
+bool C_PlusPlus::get_opcType(INSTRUCTION *item)
+{
+    switch (item->opc)
+    {
+    case starOpc:            // умножение '*'
+    case plusOpc:            //плюс '+'
+    case minusOpc:           //минус '-'
+    case minusUnOpc:         //унарный минус '-'
+    case plusUnOpc:         //унарный плюс '+'
+    case dicrimentOpc:       // декремент '−−'
+    case incrimentOpc:       //инкремент '++'
+    case modOpc:             //остаток от деления '%'
+    case slashOpc:           // деление '/'
+    case assignOpc:			// авто присваивание ':='
+    case equalOpc:			// присвоение '='
+    case notEqualOpc:		// не равно '#'
+    case smallerOpc:			// меньше '<'
+    case largerOpc:			// больше '>'
+    case smallerEQOpc:		// меньше или равно '<='
+    case largerEQOpc:		// больше или равно '>='
+    case eqOpc:              // равенство '=='
+    case noValueOpc:			// нет значения ''
+    case impersantOpc:		// имперсант '&'
+    case LCircleOpc:			// круглые скобки '('
+    case RCircleOpc:			// круглые скобки ')'
+    {
+        return true;
+    }
+    default:
+        return false;
+    }
 }
 

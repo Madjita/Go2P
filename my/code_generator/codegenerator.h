@@ -23,7 +23,9 @@ class CodeGenerator
 public:
     explicit CodeGenerator();
 
-    virtual bool generate(vector<INSTRUCTION*> vector_polish,to_generate typ);
+    virtual bool generate(vector<INSTRUCTION*> _vector_polish,to_generate typ);
+    vector<INSTRUCTION *> vector_polish;
+
 
 };
 

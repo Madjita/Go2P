@@ -89,6 +89,7 @@ void Polish_notation::push_operation(opcType var_opc)
 
     case elseOpc:
     case loop_begin:
+    case loop_end:
     case loop_short_init:
     case callFunc_Begin:
     {
@@ -405,6 +406,7 @@ void Polish_notation::End()
         }
         case elseOpc:
         case loop_begin:
+        case loop_end:
         case loop_short_init:
         {
 
@@ -775,6 +777,7 @@ string Polish_notation::opc(opcType typ)
     case gotoOpcFor_break: str = "goto_for_B";          break;              //goto метка для перехода из цикла for
     case gotoOpcFor_infinity: str = "goto_for_I";       break;              //goto метка для перехода в while(1)
 
+    case loop_end:            str = "loop_end";         break;
     case loop_begin:          str = "loop_begin";       break;
     case loop_short_init:     str = "loop_short_init";  break;
     case callFunc_Begin:      str = "call_f_begin";     break;

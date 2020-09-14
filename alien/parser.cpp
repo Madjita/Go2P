@@ -212,6 +212,11 @@ bool Parser::newFunc()
 
     if(lex == keyFunc)
     {
+        //Новый код Польской записи (проверяю)
+        polish.push_operand(call,newFuncItem);
+        //Новый код Польской записи (проверяю)
+        polish.push_operation(callFunc_Begin);
+
         nextLex();
         goto _1;
     }
@@ -290,12 +295,6 @@ _6:
     //Начало функции
     if(lex == lcLFigure)
     {
-
-        //Новый код Польской записи (проверяю)
-        polish.push_operand(call,newFuncItem);
-        //Новый код Польской записи (проверяю)
-        polish.push_operation(callFunc_Begin);
-
         nextLex();
         goto _7;
     }
@@ -1184,6 +1183,7 @@ bool Parser::StatementInit()
 
     vector<MyVariable*> save_object_hard_type;
     FuncType* find_func = nullptr;
+    bool flag_push_operand = false;
 
 _0:
     string name_id;
@@ -1224,6 +1224,13 @@ _0:
                             exit(-1);
                         }
                     }
+                    else
+                    {
+                        //Новый код Польской записи (проверяю)
+                        polish.push_operand(nameVarOpd,Object_variable);
+                        flag_push_operand = true;
+
+                    }
                 }
                 else
                 {
@@ -1231,7 +1238,8 @@ _0:
 
                     //Новый код Польской записи (проверяю)
                     polish.push_operand(nameVarOpd,Object_variable);
-                    polish.push_operation(equalOpc);
+                    flag_push_operand = true;
+                    //polish.push_operation(equalOpc);
                 }
 
             }
@@ -1258,7 +1266,8 @@ _0:
 
                     //Новый код Польской записи (проверяю)
                     polish.push_operand(nameVarOpd,Object_variable);
-                    polish.push_operation(equalOpc);
+                    flag_push_operand = true;
+                    //polish.push_operation(equalOpc);
                 }
             }
             else
@@ -1267,92 +1276,6 @@ _0:
                 Object_variable = prev_object->get_variable(name_id);
             }
         }
-
-
-
-
-
-        //        if(newFuncItem != nullptr)
-        //        {
-
-
-
-        //            if(save_name_hard_type.empty())
-        //            {
-        //                if(!newFuncItem->findInitStatment(name_id))
-        //                {
-        //                    cout << "Error: Find repeat label in Func body Statment."<<endl;
-        //                    exit(-1);
-        //                }
-
-        //                save_type.push_back(newFuncItem->getInitStatment_type(name_id));
-        //            }
-        //            else
-        //            {
-        //                //                bool flagExit = false;
-        //                //                for(auto vector_struct: vector_structType_nameType)
-        //                //                {
-        //                //                    if(vector_struct.getNameHardType() == save_type[0])
-        //                //                    {
-        //                //                        for(auto item_struct: vector_struct.getVariables())
-        //                //                        {
-        //                //                            for(auto item: item_struct)
-        //                //                            {
-        //                //                                if(item.first == name_id)
-        //                //                                {
-        //                //                                    //нашли переменную
-        //                //                                    flagExit = true;
-        //                //                                    break;
-        //                //                                }
-        //                //                            }
-
-        //                //                            if(flagExit)
-        //                //                                break;
-        //                //                        }
-
-        //                //                        if(flagExit)
-        //                //                            break;
-        //                //                    }
-        //                //                }
-
-        //                //////
-        //                bool flagExit = false;
-        //                for(auto vector_struct: table.types_)
-        //                {
-        //                    if(vector_struct->getNameHardType() == save_type[0])
-        //                    {
-        //                        if(vector_struct->find_init_variables(name_id))
-        //                        {
-        //                            //нашли переменную
-        //                            flagExit = true;
-        //                            break;
-        //                        }
-        //                    }
-        //                }
-        //                //////////////////////////
-        //                if(!flagExit)
-        //                {
-        //                    //не нашли переменную значит ошибка
-        //                    cout << "Error: Find repeat label in Func body Statment."<<endl;
-        //                    exit(-1);
-        //                }
-
-        //            }
-        //        }
-        //        else
-        //        {
-        //            if(save_object_hard_type.empty())
-        //            {
-        //               Object_variable = table.get_variable_in_globals(name_id);
-        //            }
-        //            else
-        //            {
-        //               auto prev_object = save_object_hard_type[save_object_hard_type.size()-1];
-        //               Object_variable = prev_object->get_variable(name_id);
-        //            }
-        //        }
-
-
 
         nextLex();
         goto _1;
@@ -1402,10 +1325,15 @@ _3:
 
     if(lex == lcEqual)
     {
+        polish.push_operation(equalOpc);
+
         nextLex();
     }
     else
     {
+        if(flag_push_operand)
+            polish.pop_operand();
+
         return false;
     }
 
@@ -1923,6 +1851,10 @@ _0:
                             if(Object_variable != nullptr)
                             {
                                 //мы нашли переменную, значит она объявленна и существует (все хорошо)
+
+                                //Новый код Польской записи (проверяю)
+                                //polish.push_operand(nameVarOpd,newFuncItem->get_variable_at(name));
+                                //polish.push_operation(assignOpc);
 
                             }
                             else
@@ -2753,6 +2685,8 @@ bool Parser::loop()
     unsigned int begin_position_expression = 0;
     unsigned int end_position_expression = 0;
 
+    vector<vector<map<LexClass,string>>> vvMap_KeyData_copy;
+
     position = scanAliend->getPosition();
     if(lex == keyFor)
     {
@@ -2802,6 +2736,7 @@ _5:
         nextLex();
         position = scanAliend->getPosition();
         saveLex = lex;
+        vvMap_KeyData_copy = vvMap_KeyData;
     }
 
     if(Expression())
@@ -2824,22 +2759,48 @@ _5:
     if(lex == lcEnter)
     {
         nextLex();
+
     }
 
 
     if(lex == lcSemicolon)
     {
+
+        InformPosition position_2 = scanAliend->getPosition();
+        LexClass saveLex_2 = lex;
+        vector<vector<map<LexClass,string>>> vvMap_KeyData_copy_2 = vvMap_KeyData;
+
         nextLex();
+
+
+
 
         begin_position_expression  = polish.begin_position_expression();
 
-        if(Expression())
+        if(StatementInit())
         {
             //Новый код Польской записи (проверяю)
-            polish.End();
+            //polish.End();
 
             end_position_expression = polish.end_position_expression();
             polish.save_expression_for(begin_position_expression,end_position_expression);
+        }
+        else
+        {
+            scanAliend->setPosition(position_2);
+            lex = saveLex_2;
+            vvMap_KeyData = vvMap_KeyData_copy_2; //Добавил для возвращения на последнию запомненный список
+
+            nextLex();
+
+            if(Expression())
+            {
+                //Новый код Польской записи (проверяю)
+                polish.End();
+
+                end_position_expression = polish.end_position_expression();
+                polish.save_expression_for(begin_position_expression,end_position_expression);
+            }
         }
     }
 
@@ -2850,6 +2811,7 @@ _12:
         nextLex();
         position = scanAliend->getPosition();
         saveLex = lex;
+        vvMap_KeyData_copy = vvMap_KeyData;
 
         goto _12;
     }
@@ -2936,6 +2898,7 @@ _4:
         nextLex();
         position = scanAliend->getPosition();
         saveLex = lex;
+        vvMap_KeyData_copy = vvMap_KeyData;
 
         goto _4;
     }
@@ -2964,6 +2927,8 @@ _4:
     }
     scanAliend->setPosition(position);
     lex = saveLex;
+    vvMap_KeyData = vvMap_KeyData_copy; //Добавил для возвращения на последнию запомненный список
+
 
 
     if(Statement())
@@ -3063,6 +3028,10 @@ _4:
     }
 
 _end:
+
+    //Новый код Польской записи (проверяю)
+    polish.push_operation(loop_end);
+
     return true;
 
 }
