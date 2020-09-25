@@ -13,6 +13,8 @@ using namespace std;
 #include <fstream>
 #include <vector>
 
+#include <time.h>
+
 bool ReadAllBytes(string filename,string& data)
 {
     ifstream file(filename, ios::binary);
@@ -48,6 +50,8 @@ bool Start_program(Parser* pars)
 
 int main(int argc, char *argv[])
 {
+    clock_t start = clock();
+
     string data ="";
     string fileName ="";
     string fileNameOut ="";
@@ -184,6 +188,12 @@ int main(int argc, char *argv[])
      //Код генератор
      CodeGenerator generator;
      generator.generate(pars.polish.get_vector_polish(),all);
+
+     // Execuatable code
+     clock_t stop = clock();
+     double elapsed = (double)(stop - start) * 1000.0 / CLOCKS_PER_SEC;
+     cout << "Time elapsed in ms: " << elapsed<<endl;
+     cout << "Time elapsed in s: " << elapsed*0.001<<endl;
 
 
     system("pause");
