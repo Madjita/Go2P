@@ -17,7 +17,7 @@ public:
     string expression(INSTRUCTION * item);
 
     string reverse(stack<char> stroka);
-
+    //Point begin
     string worker(stack<INSTRUCTION*>* stack_expression,int n);
 
     //обработка аргументов в функции

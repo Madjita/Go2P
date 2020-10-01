@@ -47,7 +47,6 @@ bool Start_program(Parser* pars)
     return main;
 }
 
-
 int main(int argc, char *argv[])
 {
     clock_t start = clock();

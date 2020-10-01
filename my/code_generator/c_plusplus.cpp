@@ -808,7 +808,7 @@ string C_PlusPlus::reverse(stack<char> stroka)
 
     return str;
 }
-
+//Point begin
 string C_PlusPlus::worker(stack<INSTRUCTION *>* stack_expression, int n)
 {
     vector<INSTRUCTION*> vector_func_args;
@@ -853,8 +853,8 @@ string C_PlusPlus::worker(stack<INSTRUCTION *>* stack_expression, int n)
 
         break;
     }
-    case returnOpc:
-    {
+    case returnOpc:{
+
         for(int i=0; i < tabs; i++)
         {
             code+= "\t";
@@ -948,8 +948,7 @@ string C_PlusPlus::worker(stack<INSTRUCTION *>* stack_expression, int n)
     case plusOpc:
     case incrimentOpc:
     case minusUnOpc:
-    case plusUnOpc:
-    {
+    case plusUnOpc:{
 
         code += expression(stack_expression,position);
 
@@ -957,8 +956,7 @@ string C_PlusPlus::worker(stack<INSTRUCTION *>* stack_expression, int n)
         break;
     }
         ////
-    case assignOpc:
-    {
+    case assignOpc:{
         for(int i=0; i < tabs; i++)
         {
             str+= "\t";
@@ -1009,8 +1007,7 @@ string C_PlusPlus::worker(stack<INSTRUCTION *>* stack_expression, int n)
     }
         ///
 
-    case var_statement_one:
-    {
+    case var_statement_one:{
 
         for(int i=0; i < tabs; i++)
         {
@@ -1047,8 +1044,7 @@ string C_PlusPlus::worker(stack<INSTRUCTION *>* stack_expression, int n)
 
         break;
     }
-    case ifZOpc_begin:
-    {
+    case ifZOpc_begin:{
         string code_add = "";
 
         for(int i=0; i < tabs; i++)
@@ -1116,8 +1112,7 @@ string C_PlusPlus::worker(stack<INSTRUCTION *>* stack_expression, int n)
 
         break;
     }
-    case ifZOpc:
-    {
+    case ifZOpc:{
 
         string code_add = "";
 
@@ -1200,6 +1195,11 @@ string C_PlusPlus::worker(stack<INSTRUCTION *>* stack_expression, int n)
             }
             if_else(stack_expression,position,code_add);
             item = vector_polish[position];
+
+            for(int i=0; i < tabs; i++)
+            {
+                code+= "\t";
+            }
         }
 
         if(code_add[code_add.size()-1] != '}')
@@ -1331,8 +1331,7 @@ string C_PlusPlus::loop(stack<INSTRUCTION*>* stack_expression,int n,int& positio
     case plusOpc:
     case incrimentOpc:
     case minusUnOpc:
-    case plusUnOpc:
-    {
+    case plusUnOpc:{
         code += expression(stack_expression,position);
 
         if(code != "")
@@ -1348,15 +1347,13 @@ string C_PlusPlus::loop(stack<INSTRUCTION*>* stack_expression,int n,int& positio
         break;
     }
         ////
-    case equalOpc:
-    {
+    case equalOpc:{
         code += expression(stack_expression,position);
         //stack_expression->push(item);
         position++;
         break;
     }
-    case assignOpc:
-    {
+    case assignOpc:{
 
         code += expression(stack_expression,position);
 
@@ -1364,16 +1361,14 @@ string C_PlusPlus::loop(stack<INSTRUCTION*>* stack_expression,int n,int& positio
         break;
     }
         ///
-    case loop_short_init:
-    {
+    case loop_short_init:{
         position++;
         code += expression(stack_expression,position);
         code += " ";
         break;
     }
 
-    case ifZOpc_for:
-    {
+    case ifZOpc_for:{
         int find = find_word(";",code);
         if(find != -1)
         {
@@ -1433,8 +1428,7 @@ string C_PlusPlus::loop(stack<INSTRUCTION*>* stack_expression,int n,int& positio
         position++;
         break;
     }
-    case gotoOpcFor:
-    {
+    case gotoOpcFor:{
 
         string code_add = "";
 
@@ -1502,8 +1496,7 @@ string C_PlusPlus::loop(stack<INSTRUCTION*>* stack_expression,int n,int& positio
         break;
     }
 
-    case ifZOpc:
-    {
+    case ifZOpc:{
 
         string code_add = "";
 
