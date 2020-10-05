@@ -26,8 +26,8 @@ bool ReadAllBytes(string filename,string& data)
 
     // copies all data into buffer
     vector<char> prov(
-            (istreambuf_iterator<char>(file)),
-            (istreambuf_iterator<char>()));
+                (istreambuf_iterator<char>(file)),
+                (istreambuf_iterator<char>()));
 
     if(prov[prov.size()-1] == '\n' && prov[prov.size()-2] == '\r')
         prov.erase(prov.end()-2,prov.end());
@@ -47,6 +47,8 @@ bool Start_program(Parser* pars)
     return main;
 }
 
+#include <math.h>
+
 int main(int argc, char *argv[])
 {
     clock_t start = clock();
@@ -57,6 +59,7 @@ int main(int argc, char *argv[])
 
     bool flagIn = false;
     bool flagOut = false;
+
 
     if(argc > 2)
     {
@@ -176,23 +179,23 @@ int main(int argc, char *argv[])
     fileOutScaner_keyStr.close();
 
 
-// //----Вывести разобранный код в файл----------
-     ofstream fileOut(fileNameOut, ios::binary | ios::trunc);
+    // //----Вывести разобранный код в файл----------
+    ofstream fileOut(fileNameOut, ios::binary | ios::trunc);
 
-     fileOut << pars.getWorkData();
+    fileOut << pars.getWorkData();
 
-     fileOut.close();
+    fileOut.close();
 
 
-     //Код генератор
-     CodeGenerator generator;
-     generator.generate(pars.polish.get_vector_polish(),all);
+    //Код генератор
+    CodeGenerator generator;
+    generator.generate(pars.polish.get_vector_polish(),all);
 
-     // Execuatable code
-     clock_t stop = clock();
-     double elapsed = (double)(stop - start) * 1000.0 / CLOCKS_PER_SEC;
-     cout << "Time elapsed in ms: " << elapsed<<endl;
-     cout << "Time elapsed in s: " << elapsed*0.001<<endl;
+    // Execuatable code
+    clock_t stop = clock();
+    double elapsed = (double)(stop - start) * 1000.0 / CLOCKS_PER_SEC;
+    cout << "Time elapsed in ms: " << elapsed<<endl;
+    cout << "Time elapsed in s: " << elapsed*0.001<<endl;
 
 
     system("pause");

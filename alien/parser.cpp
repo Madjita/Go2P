@@ -353,7 +353,7 @@ _7:
             newFuncItem->addNewVariables();
         }
 
-         goto _7;
+        goto _7;
     }
     scanAliend->setPosition(position);
     lex = saveLex;
@@ -583,19 +583,19 @@ _2:
 
         }
 
-//        //Новый код Польской записи (проверяю)
-//        polish.push_operand(typeNameOpd,table.get_variable_in_globals(nameId));
+        //        //Новый код Польской записи (проверяю)
+        //        polish.push_operand(typeNameOpd,table.get_variable_in_globals(nameId));
 
-//        if(flag_statement_one)
-//        {
-//            //Новый код Польской записи (проверяю)
-//            polish.push_operation(var_statement_more);
-//        }
-//        else
-//        {
-//            //Новый код Польской записи (проверяю)
-//            polish.push_operation(var_statement_one);
-//        }
+        //        if(flag_statement_one)
+        //        {
+        //            //Новый код Польской записи (проверяю)
+        //            polish.push_operation(var_statement_more);
+        //        }
+        //        else
+        //        {
+        //            //Новый код Польской записи (проверяю)
+        //            polish.push_operation(var_statement_one);
+        //        }
 
         nextLex();
         goto _3;
@@ -2623,6 +2623,228 @@ _2:
         return false;
     }
 
+    /*
+    InformPosition position_2 = position;
+    LexClass saveLex = lex;
+    vector<vector<map<LexClass,string>>> saveItem;
+    label_typ typ = label_if_true;
+    ///
+
+//    if(lex == lcLFigure)
+//    {
+//        nextLex();
+//        position = scanAliend->getPosition();
+//        saveLex = lex;
+
+//        goto _15;
+//    }
+//    else
+//    {
+//        return false;
+//    }
+
+_15:
+    if(lex == lcEnter)
+    {
+        nextLex();
+
+        position_2 = scanAliend->getPosition();
+        saveLex = lex;
+        saveItem = vvMap_KeyData;
+
+        goto _15;
+    }
+
+    //Обработка break
+    if(lex == keyBreak)
+    {
+
+        switch (typ)
+        {
+        case label_if_true:
+            polish.set_goto_label(if_break_t);
+            nextLex();
+            break;
+        case label_if_false:
+            polish.set_goto_label(if_break_f);
+            nextLex();
+            break;
+        default:break;
+        }
+
+
+        goto _15;
+    }
+
+    //обработка continue
+    if(lex == keyContinue)
+    {
+        switch (typ)
+        {
+        case label_if_true:
+            polish.set_goto_label(if_continue_t);
+            nextLex();
+            break;
+        case label_if_false:
+            polish.set_goto_label(if_continue_f);
+            nextLex();
+            break;
+        default:break;
+        }
+
+
+        goto _15;
+    }
+
+    //инициализация автоматическая 2
+    if(StatementShortInit_var())
+    {
+        //Новый код Польской записи (проверяю)
+        polish.End();
+
+        goto _15;
+    }
+    scanAliend->setPosition(position_2);
+    lex = saveLex;
+
+    //инициализация автоматическая
+    if(StatementShortInit())
+    {
+        //Новый код Польской записи (проверяю)
+        polish.End();
+
+        goto _15;
+    }
+    scanAliend->setPosition(position_2);
+    lex = saveLex;
+
+
+    if(Statement())
+    {
+        //Новый код Польской записи (проверяю)
+        polish.End();
+
+        goto _15;
+    }
+    scanAliend->setPosition(position_2);
+    lex = saveLex;
+    vvMap_KeyData = saveItem;
+
+    if(StatementInit())
+    {
+        //Новый код Польской записи (проверяю)
+        polish.End();
+
+        goto _15;
+    }
+    scanAliend->setPosition(position_2);
+    lex = saveLex;
+
+
+    if(Variable())
+    {
+        //Новый код Польской записи (проверяю)
+        polish.End();
+
+        goto _15;
+    }
+    scanAliend->setPosition(position_2);
+    lex = saveLex;
+
+    if(IfElse())
+    {
+        position_2 = scanAliend->getPosition();
+        nextLex();
+        goto _16;
+    }
+    scanAliend->setPosition(position_2);
+    lex = saveLex;
+
+
+    if(loop())
+    {
+        goto _16;
+    }
+    scanAliend->setPosition(position_2);
+    lex = saveLex;
+
+    if(switchCase())
+    {
+        goto _16;
+    }
+    scanAliend->setPosition(position_2);
+    lex = saveLex;
+
+    //return function
+    if(lex == keyReturn)
+    {
+        nextLex();
+
+        if(lex == lcCharConst)
+        {
+            nextLex();
+        }
+
+        if(Expression())
+        {
+            polish.End();
+        }
+
+        switch (typ)
+        {
+        case label_if_true:
+            //Новый код Польской записи (проверяю)
+            polish.push_operation(returnOpc);
+            //Добавляем прыжок в конец цикла
+            polish.set_goto_label(if_return_t);
+            break;
+        case label_if_false:
+            //Новый код Польской записи (проверяю)
+            polish.push_operation(returnOpc);
+            //Добавляем прыжок в конец цикла
+            polish.set_goto_label(if_return_f);
+            break;
+        default:break;
+        }
+
+        goto _16;
+    }
+    scanAliend->setPosition(position_2);
+    lex = saveLex;
+
+_16:
+
+    if(lex == lcEnter)
+    {
+        goto _16;
+    }
+
+//    if(lex == lcRFigure)
+//    {
+//        //Новый код Польской записи (проверяю)
+//        //Устанавливаем метку
+//        switch (typ)
+//        {
+//        case label_if_true:
+//            polish.set_goto_label(if_true);
+//            break;
+//        case label_if_false:
+//            polish.set_goto_label(if_false);
+//            break;
+//        default:break;
+//        }
+
+//        goto _end;
+//    }
+//    else
+//    {
+//        return false;
+//    }
+
+    ///
+
+    */
+
 _5:
     if(lex == lcEnter)
     {
@@ -2634,7 +2856,7 @@ _5:
     if(lex == keyElse)
     {
 
-       polish.push_operation(elseOpc);
+        polish.push_operation(elseOpc);
 
         nextLex();
 
@@ -2959,7 +3181,6 @@ _4:
     scanAliend->setPosition(position);
     lex = saveLex;
 
-    //исправить
     if(IfElse())
     {
         position = scanAliend->getPosition();
@@ -3923,15 +4144,15 @@ _3:
 
         switch (typ)
         {
-            case label_if_true:
-                polish.set_goto_label(if_break_t);
-                nextLex();
-                break;
-            case label_if_false:
-                polish.set_goto_label(if_break_f);
-                nextLex();
-                break;
-            default:break;
+        case label_if_true:
+            polish.set_goto_label(if_break_t);
+            nextLex();
+            break;
+        case label_if_false:
+            polish.set_goto_label(if_break_f);
+            nextLex();
+            break;
+        default:break;
         }
 
 
@@ -3943,15 +4164,15 @@ _3:
     {
         switch (typ)
         {
-            case label_if_true:
-                polish.set_goto_label(if_continue_t);
-                nextLex();
-                break;
-            case label_if_false:
-                polish.set_goto_label(if_continue_f);
-                nextLex();
-                break;
-            default:break;
+        case label_if_true:
+            polish.set_goto_label(if_continue_t);
+            nextLex();
+            break;
+        case label_if_false:
+            polish.set_goto_label(if_continue_f);
+            nextLex();
+            break;
+        default:break;
         }
 
 
@@ -3961,6 +4182,7 @@ _3:
     //инициализация автоматическая 2
     if(StatementShortInit_var())
     {
+        polish.End();
         goto _3;
     }
     scanAliend->setPosition(position);
@@ -3969,6 +4191,7 @@ _3:
     //инициализация автоматическая
     if(StatementShortInit())
     {
+        polish.End();
         goto _3;
     }
     scanAliend->setPosition(position);
@@ -3977,6 +4200,7 @@ _3:
 
     if(Statement())
     {
+        polish.End();
         goto _3;
     }
     scanAliend->setPosition(position);
@@ -3985,6 +4209,7 @@ _3:
 
     if(StatementInit())
     {
+        polish.End();
         goto _3;
     }
     scanAliend->setPosition(position);
@@ -3993,6 +4218,7 @@ _3:
 
     if(Variable())
     {
+        polish.End();
         goto _3;
     }
     scanAliend->setPosition(position);
@@ -4045,19 +4271,19 @@ _3:
 
         switch (typ)
         {
-            case label_if_true:
-                //Новый код Польской записи (проверяю)
-                polish.push_operation(returnOpc);
-                //Добавляем прыжок в конец цикла
-                polish.set_goto_label(if_return_t);
+        case label_if_true:
+            //Новый код Польской записи (проверяю)
+            polish.push_operation(returnOpc);
+            //Добавляем прыжок в конец цикла
+            polish.set_goto_label(if_return_t);
             break;
-            case label_if_false:
-                //Новый код Польской записи (проверяю)
-                polish.push_operation(returnOpc);
-                //Добавляем прыжок в конец цикла
-                polish.set_goto_label(if_return_f);
+        case label_if_false:
+            //Новый код Польской записи (проверяю)
+            polish.push_operation(returnOpc);
+            //Добавляем прыжок в конец цикла
+            polish.set_goto_label(if_return_f);
             break;
-            default:break;
+        default:break;
         }
 
 
@@ -4081,13 +4307,13 @@ _4:
         //Устанавливаем метку
         switch (typ)
         {
-            case label_if_true:
-                polish.set_goto_label(if_true);
+        case label_if_true:
+            polish.set_goto_label(if_true);
             break;
-            case label_if_false:
-                polish.set_goto_label(if_false);
+        case label_if_false:
+            polish.set_goto_label(if_false);
             break;
-            default:break;
+        default:break;
         }
 
         goto _end;

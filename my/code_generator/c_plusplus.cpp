@@ -96,11 +96,15 @@ bool C_PlusPlus::generate() //vector<INSTRUCTION *> vector_polish
     stack<INSTRUCTION*> stack_expression;
 
     stack<stack<INSTRUCTION*>*> loop;
+    string code = "";
 
     position = 0;
 
     while (vector_polish.size() > position) {
-        str += worker(&stack_expression,position);
+        code = worker(&stack_expression,position);
+
+        str += code;
+        code = "";
     }
 
 
@@ -950,9 +954,17 @@ string C_PlusPlus::worker(stack<INSTRUCTION *>* stack_expression, int n)
     case minusUnOpc:
     case plusUnOpc:{
 
+        for(int i=0; i < tabs; i++)
+        {
+            code+= "\t";
+        }
+
         code += expression(stack_expression,position);
 
-        position++;
+
+        code +="\n";
+
+
         break;
     }
         ////
@@ -1003,6 +1015,8 @@ string C_PlusPlus::worker(stack<INSTRUCTION *>* stack_expression, int n)
 
         position++;
 
+
+
         break;
     }
         ///
@@ -1052,73 +1066,47 @@ string C_PlusPlus::worker(stack<INSTRUCTION *>* stack_expression, int n)
             code+= "\t";
         }
 
-        code += "if";
-        code +=" ";
-        code += "( ";
         position++;
 
-
-        code += expression(stack_expression,position);
-
-        item = vector_polish[position];
-
-        if(stack_expression->empty())
+        while(item->opc != ifZOpc_end)
         {
-            switch (item->arg1->typ)
-            {
-            case nameVarOpd:
-            {
-                code_add += item->arg1->val.var->get_name();
-                break;
-            }
-            case constOpd:
-            {
-
-                switch (item->arg1->val.cons->typ)
-                {
-                case INTTYP:
-                    code_add += to_string(item->arg1->val.cons->val.unum);
-                    break;
-
-                default:break;
-                }
-                break;
-            }
-            default:break;
-            }
-
-        }
-        else
-        {
-            //expression
-            expression(code_add,*stack_expression,item->arg1->val.varTmp->name);
+            if_else(stack_expression,position,code_add);
+            item = vector_polish[position];
         }
 
-        code += code_add;
-        code += " )";
+        code +=code_add;
+        code += "}";
         code += "\n";
-
-        for(int i=0; i < tabs; i++)
-        {
-            code+= "\t";
-        }
-        code += "{";
-        code += "\n";
-        tabs++;
-        for(int i=0; i < tabs; i++)
-        {
-            code+= "\t";
-        }
+        tabs--;
+        position++;
 
         break;
     }
+//    case ifZOpc_end:
+//    {
+//        string code_add = "\n";
+//        for(int i=0; i < tabs-1; i++)
+//        {
+//            code_add+= "\t";
+//        }
+
+//        code_add += expression(stack_expression,position);
+//        code +=code_add;
+//        code += "}";
+//        code += "\n";
+//        tabs--;
+
+
+//        position++;
+//        break;
+//    }
     case ifZOpc:{
 
         string code_add = "";
 
         position++;
 
-        while(item->opc != gotoOpcIfZ_true)
+        while(item->opc != ifZOpc_end)
         {
             if_else(stack_expression,position,code_add);
             item = vector_polish[position];
@@ -1141,12 +1129,14 @@ string C_PlusPlus::worker(stack<INSTRUCTION *>* stack_expression, int n)
 
 
         code +=code_add;
-        code += "}";
+        /*Добавил
+         * code += "}";
         code += "\n";
         tabs--;
 
 
         position++;
+        */
         break;
     }
     case elseOpc:{
@@ -1195,11 +1185,11 @@ string C_PlusPlus::worker(stack<INSTRUCTION *>* stack_expression, int n)
             }
             if_else(stack_expression,position,code_add);
             item = vector_polish[position];
+        }
 
-            for(int i=0; i < tabs; i++)
-            {
-                code+= "\t";
-            }
+        for(int i=0; i < tabs; i++)
+        {
+            code+= "\t";
         }
 
         if(code_add[code_add.size()-1] != '}')
@@ -1609,6 +1599,24 @@ string C_PlusPlus::if_else(stack<INSTRUCTION *> *stack_expression, int n,string 
 
     switch (item->opc)
     {
+    case ifZOpc_begin:
+    {
+        string code_add = "";
+        position++;
+
+        while(item->opc != ifZOpc_end)
+        {
+            if_else(stack_expression,position,code_add);
+            item = vector_polish[position];
+        }
+
+        code +=code_add;
+        code += "}";
+        code += "\n";
+        tabs--;
+        position++;
+        break;
+    }
     case ifZOpc:
     {
         string code_add = "";
@@ -1700,14 +1708,7 @@ string C_PlusPlus::if_else(stack<INSTRUCTION *> *stack_expression, int n,string 
         }
 
         code +=code_add;
-        code += "}";
 
-
-
-        tabs--;
-
-
-        //position++;
         break;
     }
         ////
@@ -1756,6 +1757,25 @@ string C_PlusPlus::if_else(stack<INSTRUCTION *> *stack_expression, int n,string 
         break;
     }
         ///
+
+//    case ifZOpc_end:
+//    {
+//        string code_add = "\n";
+//        for(int i=0; i < tabs-1; i++)
+//        {
+//            code_add+= "\t";
+//        }
+
+
+//        code +=code_add;
+//        code += "}";
+//        code += "\n";
+//        tabs--;
+
+
+//        position++;
+//        break;
+//    }
     default:{
         position++;
         break;
