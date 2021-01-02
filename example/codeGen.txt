@@ -1,11 +1,32 @@
 func add(a,b int) int
 {
-  for i:= 5; i < 15; i++ {
+  
+  f := (5-(4-2)/1)*(2+3)
 
-    for k:= 5; k < 15; k++ {
-
-    
-    }
+  for {
+      if 5 < 10
+      {
+        for {
+            if 5 < 10
+            {
+              break
+            }
+            else
+            {
+              break
+            }
+        }
+      }
+      else
+      {
+        break
+      }
   }
+
   return 0
+}
+
+func main() int
+{
+  return 1
 }

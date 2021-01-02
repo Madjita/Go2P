@@ -87,12 +87,8 @@ void Polish_notation::push_operation(opcType var_opc)
         return;
     }
 
-    case ifZOpc_begin:
-    case ifZOpc_end:
     case elseOpc:
     case loop_begin:
-    case loop_end:
-    case loop_short_init:
     case callFunc_Begin:
     {
         //Добавим созданную инструкцию в стек операций
@@ -140,12 +136,6 @@ void Polish_notation::push_operation(opcType var_opc)
         return;
     }
     case call_func:{
-        //Добавим созданную инструкцию в стек операций
-        stack_operations.push(instruction_ptr);
-        End();
-        return;
-    }
-    case var_statement_one:{
         //Добавим созданную инструкцию в стек операций
         stack_operations.push(instruction_ptr);
         End();
@@ -199,16 +189,6 @@ void Polish_notation::push_operation(opcType var_opc)
                     pop_operand_left = pop_operand();
                     //устанавливаем в трехадресном коде инструкции Результат данную временную переменную
                     add_rezult_operand(pop_operation_top,pop_operand_left);
-                    break;
-                }
-                case plusUnOpc:
-                {
-                    //Достаем только 1 операнд
-                    pop_operand_left = pop_operand();
-                    //Создаем временную переменную операнд и добавляемв в стек операндов
-                    OPERAND* tmp = push_operand(tmpVarOpd,nullptr);
-                    //устанавливаем в трехадресном коде инструкции Результат данную временную переменную
-                    add_rezult_operand(pop_operation_top,tmp);
                     break;
                 }
                 case minusUnOpc:
@@ -370,7 +350,6 @@ void Polish_notation::End()
             add_rezult_operand(pop_operation_top,pop_operand_left);
             break;
         }
-        case plusUnOpc:
         case minusUnOpc:
         {
             //Достаем только 1 операнд
@@ -381,17 +360,14 @@ void Polish_notation::End()
             add_rezult_operand(pop_operation_top,tmp);
             break;
         }
-
-        case equalOpc:
         case assignOpc:
         {
-                //Достаем левй операнд
-                pop_operand_left = pop_operand();
-                //Достаем результат операнд
-                OPERAND* tmp  = pop_operand();
-                //устанавливаем в трехадресном коде инструкции Результат являющийся переменной
-                add_rezult_operand(pop_operation_top,tmp);
-
+            //Достаем левй операнд
+            pop_operand_left = pop_operand();
+            //Достаем результат операнд
+            OPERAND* tmp  = pop_operand();
+            //устанавливаем в трехадресном коде инструкции Результат являющийся переменной
+            add_rezult_operand(pop_operation_top,tmp);
             break;
         }
         case param:{
@@ -400,20 +376,9 @@ void Polish_notation::End()
             break;
         }
 
-        case var_statement_one:
-        {
-            //устанавливаем в трехадресном коде инструкции Результат являющийся переменной
-            add_rezult_operand(pop_operation_top,pop_operand());
-            break;
-        }
         case elseOpc:
-        case ifZOpc_end:
-        case ifZOpc_begin:
         case loop_begin:
-        case loop_end:
-        case loop_short_init:
         {
-
             break;
         }
         case callFunc_Begin:{
@@ -620,21 +585,10 @@ void Polish_notation::out_stek_file(string fileName)
         }
         else
         {
-
-            switch (top->opc) {
-            case var_statement_one:
-            {
-                 str += top->rez->val.var->get_type()+"\t\t";
-                break;
-            }
-            default:
-                str += "null\t";
-                break;
-            }
+            str += "null\t\t";
         }
 
-        str +=opc(top->opc)+"\t\t\t";
-
+        str +=opc(top->opc)+"\t\t\t\t";
 
         if(top->arg2 != nullptr)
         {
@@ -753,7 +707,6 @@ string Polish_notation::opc(opcType typ)
     case  minusOpc:     str = "-";                      break;
 
     case assignOpc:     str = ":=";                     break;
-    case equalOpc:      str = "=";                      break;
     case modOpc:        str = "%";                      break;
     case smallerOpc:    str = "<";                      break;
     case smallerEQOpc:  str = "<=";                     break;
@@ -766,7 +719,6 @@ string Polish_notation::opc(opcType typ)
     case gotoOpc:       str = "goto";                   break;
 
     case elseOpc:       str = "elseOpc";                break;
-
 
     case gotoOpcIfZ_false: str ="goto_ifz_f";           break;              //goto метка для перехода if после ложного условия
     case gotoOpcIfZ_true: str = "goto_ifz_t";           break;              //goto метка для перехода if после истенного условия
@@ -781,21 +733,15 @@ string Polish_notation::opc(opcType typ)
     case gotoOpcFor_break: str = "goto_for_B";          break;              //goto метка для перехода из цикла for
     case gotoOpcFor_infinity: str = "goto_for_I";       break;              //goto метка для перехода в while(1)
 
-    case ifZOpc_begin:        str = "ifZOpc_begin";     break;
-    case ifZOpc_end:        str = "ifZOpc_end";     break;
-    case loop_end:            str = "loop_end";         break;
     case loop_begin:          str = "loop_begin";       break;
-    case loop_short_init:     str = "loop_short_init";  break;
     case callFunc_Begin:      str = "call_f_begin";     break;
-    case callFunc_End:        str = "call_f_end";       break;
-    case param:               str = "param";            break;
-    case returnOpc:           str ="return";            break;
-    case arg_call_func:       str ="arg_call_func";     break;
-    case call_func:           str = "call_func";        break;
-    case gotoOpc_return:      str = "goto_return";      break;
-    case gotoOpcFor_return:   str = "goto_for_return";  break;
-
-    case var_statement_one:   str = "var_statement_one";break;
+    case callFunc_End:      str = "call_f_end";     break;
+    case param:     str = "param";      break;
+    case returnOpc: str ="return";break;
+    case arg_call_func: str ="arg_call_func";break;
+    case call_func: str = "call_func";break;
+    case gotoOpc_return: str = "goto_return";break;
+    case gotoOpcFor_return: str = "goto_for_return";break;
     default: break;
     }
 
@@ -1282,17 +1228,9 @@ void Polish_notation::set_goto_label(for_or_if typ)
             }
 
             expression_for->clear();
+            delete expression_for;
 
-            if(expression_for != nullptr)
-            {
-                delete expression_for;
-            }
-
-            if(!stack_breaks.empty())
-            {
-                stack_breaks.pop();
-            }
-            stack_expression_for.pop();
+            stack_breaks.pop();
         }
 
         //Установить оператор goto (по достижению закрывающейся скобки)

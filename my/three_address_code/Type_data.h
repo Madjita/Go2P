@@ -60,7 +60,6 @@ struct LABEL{
 // Разновидности операнда
 typedef enum {
     noOpd,      // не выбранна
-    typeNameOpd,// тип данных
     nameVarOpd, // именованная переменная из таблицы имен
     tmpVarOpd,  // промежуточная переменная в выражениях
     funcVar,    // аргументы функции
@@ -115,8 +114,7 @@ typedef enum {
     elseOpc,
 
     loop_begin,
-    loop_short_init,
-    loop_end,
+    lopp_end,
     gotoOpcFor,         //goto метка для перехода в цикле
     gotoOpcFor_infinity, //goto метка для перехода в while(1)
     gotoOpcFor_break,   //goto метка для перехода из цикла for
@@ -129,8 +127,6 @@ typedef enum {
     ifZOpc_for,           //ifZ (если условие отрицательное то перейти по метке выйти из цикла)
     ifZOpc_while,         //ifZ (если условие отрицательное то перейти по метке выйти из цикла)
     ifZOpc,              //ifZ (если условие отрицательное то перейти по метке на else) (goto метка для перехода if после отрицательного действия)
-    ifZOpc_begin,
-    ifZOpc_end,
     forOpc,             //for
     whileOpc,           //while
     doOpc,              //do {} while()
@@ -142,8 +138,6 @@ typedef enum {
     arg_call_func,       //Передача аргументов в функцию
     call_func,           //Вызов функции
 
-    var_statement_one,   // объявление одной переменной с одним типом данных
-    var_statement_more,   // объявление нескольких переменных через запятую с одним типом данных
 } opcType;
 
 

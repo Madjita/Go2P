@@ -35,6 +35,8 @@ public:
 
     Polish_notation polish;
 
+
+
     Scanner* scanAliend;
     LexClass lex;
     LexClass prevLex;
@@ -47,15 +49,11 @@ public:
 
     //определение новой функции
     bool newFunc();
-    //var <name> <type>
     bool Statement();
     bool StatementArray();
     bool StatementArrayInit();
     //инициализация атоматическая
     bool StatementShortInit();
-    // второй вариант автоматической инициализации
-    bool StatementShortInit_var();
-    // инициализаци объявленной переменной ранее
     bool StatementInit();
     bool funcReturn();
     bool rowStructStatement();
@@ -114,6 +112,8 @@ private:
     LexClass nextLex(bool flagSetSavePosition = false);
 
     void add_vvMap_KeyData();
+
+    int savePosition;
 
     //
     FuncType* newFuncItem;

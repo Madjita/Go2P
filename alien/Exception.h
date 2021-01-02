@@ -540,8 +540,8 @@ class Exception
 {
 public:
     Exception(string& _file, int _line, string& _error)
-        :       line(_line),
-                file(_file),
+        :	file(_file),
+                line(_line),
                 error(_error)
         {
         }

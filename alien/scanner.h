@@ -116,7 +116,6 @@ enum LexClass
     lcRealNum,			// действительное число
     lcHardType,         // сложный тип данных (структура)
     lcRecordType,       // сложный тип данных (обобщение)
-    lcAuto,             // Автоматический тип
 
     lcCharConst,		// символ
     lcString,			// строка

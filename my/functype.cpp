@@ -59,17 +59,10 @@ void FuncType::addNewVariables()
 
         if(nameThisType == "auto")
         {
-            auto it = expression.getResult();
-
-            if(!it.empty())
+            if(expression.getResult().rbegin()->first == lcIntNum)
             {
-                if(it.rbegin()->first == lcIntNum)
-                {
-                    nameThisType = "int";
-                }
+                nameThisType = "int";
             }
-
-
         }
 
         map<string,string> map_nameType;

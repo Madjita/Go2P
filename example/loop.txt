@@ -5,11 +5,12 @@ func add(a,b int) int
 
 func main() 
 {
+
   x := 5
   add(1,x)
 }
 
-/* 
+
 func sum(x,y int)
 {
     for i := 0; i < 10; ++i
@@ -58,4 +59,3 @@ func sum(x,y int)
   }
 
 }
-  */

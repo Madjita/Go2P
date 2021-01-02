@@ -6,14 +6,9 @@
 #include "alien/CompileErrors.h"
 #include "alien/parser.h"
 
-#include "my/myvariable.h"
-#include "my/code_generator/codegenerator.h"
-
 using namespace std;
 #include <fstream>
 #include <vector>
-
-#include <time.h>
 
 bool ReadAllBytes(string filename,string& data)
 {
@@ -26,8 +21,8 @@ bool ReadAllBytes(string filename,string& data)
 
     // copies all data into buffer
     vector<char> prov(
-                (istreambuf_iterator<char>(file)),
-                (istreambuf_iterator<char>()));
+            (istreambuf_iterator<char>(file)),
+            (istreambuf_iterator<char>()));
 
     if(prov[prov.size()-1] == '\n' && prov[prov.size()-2] == '\r')
         prov.erase(prov.end()-2,prov.end());
@@ -40,26 +35,22 @@ bool ReadAllBytes(string filename,string& data)
     return true;
 }
 
-bool Start_program(Parser* pars)
-{
-    auto main = pars->table.find_name_func("main");
 
-    return main;
-}
+#include <my/myvariable.h>
 
-#include <math.h>
+#include "my/code_generator/codegenerator.h"
+
+bool Start_program(Parser* pars);
+
 
 int main(int argc, char *argv[])
 {
-    clock_t start = clock();
-
     string data ="";
     string fileName ="";
     string fileNameOut ="";
 
     bool flagIn = false;
     bool flagOut = false;
-
 
     if(argc > 2)
     {
@@ -138,6 +129,7 @@ int main(int argc, char *argv[])
     Parser pars(data,&err);
 
     //1 деййствие : Собрать объект table в котором хрнаится вся информация о коде по массивам
+    //Не понимаю как составить таблицу с if (почти сделал) ,switch,for
     pars.Do();
 
 
@@ -179,28 +171,30 @@ int main(int argc, char *argv[])
     fileOutScaner_keyStr.close();
 
 
-    // //----Вывести разобранный код в файл----------
-    ofstream fileOut(fileNameOut, ios::binary | ios::trunc);
+    //ofstream fileOutScaner("scaner_out.txt", ios::binary | ios::trunc);
+    //fileOutScaner << pars.scanAliend->debugOutLex;
+    //fileOutScaner.close();
 
-    fileOut << pars.getWorkData();
+// //----Вывести разобранный код в файл----------
+     ofstream fileOut(fileNameOut, ios::binary | ios::trunc);
 
-    fileOut.close();
+     fileOut << pars.getWorkData();
+
+     fileOut.close();
 
 
-    //Код генератор
-    CodeGenerator generator;
-    generator.generate(pars.polish.get_vector_polish(),all);
-
-    // Execuatable code
-    clock_t stop = clock();
-    double elapsed = (double)(stop - start) * 1000.0 / CLOCKS_PER_SEC;
-    cout << "Time elapsed in ms: " << elapsed<<endl;
-    cout << "Time elapsed in s: " << elapsed*0.001<<endl;
+     //Код генератор
+     CodeGenerator generator;
+     generator.generate(pars.polish.get_vector_polish(),all);
 
 
     system("pause");
     return 0;
 }
 
+bool Start_program(Parser* pars)
+{
+    auto main = pars->table.find_name_func("main");
 
-
+    return main;
+}

@@ -5,7 +5,7 @@
 
 using namespace std;
 
-// В объекте хранится позиция
+// объект хранящий позицию
 struct InformPosition{
     int position_row_str;
     int position_col_char_str;
@@ -34,16 +34,46 @@ public:
 
 
     //Получить объект сохраненной позиции
-    InformPosition getPosition();
+    InformPosition getPosition() {
+        InformPosition info;
+        info.position_file_str = Get_position_file_str();
+        info.position_row_str = Get_position_row_str();
+        info.position_col_char_str = Get_position_col_char_str_();
+        info.value = Get_value();
+
+        if(info.value == 's')
+        {
+            cout << "SUM"<<endl;
+        }
+        return  info;
+    }
 
 
     bool flagEnter = false;
 
     //Установить сохранненную позицию в буфер сохренной позиции
-    bool setPosition(InformPosition oldInfoPosition);
+    bool setPosition(InformPosition oldInfoPosition) {
+        save_position_file_str_ = oldInfoPosition.position_file_str;
+        save_position_row_str_ = oldInfoPosition.position_row_str;
+        save_position_col_char_str_ = oldInfoPosition.position_col_char_str;
+        save_value_ = oldInfoPosition.value;
+
+        setSavePosition();
+
+        return  true;
+    }
 
     //Установить сохранненную позицию
-    bool setSavePosition();
+    bool setSavePosition()
+    {
+        position_file_str_      = save_position_file_str_;
+        position_row_str_       = save_position_row_str_;
+        position_col_char_str_   = save_position_col_char_str_;
+        value_ = save_value_;
+
+        flagEnter = false;
+        return true;
+    }
 
     //--------------------------------------------------------------------------
     // проверка на конец файла
